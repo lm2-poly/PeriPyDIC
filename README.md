@@ -3,11 +3,27 @@
 
 ##PD_deck class
 
+###Discretization
+
 * `PD_deck.Horizon_Factor:` The horizon factor parameter
 
 * `PD_deck.N_Delta_t:`
 
-* `PD_deck.Length:` Length of the 1D bar. 
+* `PD_deck.Final_Time:`
+
+* `PD_deck.N_Delta_x:`
+
+* `PD_deck.Length:` Length of the 1D bar.
+
+* `PD_deck.Num_Nodes:`
+
+* `PD_deck.Delta_x:`
+
+* `PD_deck.Length_Tot:`
+
+* `PD_deck.Num_TimeStep:` 
+
+* `PD_deck.x`
 
 ##Example of XML deck
 

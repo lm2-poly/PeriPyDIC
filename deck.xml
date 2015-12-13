@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
 <data>
 	<Discretization>
-			<N_Delta_x>4</N_Delta_x>
-			<N_Delta_t>3</N_Delta_t>
-			<Final_Time>1.5</Final_Time>
+			<N_Delta_x>8</N_Delta_x>
+			<N_Delta_t>20</N_Delta_t>
+			<Final_Time>5.0</Final_Time>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1</Influence_Function>
 	</Discretization>
 	<Boundary_Conditions>
-			<Force>54.0</Force>
-			<Ramp_Time>1.0</Ramp_Time>
+	        <Type>RAMP</Type>
+			<Force>40.0</Force>
+			<Ramp_Time>0.5</Ramp_Time>
 	</Boundary_Conditions>
 	<Geometry>
 			<Length>4.0</Length>
@@ -17,8 +18,10 @@
 	</Geometry>
 	<Material>
 			<E_Modulus0>4000.0</E_Modulus0>
-			<E_Modulus1>0.0</E_Modulus1>
+			<E_Modulus1>2000.0</E_Modulus1>
+			<E_Modulus2>1000.0</E_Modulus2>
 			<Relaxation_Time0>NaN</Relaxation_Time0>
-			<Relaxation_Time1>88.74</Relaxation_Time1>
+			<Relaxation_Time1>1.0</Relaxation_Time1>
+			<Relaxation_Time2>100.0</Relaxation_Time2>
 	</Material>
 </data>
