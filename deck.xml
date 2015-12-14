@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <data>
 	<Discretization>
-			<N_Delta_x>8</N_Delta_x>
-			<N_Delta_t>20</N_Delta_t>
-			<Final_Time>5.0</Final_Time>
+			<N_Delta_x>4</N_Delta_x>
+			<N_Delta_t>2</N_Delta_t>
+			<Final_Time>1.0</Final_Time>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1</Influence_Function>
 	</Discretization>
 	<Boundary_Conditions>
 	        <Type>RAMP</Type>
-			<Force>40.0</Force>
-			<Ramp_Time>2</Ramp_Time>
+			<Force>54.0</Force>
+			<Ramp_Time>1.0</Ramp_Time>
 	</Boundary_Conditions>
 	<Geometry>
 			<Length>4.0</Length>

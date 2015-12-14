@@ -24,7 +24,7 @@ class PD_problem():
         self.compute_horizon(PD_deck)
         
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
-        self.forces= Ts = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.forces = Ts = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
 
     def compute_b(self, PD_deck):       
         #Build  matrix b[row = node, column = time]
@@ -91,14 +91,13 @@ class PD_problem():
         Influence_Function = PD_deck.Influence_Function
         result = 0
         for x_p in index_x_family:
-            #print x[x_i], x[x_p], Volume, Influence_Function
             result = result + Influence_Function*(x[x_p]-x[x_i])**2 * Delta_V
         return result
         
     def compute_residual(self, y, PD_deck, forces, t_n):
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         from elastic import elastic_material
-        y[len(y)/2] = 0
+        #y[len(y)/2] = 0
         forces = elastic_material( PD_deck, self, y )
         self.update_force_data(forces, t_n)
         for x_i in range(0, len(self.x)):

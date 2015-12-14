@@ -1,9 +1,9 @@
 # Peridynamics
 
 
-##PD_deck class
+## PD_deck class
 
-###Discretization
+### Discretization
 
 * `PD_deck.Horizon_Factor:` Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
 
@@ -28,7 +28,7 @@
 
 * `PD_deck.x`
 
-##Example of XML deck
+## Example of XML deck
 
 ```XML
 <?xml version="1.0"?>

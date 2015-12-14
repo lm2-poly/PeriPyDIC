@@ -22,7 +22,7 @@ problem = PD_problem( data )
 
 y = np.zeros( ( int(data.Num_Nodes) ) )
 for x_i in range(0, int(data.Num_Nodes)):
-    y[x_i] = problem.x[x_i]
+    y[x_i] = problem.x[x_i]+0*random.random()*data.Delta_x/3
 print 'Y init'
 print y
 
@@ -31,11 +31,13 @@ print problem.x
 
 forces = elastic_material( data, problem, y )
 
-print problem.quasi_static_solver( y, data, forces )
+problem.quasi_static_solver( y, data, forces )
 
 problem.write_data_to_csv(data, problem)
 
 problem.plot_force(data)
+
+print problem.y
 
 force_plot = problem.plot_force(data)
 force_plot.show()
