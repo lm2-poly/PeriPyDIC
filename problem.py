@@ -109,7 +109,7 @@ class PD_problem():
         
     def quasi_static_solver(self, y, PD_deck, forces):
         for t_n in range(1, PD_deck.Num_TimeStep):
-            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, forces, t_n), method='krylov',jac=None,tol=1.0e-12,callback=None,options={'maxiter':1000})
+            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, forces, t_n), method='krylov',jac=False,tol=1.0e-09,callback=None,options={'maxiter':100,'xtol':1.0e-09,'xatol':1.0e-09,'ftol':1.0e-09})
             self.y[:, t_n] = solver.x
             y = solver.x
             if solver.success == "False":
@@ -146,7 +146,7 @@ class PD_problem():
     def plot_force(self, PD_deck):
         for t_n in range(1, PD_deck.Num_TimeStep):
             force_plot = plt
-            force_plot.plot(self.y[:,1], self.forces[:, t_n], '-+')
+            force_plot.plot(self.y[:,1], self.forces[:, t_n], '-+', label = t_n)
         force_plot.legend(title = "forces")
         return force_plot
         
