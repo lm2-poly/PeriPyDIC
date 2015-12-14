@@ -40,7 +40,8 @@ class PD_deck():
         #Compute the total number of timesteps
         self.Num_TimeStep = int(self.N_Delta_t + 1)
         self.Loading_Flag = str(initial_data['Boundary_Conditions']['Type'])
-        
+        self.Material_Flag = str(initial_data['Material']['Type'])
+        self.Influence_Function = float(initial_data['Discretization']['Influence_Function'])
     
     def compute_volumes(self):
         self.Surface = float(self.initial_data['Geometry']['Surface'])
@@ -56,3 +57,6 @@ class PD_deck():
         self.Force = float(self.initial_data['Boundary_Conditions']['Force'])
         self.compute_force_density()
         
+    def get_elastic_material_properties(self):
+        Modulus = float(self.initial_data['Material']['E_Modulus'])  
+        return Modulus 

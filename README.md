@@ -5,7 +5,10 @@
 
 ###Discretization
 
-* `PD_deck.Horizon_Factor:` The horizon factor parameter
+* `PD_deck.Horizon_Factor:` Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
+
+`Safety parameter:` 1.01
+
 
 * `PD_deck.N_Delta_t:`
 
@@ -17,7 +20,7 @@
 
 * `PD_deck.Num_Nodes:`
 
-* `PD_deck.Delta_x:`
+* `PD_deck.Delta_x:` 
 
 * `PD_deck.Length_Tot:`
 

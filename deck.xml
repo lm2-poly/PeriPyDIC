@@ -10,18 +10,14 @@
 	<Boundary_Conditions>
 	        <Type>RAMP</Type>
 			<Force>40.0</Force>
-			<Ramp_Time>0.5</Ramp_Time>
+			<Ramp_Time>2</Ramp_Time>
 	</Boundary_Conditions>
 	<Geometry>
 			<Length>4.0</Length>
 			<Surface>1</Surface>
 	</Geometry>
 	<Material>
-			<E_Modulus0>4000.0</E_Modulus0>
-			<E_Modulus1>2000.0</E_Modulus1>
-			<E_Modulus2>1000.0</E_Modulus2>
-			<Relaxation_Time0>NaN</Relaxation_Time0>
-			<Relaxation_Time1>1.0</Relaxation_Time1>
-			<Relaxation_Time2>100.0</Relaxation_Time2>
+	        <Type>ELASTIC</Type>
+			<E_Modulus>4000.0</E_Modulus>
 	</Material>
 </data>
