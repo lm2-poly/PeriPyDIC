@@ -3,12 +3,12 @@
 ###Dependencies
 
    The following python packages are **required**:
-* `numpy`
-* `xmltodict`
-* `scipy.optimize`
+   * `numpy`
+   * `xmltodict`
+   * `scipy.optimize`
 
    Optional packages:
-* `matplotlib.pyplot`
+   * `matplotlib.pyplot`
 
    Solve a default problem provided in the `deck.xml` by either executing the following python script in the folder where you cloned the repo, or opening a python console in the same folder and executing the following lines one by one.
 
@@ -52,9 +52,9 @@ problem.write_data_to_csv(data, problem)
 
 Open a python terminal or create a python script in the folder where the `deck.py` file is:
 
-`from deck import PD_deck` will import the *PD_deck* class.
+   `from deck import PD_deck` will import the *PD_deck* class.
 
-`data = PD_deck()` will create an object called `data` having the variables and methods of the *PD_deck* class. To create that object, the class will import data from the `deck.xml` file. It is necessary to properly fill it. The following sections explain how to do so.
+   `data = PD_deck()` will create an object called `data` having the variables and methods of the *PD_deck* class. To create that object, the class will import data from the `deck.xml` file. It is necessary to properly fill it. The following sections explain how to do so.
 
 It is possible to check the data currently loaded in the class using, for example, `data.Final_time` will show you the total duration of the simulation, or `data.Num_Nodes` to see how many PD nodes there are.
 
@@ -62,32 +62,31 @@ It is possible to check the data currently loaded in the class using, for exampl
 
 List of available parameters of the *PD_deck* class:
 
-* `PD_deck.Horizon_Factor:` Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
+   * `PD_deck.Horizon_Factor:` Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
 
-    * `Safety parameter`= 1.01
+      * `Safety parameter`= 1.01
 
+   * `PD_deck.N_Delta_t:` Total number of timesteps.
 
-* `PD_deck.N_Delta_t:` Total number of timesteps.
+   * `PD_deck.Final_Time:` Total duration of the simulation.
 
-* `PD_deck.Final_Time:` Total duration of the simulation.
+   * `PD_deck.N_Delta_x:` Total number of spatial steps.
 
-* `PD_deck.N_Delta_x:` Total number of spatial steps.
+   * `PD_deck.Length:` Length of the 1D bar.
 
-* `PD_deck.Length:` Length of the 1D bar.
+   * `PD_deck.Num_Nodes:` Total number od PD nodes.
 
-* `PD_deck.Num_Nodes:` Total number od PD nodes.
+   * `PD_deck.Delta_x:` Spatial step.
 
-* `PD_deck.Delta_x:` Spatial step.
+   * `PD_deck.Length_Tot:` Length of the bar specified by the user + additional nodes to apply the load.
 
-* `PD_deck.Length_Tot:` Length of the bar specified by the user + additional nodes to apply the load.
+   * `PD_deck.x:` Vector x containing the positions of the PD nodes centered around 0 and separated by a constant distance `PD_deck.Delta_x`.
 
-* `PD_deck.x:` Vector x containing the positions of the PD nodes centered around 0 and separated by a constant distance `PD_deck.Delta_x`.
+   * `PD_deck.Influence_Function:` Value fo the influence function provided in `deck.xml`
 
-* `PD_deck.Influence_Function:` Value fo the influence function provided in `deck.xml`
+   * `PD_deck.Loading_Flag:` Loading scheme selected by the user.
 
-* `PD_deck.Loading_Flag:` Loading scheme selected by the user.
-
-* `PD_deck.Material_Flag:` Material behaviour selected by the user.
+   * `PD_deck.Material_Flag:` Material behaviour selected by the user.
 
 ## PD_problem class
 
@@ -107,7 +106,7 @@ List of available parameters of the *PD_deck* class:
     
    * `PD_problem.x` A vector **x** of linearly distributed points on the bar. Its length is equal to `PD_deck.Num_Nodes`
 
-In order to **solve the problem** it is necessary to select a material parameter and loading it in an object called `forces` for example. This is covered in the section *elastic_material* class.
+In order to **solve the problem** it is necessary to select a material parameter and load it in an object called `forces` for example. This is covered in the section *elastic_material* class. Solving the problem is covered in *PD_problem methods* section.
 
 **After solving the problem**, the following variables are also available:
 
@@ -117,7 +116,7 @@ In order to **solve the problem** it is necessary to select a material parameter
 
 #### PD_problem methods
 
-* `PD_problem`
+   * `PD_problem`
 
 ## elastic_material class
 
