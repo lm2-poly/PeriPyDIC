@@ -23,7 +23,8 @@ data = PD_deck()
 
 problem = PD_problem( data )
 
-#Create an initial guess vector here based on a linear distribtuion of the nodes, disturbed by a small random coefficient
+#Create an initial guess vector here based on a linear distribtuion of the 
+#nodes, disturbed by a small random coefficient
 y = np.zeros( ( int(data.Num_Nodes) ) )
 #data.Num_Nodes is the total number of nodes provided by the user
 for x_i in range(0, int(data.Num_Nodes)):
@@ -39,7 +40,8 @@ problem.quasi_static_solver( y, data, forces )
 
 #Write the results to a CSV file
 problem.write_data_to_csv(data, problem)
-#The problem resolution (time step by time step) is now written in a csv file called data_csv in the current folder
+#The problem resolution (time step by time step) is now written in a 
+#csv file called data_csv in the current folder
 
 ```
 
