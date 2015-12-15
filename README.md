@@ -36,12 +36,9 @@ from problem import PD_problem
 problem = PD_problem( data )
 
 #Create an initial guess vector here based on a linear distribtuion of the 
-#nodes, disturbed by a small random coefficient
-y = np.zeros( ( int(data.Num_Nodes) ) )
-#data.Num_Nodes is the total number of nodes provided by the user
-for x_i in range(0, int(data.Num_Nodes)):
-    # problem.x contains a vector of linearly distributed nodes on the bar
-    x_0[x_i] = problem.x[x_i]+0.1*random.random()*data.Delta_x
+#nodes, disturbed by a small random coefficient using a method provided in the
+#PD_problem class
+x_0 = problem.provide_random_initial_guess( data ) 
 #x_0 is our initial guess
 
 #Load the elastic_material class and compute first step PD forces
@@ -132,6 +129,8 @@ In order to **solve the problem** it is necessary to select a material parameter
    * `PD_problem.forces` A matrix of size `PD_deck.Num_Nodes`x`PD_deck.Num_TimeStep` which records the PD forces at each PD node, at each time step.
 
 #### PD_problem methods
+
+   * `PD_problem.provide_random_initial_guess( PD_deck ) ` Takes a *PD_deck* class object and **returns** an initial guess vector which is based on the linear distribution of PD nodes on the bar, disturbed by a small random parameter. You can also make your own initial guess vector. It must be of length `PD_deck.Num_Nodes`
 
    * `PD_problem.quasi_static_solver( x_0, PD_deck, elastic_material )` Takes an initial guess vector **x_0** of length `PD_deck.Num_Nodes`, a *PD_deck* class object and an *elastic_material* class ibject. **It solves the problem** and provides the `PD_problem.y` and `PD_problem.forces` variables.
    

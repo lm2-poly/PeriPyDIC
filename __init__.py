@@ -20,18 +20,19 @@ data = PD_deck()
 
 problem = PD_problem( data )
 
-y = np.zeros( ( int(data.Num_Nodes) ) )
-for x_i in range(0, int(data.Num_Nodes)):
-    y[x_i] = problem.x[x_i]+0.1*random.random()*data.Delta_x
-print 'Y init'
-print y
+x_0 = problem.provide_random_initial_guess( data ) 
+#y = np.zeros( ( int(data.Num_Nodes) ) )
+#for x_i in range(0, int(data.Num_Nodes)):
+#    y[x_i] = problem.x[x_i]+0.1*random.random()*data.Delta_x
+#print 'Y init'
+#print y
 
-print "X"
-print problem.x
+#print "X"
+#print problem.x
 
-forces = elastic_material( data, problem, y )
+forces = elastic_material( data, problem, x_0 )
 
-problem.quasi_static_solver( y, data, forces )
+problem.quasi_static_solver( x_0, data, forces )
 
 problem.write_data_to_csv(data, problem)
 

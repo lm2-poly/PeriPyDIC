@@ -12,6 +12,7 @@ from deck import PD_deck
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +118,12 @@ class PD_problem():
             else:
                 logger.info( t_n, solver.success )
         return solver
+        
+    def provide_random_initial_guess( self, PD_deck ):
+        y = np.zeros( ( int(PD_deck.Num_Nodes) ) )
+        for x_i in range(0, int(PD_deck.Num_Nodes)):
+            y[x_i] = self.x[x_i]+0.1*random.random()*PD_deck.Delta_x
+        return y
         
     def write_data_to_csv(self, PD_deck, PD_problem):
         f = open('data_csv', 'wr+')
