@@ -59,7 +59,7 @@ Open a python terminal or create a python script in the folder where the `deck.p
 
 It is possible to check the data currently loaded in the class using, for example, `data.Final_time` will show you the total duration of the simulation, or `data.Num_Nodes` to see how many PD nodes there are.
 
-   #### PD_deck variables
+#### PD_deck variables
 
    List of available parameters of the *PD_deck* class:
 
@@ -117,9 +117,9 @@ In order to **solve the problem** it is necessary to select a material parameter
 
 #### PD_problem methods
 
-   * `PD_problem.quasi_static_solver( y, PD_deck, elastic_material )`
+   * `PD_problem.quasi_static_solver( y, PD_deck, elastic_material )` Takes an initial guess vector **y** of length `PD_deck.Num_Nodes`, a *PD_deck* class object and an *elastic_material* class ibject. **It solves the problem** and provides the `PD_problem.y` and `PD_problem.forces` variables.
    
-   * `PD_problem.write_data_to_csv( PD_deck, PD_problem )`
+   * `PD_problem.write_data_to_csv( PD_deck, PD_problem )` Takes a *PD_deck* class object and a *PD_problem* class object and writes the result of the solved problem in a csv file `data_csv`. This method is **not available before solving the problem**.
 
 ## elastic_material class
 
