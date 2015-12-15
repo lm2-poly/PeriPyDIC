@@ -106,7 +106,7 @@ List of available parameters of the *PD_deck* class:
     
    * `PD_problem.x` A vector **x** of linearly distributed points on the bar. Its length is equal to `PD_deck.Num_Nodes`
 
-In order to **solve the problem** it is necessary to select a material parameter and load it in an object called `forces` for example. This is covered in the section *elastic_material* class. Solving the problem is covered in [PD_problem methods](https://github.com/joydisee/peridynamics_viscoelasticity_1D#pd_problem-methods) section.
+In order to **solve the problem** it is necessary to select a material parameter and load it in an object called `forces` for example. This is covered in the section [elastic_material](https://github.com/joydisee/peridynamics_viscoelasticity_1D#elastic_material-class) class. Solving the problem is covered in [PD_problem methods](https://github.com/joydisee/peridynamics_viscoelasticity_1D#pd_problem-methods) section.
 
 **After solving the problem**, the following variables are also available:
 
