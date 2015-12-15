@@ -10,7 +10,7 @@
    Optional packages:
    * `matplotlib.pyplot`
 
-####Basic script
+###Basic script
 Solve a default problem provided in the `deck.xml` by either executing the following python script in the folder where you cloned the repo, or opening a python console in the same folder and executing the following lines one by one.
 
 ```python
@@ -59,9 +59,9 @@ Open a python terminal or create a python script in the folder where the `deck.p
 
 It is possible to check the data currently loaded in the class using, for example, `data.Final_time` will show you the total duration of the simulation, or `data.Num_Nodes` to see how many PD nodes there are.
 
-#### PD_deck variables
+   #### PD_deck variables
 
-List of available parameters of the *PD_deck* class:
+   List of available parameters of the *PD_deck* class:
 
    * `PD_deck.Horizon_Factor:` Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
 
