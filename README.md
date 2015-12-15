@@ -10,7 +10,7 @@
    Optional packages:
    * `matplotlib.pyplot`
 
-   Solve a default problem provided in the `deck.xml` by either executing the following python script in the folder where you cloned the repo, or opening a python console in the same folder and executing the following lines one by one.
+Solve a default problem provided in the `deck.xml` by either executing the following python script in the folder where you cloned the repo, or opening a python console in the same folder and executing the following lines one by one.
 
 ```python
 import numpy as np
