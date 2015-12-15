@@ -12,7 +12,7 @@
 
    Solve a default problem provided in the `deck.xml` by either executing the following python script in the folder where you cloned the repo, or opening a python console in the same folder and executing the following lines one by one.
 
-```
+```python
 from deck import PD_deck
 from problem import PD_problem
 from elastic import elastic_material
