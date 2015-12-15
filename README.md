@@ -7,11 +7,11 @@ Open a python terminal or create a python script in the folder where the `deck.p
 
 `from deck import PD_deck` will import the *PD_deck* class.
 
-`data = PD_deck()` will create an object called `data` having the attributes and methods of the *PD_deck* class. To create that object, the class will import data from the `deck.xml` file. It is necessary to properly fill it. The following sections explain how to do so.
+`data = PD_deck()` will create an object called `data` having the variables and methods of the *PD_deck* class. To create that object, the class will import data from the `deck.xml` file. It is necessary to properly fill it. The following sections explain how to do so.
 
 It is possible to check the data currently loaded in the class using, for example, `data.Final_time` will show you the total duration of the simulation, or `data.Num_Nodes` to see how many PD nodes there are.
 
-### Discretization
+#### Variables
 
 * `PD_deck.Horizon_Factor:` Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
 
