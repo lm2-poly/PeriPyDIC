@@ -140,7 +140,7 @@ In order to **solve the problem** it is necessary to select a material parameter
 
    `from elastic import elastic_material` will import the *elastic_material* class.
    
-   `forces = elastic_material( data, problem, x_0  )` will create a `forces` object which is an *elastic_material* class. It needs a `data` object of class *PD_deck*, a `problem` object of class *PD_problem* and an initial guess vector **x_0**(the (Basic script)[https://github.com/joydisee/peridynamics_viscoelasticity_1D#basic-script] shows an example of initial guess vector **x_0**).
+   `forces = elastic_material( data, problem, x_0  )` will create a `forces` object which is an *elastic_material* class. It needs a `data` object of class *PD_deck*, a `problem` object of class *PD_problem* and an initial guess vector **x_0**(the [Basic script](https://github.com/joydisee/peridynamics_viscoelasticity_1D#basic-script] shows an example of initial guess vector **x_0**)).
    
    The material behavior is now selected, it is now possible to solve the problem.
 
