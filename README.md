@@ -2,7 +2,7 @@
 
    Consider a 1D bar. The length of the bar and the number of sections in which the bar will be divided (the Peridynamic (PD) nodes are at the edges of each section) are provided by the user.
    
-   A ramp loading is applied at the edges of the bar. The user provide the number of seconds after which the ramp reaches a maximal force value and remains there.
+   A ramp loading is applied at the edges of the bar. The user provides the number of seconds after which the ramp reaches a maximal force value and remains there.
    Additional blocks are added at the edges of the block in order to apply the load. The number of blocks added at each edge of the bar is provided as the Horizon Factor.
    The user also provides the total duration of the simulation and the total number of time steps desired.
    
