@@ -31,15 +31,21 @@ y = np.zeros( ( int(data.Num_Nodes) ) )
 #data.Num_Nodes is the total number of nodes provided by the user
 for x_i in range(0, int(data.Num_Nodes)):
     # problem.x contains a vector of linearly distributed nodes on the bar
-    y[x_i] = problem.x[x_i]+0.1*random.random()*data.Delta_x
-#y is our initial guess
+    x_0[x_i] = problem.x[x_i]+0.1*random.random()*data.Delta_x
+#x_0 is our initial guess
 
 #Load the elastic_material class and compute first step PD forces
 from elastic import elastic_material
-forces = elastic_material( data, problem, y )
+forces = elastic_material( data, problem, x_0 )
 
 #Solve the problem
-problem.quasi_static_solver( y, data, forces )
+problem.quasi_static_solver( x_0, data, forces )
+
+#Check the position of PD nodes at the 3rd time step
+print problem.y[:, 3]
+
+#Check the PD force value at each node at the 5th time step
+print problem.forces[:, 5]
 
 #Write the results to a CSV file
 problem.write_data_to_csv(data, problem)
