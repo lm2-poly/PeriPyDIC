@@ -2,7 +2,8 @@
 """
 Created on Sun Dec 13 12:50:28 2015
 
-@author: ilyass
+@author: ilyass.tabiai@gmail.com
+@author: rolland.delorme@gmail.com
 """
 
 import logging
@@ -26,7 +27,9 @@ class PD_problem():
         
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.forces = Ts = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
-
+    
+    #Creates a loading vector b which describes the force applied on each node
+    #at any time step
     def compute_b(self, PD_deck):       
         #Build  matrix b[row = node, column = time]
         b = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )   
@@ -42,14 +45,16 @@ class PD_problem():
         else:
             logger.error("There is a problem with the Boundary Conditions in your XML deck.")
         self.b = b
-        
+    
+    #Creates a vector of linearly distributed nodes along the bar
     def get_pd_nodes(self, PD_deck):
         # Define x
         x = np.zeros( PD_deck.Num_Nodes )    
         for i in range(0, PD_deck.Num_Nodes):
             x[i] = -PD_deck.Length_Tot/2 + i * PD_deck.Delta_x
         self.x = x
-        
+    
+    #Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):     
         Time_t = PD_deck.Delta_t*t_n
         for x_i in range(0, int(PD_deck.Num_Nodes)):
@@ -59,12 +64,14 @@ class PD_problem():
             else:
                 result = PD_deck.Force_Density
                 return result
-            
+   
+    #Computes the horizon        
     def compute_horizon(self, PD_deck):
         #Be sure that points are IN the horizon
         safety_small_fraction = 1.01
         self.Horizon = PD_deck.Horizon_Factor*PD_deck.Delta_x*safety_small_fraction
-        
+    
+    #Returns a list of addresses of the neighbors of a point x_i
     def get_index_x_family(self, x, x_i):
         x_family = []
         for x_p in range(0, len(x)):
@@ -76,7 +83,8 @@ class PD_problem():
             else:
                 pass
         return x_family
-        
+    
+    #Computes the shape tensor (here a scalar) for each node    
     def compute_m(self, Num_Nodes, y_n):         
         M = np.zeros( (int(Num_Nodes), int(Num_Nodes)) )
         for x_i in range(0, len(self.x)):
@@ -84,7 +92,8 @@ class PD_problem():
             for x_p in index_x_family:
                 M[x_i, x_p] = (y_n[x_p] - y_n[x_i]) / np.absolute(y_n[x_p] - y_n[x_i])
         return M
-        
+    
+    #Computes the weights for each PD node
     def weighted_function(self, PD_deck, x, x_i):
         Horizon = self.compute_horizon(PD_deck)
         index_x_family = self.get_index_x_family( x, x_i )
@@ -94,7 +103,8 @@ class PD_problem():
         for x_p in index_x_family:
             result = result + Influence_Function*(x[x_p]-x[x_i])**2 * Delta_V
         return result
-        
+    
+    #Comutes the residual vector used in the quasi_static_solver function
     def compute_residual(self, y, PD_deck, forces, t_n):
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         from elastic import elastic_material
@@ -104,10 +114,14 @@ class PD_problem():
         for x_i in range(0, len(self.x)):
             residual[x_i] = forces.Ts[x_i] + self.b[x_i, t_n]
         return residual
-        
+    
+    #Records the force vector at each time step
     def update_force_data(self, forces, t_n):    
         self.forces[:, t_n] = forces.Ts
-        
+    
+    #This functtion solves the problem at each time step, using the previous
+    #time step solution as an initial guess
+    #This function calls the compute_residual function
     def quasi_static_solver(self, y, PD_deck, forces):
         for t_n in range(1, PD_deck.Num_TimeStep):
             solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, forces, t_n), method='krylov',jac=False,tol=1.0e-09,callback=None,options={'maxiter':100,'xtol':1.0e-09,'xatol':1.0e-09,'ftol':1.0e-09})
@@ -118,13 +132,18 @@ class PD_problem():
             else:
                 logger.info( t_n, solver.success )
         return solver
-        
+    
+    #Provides a random initial guess based on a linear distribution of the 
+    #nodes along the bar and disturbs it by a small random parameter for each 
+    #node, in order to provide an acceptable initial guess
     def provide_random_initial_guess( self, PD_deck ):
         y = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         for x_i in range(0, int(PD_deck.Num_Nodes)):
             y[x_i] = self.x[x_i]+0.1*random.random()*PD_deck.Delta_x
         return y
-        
+    
+    #Exports the data to a CSV file
+    #Sill needs work...
     def write_data_to_csv(self, PD_deck, PD_problem):
         f = open('data_csv', 'wr+')
         for t_n in range(1, PD_deck.Num_TimeStep):

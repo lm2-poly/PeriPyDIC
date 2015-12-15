@@ -2,42 +2,45 @@
 """
 Created on Fri Dec 11 19:24:33 2015
 
-@author: ilyass
+@author: ilyass.tabiai@gmail.com
+@author: rolland.delorme@gmail.com
 """
-
 #from Class_1D-PD-elastic-problem import PD_1D_elastic_problem
-from deck import PD_deck
-from problem import PD_problem
-from elastic import elastic_material
-import numpy as np
 import logging
-import random
-
-
 logger = logging.getLogger(__name__)
 
+import numpy as np
+import random
+
+#Load the PD_deck class and create a PD_deck object
+from deck import PD_deck
 data = PD_deck()
 
+#Load the PD_problem class and create a PD_problem object
+from problem import PD_problem
 problem = PD_problem( data )
 
+#Create an initial guess vector here based on a linear distribtuion of the 
+#nodes, disturbed by a small random coefficient using a method provided in the
+#PD_problem class
 x_0 = problem.provide_random_initial_guess( data ) 
-#y = np.zeros( ( int(data.Num_Nodes) ) )
-#for x_i in range(0, int(data.Num_Nodes)):
-#    y[x_i] = problem.x[x_i]+0.1*random.random()*data.Delta_x
-#print 'Y init'
-#print y
+#x_0 is our initial guess
 
-#print "X"
-#print problem.x
-
+#Load the elastic_material class and compute first step PD forces
+from elastic import elastic_material
 forces = elastic_material( data, problem, x_0 )
 
+#Solve the problem
 problem.quasi_static_solver( x_0, data, forces )
 
+#Check the position of PD nodes at the 3rd time step
+print problem.y[:, 3]
+
+#Check the PD force value at each node at the 5th time step
+print problem.forces[:, 5]
+
+#Write the results to a CSV file
 problem.write_data_to_csv(data, problem)
+#The problem resolution (time step by time step) is now written in a 
+#csv file called data_csv in the current folder
 
-
-print problem.y
-
-#force_plot = problem.plot_force(data)
-#force_plot.show()

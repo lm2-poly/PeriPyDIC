@@ -2,7 +2,8 @@
 """
 Created on Sun Dec 13 16:16:07 2015
 
-@author: ilyass
+@author: ilyass.tabiai@gmail.com
+@author: rolland.delorme@gmail.com
 """
 from deck import PD_deck
 from problem import PD_problem
@@ -17,7 +18,9 @@ class elastic_material():
         self.compute_T(PD_deck, PD_problem, y)
         self.compute_Ts(PD_deck, PD_problem)
         
-        
+    #Computes the deformations using the current positions and initial 
+    #positions of each node
+    #Reminder: y[xi, t] = x[xi] + u[xi, t]
     def compute_ext_state(self, PD_deck, PD_problem, y):        
         # Initialization for e
         e = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes)) )    
@@ -28,7 +31,7 @@ class elastic_material():
                 e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(PD_problem.x[x_p] - PD_problem.x[x_i])
         self.e = e
         return e
-
+    
     def compute_T(self, PD_deck, PD_problem, y):
         w = PD_deck.Influence_Function
         e = self.compute_ext_state(PD_deck, PD_problem, y)
