@@ -117,15 +117,20 @@ In order to **solve the problem** it is necessary to select a material parameter
 
 #### PD_problem methods
 
-   * `PD_problem.quasi_static_solver( y, PD_deck, elastic_material )` Takes an initial guess vector **y** of length `PD_deck.Num_Nodes`, a *PD_deck* class object and an *elastic_material* class ibject. **It solves the problem** and provides the `PD_problem.y` and `PD_problem.forces` variables.
+   * `PD_problem.quasi_static_solver( x_0, PD_deck, elastic_material )` Takes an initial guess vector **x_0** of length `PD_deck.Num_Nodes`, a *PD_deck* class object and an *elastic_material* class ibject. **It solves the problem** and provides the `PD_problem.y` and `PD_problem.forces` variables.
    
    * `PD_problem.write_data_to_csv( PD_deck, PD_problem )` Takes a *PD_deck* class object and a *PD_problem* class object and writes the result of the solved problem in a csv file `data_csv`. This method is **not available before solving the problem**.
 
 ## elastic_material class
 
+   `from elastic import elastic_material` will import the *elastic_material* class.
+   
+   `forces = elastic_material( data, problem, x_0  )` will create a `forces` object which is an *elastic_material* class. It needs a `data` object of class *PD_deck*, a `problem` object of class *PD_problem* and an initial guess vector **x_0**(the (Basic script)[https://github.com/joydisee/peridynamics_viscoelasticity_1D#basic-script] shows an example of initial guess vector **x_0**).
+   
+   The material behavior is now selected, it is now possible to solve the problem.
 
 
-## Example of XML deck
+## XML deck description
 
 ```XML
 <?xml version="1.0"?>
