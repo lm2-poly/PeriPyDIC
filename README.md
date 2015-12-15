@@ -13,14 +13,15 @@
    Solve a default problem provided in the `deck.xml` by either executing the following python script in the folder where you cloned the repo, or opening a python console in the same folder and executing the following lines one by one.
 
 ```python
-from deck import PD_deck
-from problem import PD_problem
-from elastic import elastic_material
 import numpy as np
 import random
 
+#Load the PD_deck class and create a PD_deck object
+from deck import PD_deck
 data = PD_deck()
 
+#Load the PD_problem class and create a PD_problem object
+from problem import PD_problem
 problem = PD_problem( data )
 
 #Create an initial guess vector here based on a linear distribtuion of the 
@@ -32,7 +33,8 @@ for x_i in range(0, int(data.Num_Nodes)):
     y[x_i] = problem.x[x_i]+0.1*random.random()*data.Delta_x
 #y is our initial guess
 
-#Compute PD forces
+#Load the elastic_material class and compute first step PD forces
+from elastic import elastic_material
 forces = elastic_material( data, problem, y )
 
 #Solve the problem
@@ -56,7 +58,9 @@ Open a python terminal or create a python script in the folder where the `deck.p
 
 It is possible to check the data currently loaded in the class using, for example, `data.Final_time` will show you the total duration of the simulation, or `data.Num_Nodes` to see how many PD nodes there are.
 
-#### Variables
+#### PD_deck variables
+
+List of available parameters of the *PD_deck* class:
 
 * `PD_deck.Horizon_Factor:` Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
 
@@ -84,6 +88,39 @@ It is possible to check the data currently loaded in the class using, for exampl
 * `PD_deck.Loading_Flag:` Loading scheme selected by the user.
 
 * `PD_deck.Material_Flag:` Material behaviour selected by the user.
+
+## PD_problem class
+
+   `from problem import PD_problem` will import the *PD_problem* class.
+   
+   `problem = PD_problem( data )` will create a `problem` object which is a *PD_prolem* class.
+   
+   The problem is now loaded and it is possible to check some of its parameters 
+   ( `PD_problem.b`, `PD_problem.Horizon`, `PD_problem.x` ). In order to solve the problem, it is necessary to select a material behavior class and provide an initial guess vector.
+   
+#### PD_problem variables
+
+   * `PD_problem.b` External load vector **b**. Its length is equal to the total number of PD nodes `PD_deck.Num_Nodes`
+
+   * `PD_problem.Horizon` This parameter is Horizon = Horizon\_Factor X `PD_deck.Delta_x` X `Safety parameter`
+    * `Safety parameter`= 1.01
+    
+   * `PD_problem.x` A vector **x** of linearly distributed points on the bar. Its length is equal to `PD_deck.Num_Nodes`
+
+In order to **solve the problem** it is necessary to select a material parameter and loading it in an object called `forces` for example. This is covered in the section *elastic_material* class.
+
+**After solving the problem**, the following variables are also available:
+
+   * `PD_problem.y` A matrix of size `PD_deck.Num_Nodes`x`PD_deck.Num_TimeStep` which records the position of each PD node at each time step.
+
+   * `PD_problem.forces` A matrix of size `PD_deck.Num_Nodes`x`PD_deck.Num_TimeStep` which records the PD forces at each PD node, at each time step.
+
+#### PD_problem methods
+
+* `PD_problem`
+
+## elastic_material class
+
 
 ## Example of XML deck
 
