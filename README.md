@@ -195,4 +195,5 @@ In order to **solve the problem** it is necessary to select a material parameter
 
 * `<Type>` Currently, only the `ELASTIC` material is avilable.
     * `<E_Modulus>` Value of the 1D elastic modulus.
-*
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">peridynamics_1D</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://iltabiai.github.io/" property="cc:attributionName" rel="cc:attributionURL">Ilyass Tabiai, Rolland Delorme</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.<br />Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="http://dx.doi.org/10.1016/S0022-5096(99)00029-0" rel="dct:source">http://dx.doi.org/10.1016/S0022-5096(99)00029-0</a>.
