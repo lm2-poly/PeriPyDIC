@@ -41,12 +41,9 @@ problem = PD_problem( data )
 x_0 = problem.provide_random_initial_guess( data ) 
 #x_0 is our initial guess
 
-#Load the elastic_material class and compute first step PD forces
-from elastic import elastic_material
-forces = elastic_material( data, problem, x_0 )
-
-#Solve the problem
-problem.quasi_static_solver( x_0, data, forces )
+#Solve the problem, the material behavior model provided in the deck.xml
+#will be used
+problem.quasi_static_solver( x_0, data )
 
 #Check the position of PD nodes at the 3rd time step
 print problem.y[:, 3]
@@ -109,7 +106,7 @@ It is possible to check the data currently loaded in the class using, for exampl
    `problem = PD_problem( data )` will create a `problem` object which is a *PD_prolem* class.
    
    The problem is now loaded and it is possible to check some of its parameters 
-   ( `PD_problem.b`, `PD_problem.Horizon`, `PD_problem.x` ). In order to solve the problem, it is necessary to select a material behavior class and provide an initial guess vector.
+   ( `PD_problem.b`, `PD_problem.Horizon`, `PD_problem.x` ). In order to solve the problem, it is necessary to provide an initial guess vector.
    
 #### PD_problem variables
 
@@ -120,7 +117,7 @@ It is possible to check the data currently loaded in the class using, for exampl
     
    * `PD_problem.x` A vector **x** of linearly distributed points on the bar. Its length is equal to `PD_deck.Num_Nodes`
 
-In order to **solve the problem** it is necessary to select a material parameter and load it in an object called `forces` for example. This is covered in the section [elastic_material](https://github.com/joydisee/peridynamics_viscoelasticity_1D#elastic_material-class) class. Solving the problem is covered in [PD_problem methods](https://github.com/joydisee/peridynamics_viscoelasticity_1D#pd_problem-methods) section.
+**Solving the problem** is convered in [PD_problem methods](https://github.com/joydisee/peridynamics_viscoelasticity_1D#pd_problem-methods).
 
 **After solving the problem**, the following variables are also available:
 
@@ -132,7 +129,7 @@ In order to **solve the problem** it is necessary to select a material parameter
 
    * `PD_problem.provide_random_initial_guess( PD_deck ) ` Takes a *PD_deck* class object and **returns** an initial guess vector which is based on the linear distribution of PD nodes on the bar, disturbed by a small random parameter. You can also make your own initial guess vector. It must be of length `PD_deck.Num_Nodes`
 
-   * `PD_problem.quasi_static_solver( x_0, PD_deck, elastic_material )` Takes an initial guess vector **x_0** of length `PD_deck.Num_Nodes`, a *PD_deck* class object and an *elastic_material* class ibject. **It solves the problem** and provides the `PD_problem.y` and `PD_problem.forces` variables.
+   * `PD_problem.quasi_static_solver( x_0, PD_deck )` Takes an initial guess vector **x_0** of length `PD_deck.Num_Nodes` and a *PD_deck* class object. **It solves the problem** and provides the `PD_problem.y` and `PD_problem.forces` variables.
    
    * `PD_problem.write_data_to_csv( PD_deck, PD_problem )` Takes a *PD_deck* class object and a *PD_problem* class object and writes the result of the solved problem in a csv file `data_csv`. This method is **not available before solving the problem**.
 
@@ -140,10 +137,18 @@ In order to **solve the problem** it is necessary to select a material parameter
 
    `from elastic import elastic_material` will import the *elastic_material* class.
    
-   `forces = elastic_material( data, problem, x_0  )` will create a `forces` object which is an *elastic_material* class. It needs a `data` object of class *PD_deck*, a `problem` object of class *PD_problem* and an initial guess vector **x_0**(the [Basic script](https://github.com/joydisee/peridynamics_viscoelasticity_1D#basic-script] shows an example of initial guess vector **x_0**)).
+   `forces = elastic_material( data, problem, y  )` will create a `forces` object which is an *elastic_material* class. It needs a `data` object of class *PD_deck*, a `problem` object of class *PD_problem* and a position vector **y**. It is not necessary for the user to interact with this class.
+   It can be used to compute PD forces for any given positions **y** of the PD nodes. After creating a *PD_deck* object and a *PD_problem* project, you can create a vector **y** of length `PD_deck.Num_Nodes` and then create a `forces = elastic_material( data, problem, y  )`. It is then possible to check the *elastic_material* variables.
    
-   The material behavior is now selected, it is now possible to solve the problem.
+#### elastic_material class variables
 
+   * `elastic_material.e` A matrix ( `PD_deck.Num_Nodes`, Horizon\_Factor X `PD_deck.Delta_x` ) that provides the deformation of each point relatively to the nodes in its family.
+   
+   * `elastic_material.T`
+   
+   * `elastic_material.Ts` A vector of length `PD_deck.Num_Nodes` which contains the PD forces value at each PD node.
+   
+   
 
 ## XML deck description
 

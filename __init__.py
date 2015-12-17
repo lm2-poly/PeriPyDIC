@@ -27,11 +27,11 @@ x_0 = problem.provide_random_initial_guess( data )
 #x_0 is our initial guess
 
 #Load the elastic_material class and compute first step PD forces
-from elastic import elastic_material
-forces = elastic_material( data, problem, x_0 )
+#from elastic import elastic_material
+#forces = elastic_material( data, problem, x_0 )
 
 #Solve the problem
-problem.quasi_static_solver( x_0, data, forces )
+problem.quasi_static_solver( x_0, data )
 
 #Check the position of PD nodes at the 3rd time step
 print problem.y[:, 3]

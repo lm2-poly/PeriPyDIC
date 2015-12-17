@@ -105,7 +105,7 @@ class PD_problem():
         return result
     
     #Comutes the residual vector used in the quasi_static_solver function
-    def compute_residual(self, y, PD_deck, forces, t_n):
+    def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         from elastic import elastic_material
         #y[len(y)/2] = 0
@@ -122,9 +122,9 @@ class PD_problem():
     #This functtion solves the problem at each time step, using the previous
     #time step solution as an initial guess
     #This function calls the compute_residual function
-    def quasi_static_solver(self, y, PD_deck, forces):
+    def quasi_static_solver(self, y, PD_deck):
         for t_n in range(1, PD_deck.Num_TimeStep):
-            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, forces, t_n), method='krylov',jac=False,tol=1.0e-09,callback=None,options={'maxiter':100,'xtol':1.0e-09,'xatol':1.0e-09,'ftol':1.0e-09})
+            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov',jac=None,tol=1.0e-09,callback=None,options={'maxiter':1000,'xtol':1.0e-09,'xatol':1.0e-09,'ftol':1.0e-09})
             self.y[:, t_n] = solver.x
             y = solver.x
             if solver.success == "False":
@@ -139,7 +139,7 @@ class PD_problem():
     def provide_random_initial_guess( self, PD_deck ):
         y = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         for x_i in range(0, int(PD_deck.Num_Nodes)):
-            y[x_i] = self.x[x_i]+0.1*random.random()*PD_deck.Delta_x
+            y[x_i] = self.x[x_i]+0.3*random.random()*PD_deck.Delta_x
         return y
     
     #Exports the data to a CSV file

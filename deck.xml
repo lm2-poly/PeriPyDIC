@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <data>
 	<Discretization>
-			<N_Delta_x>10</N_Delta_x>
+			<N_Delta_x>5</N_Delta_x>
 			<N_Delta_t>12</N_Delta_t>
 			<Final_Time>6.0</Final_Time>
 			<Horizon_Factor>1</Horizon_Factor>
@@ -9,7 +9,7 @@
 	</Discretization>
 	<Boundary_Conditions>
 	        <Type>RAMP</Type>
-			<Force>54.0</Force>
+			<Force>20.0</Force>
 			<Ramp_Time>5.5</Ramp_Time>
 	</Boundary_Conditions>
 	<Geometry>
@@ -18,6 +18,6 @@
 	</Geometry>
 	<Material>
 	        <Type>ELASTIC</Type>
-			<E_Modulus>4000.0</E_Modulus>
+			<E_Modulus>2000.0</E_Modulus>
 	</Material>
 </data>
