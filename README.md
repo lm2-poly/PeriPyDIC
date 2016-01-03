@@ -85,7 +85,7 @@ It is possible to check the data currently loaded in the class using, for exampl
 
    * `PD_deck.Length:` Length of the 1D bar.
 
-   * `PD_deck.Num_Nodes:` Total number od PD nodes.
+   * `PD_deck.Num_Nodes:` Total number of PD nodes.
 
    * `PD_deck.Delta_x:` Spatial step.
 
@@ -93,7 +93,7 @@ It is possible to check the data currently loaded in the class using, for exampl
 
    * `PD_deck.x:` Vector x containing the positions of the PD nodes centered around 0 and separated by a constant distance `PD_deck.Delta_x`.
 
-   * `PD_deck.Influence_Function:` Value fo the influence function provided in `deck.xml`
+   * `PD_deck.Influence_Function:` Value of the influence function provided in `deck.xml`
 
    * `PD_deck.Loading_Flag:` Loading scheme selected by the user.
 
