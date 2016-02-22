@@ -26,6 +26,7 @@ class PD_problem():
         self.compute_horizon(PD_deck)
         
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.y[:,0] = self.x
         self.forces = Ts = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
     
     #Creates a loading vector b which describes the force applied on each node
@@ -36,14 +37,11 @@ class PD_problem():
         PD_deck.get_parameters_loading_ramp()
         if PD_deck.Loading_Flag == "RAMP":
             PD_deck.get_parameters_loading_ramp()
-            for x_i in range(0, PD_deck.Horizon_Factor):
-                for t_n in range(1, int(PD_deck.Num_TimeStep)):
-                    b[x_i, t_n] = - self.ramp_loading( PD_deck, t_n )
-            for x_i in range(len(self.x) - PD_deck.Horizon_Factor, len(self.x) ):
-                for t_n in range(1, int(PD_deck.Num_TimeStep)):
-                    b[x_i, t_n] = self.ramp_loading( PD_deck, t_n )
+            for t_n in range(1, int(PD_deck.Num_TimeStep)):
+                b[len(self.x) - PD_deck.Horizon_Factor, t_n] = self.ramp_loading( PD_deck, t_n )
         else:
             logger.error("There is a problem with the Boundary Conditions in your XML deck.")
+        #print b
         self.b = b
     
     #Creates a vector of linearly distributed nodes along the bar
@@ -51,7 +49,8 @@ class PD_problem():
         # Define x
         x = np.zeros( PD_deck.Num_Nodes )    
         for i in range(0, PD_deck.Num_Nodes):
-            x[i] = -PD_deck.Length_Tot/2 + i * PD_deck.Delta_x
+            x[i] = i * PD_deck.Delta_x
+        #print x
         self.x = x
     
     #Provides ramp force values to compute the load vector b
@@ -108,11 +107,12 @@ class PD_problem():
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         from elastic import elastic_material
-        #y[len(y)/2] = 0
+        y[0] = 0
         forces = elastic_material( PD_deck, self, y )
         self.update_force_data(forces, t_n)
-        for x_i in range(0, len(self.x)):
+        for x_i in range(1, len(self.x)):
             residual[x_i] = forces.Ts[x_i] + self.b[x_i, t_n]
+        #print residual
         return residual
     
     #Records the force vector at each time step
@@ -124,13 +124,14 @@ class PD_problem():
     #This function calls the compute_residual function
     def quasi_static_solver(self, y, PD_deck):
         for t_n in range(1, PD_deck.Num_TimeStep):
-            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov',jac=None,tol=1.0e-09,callback=None,options={'maxiter':1000,'xtol':1.0e-09,'xatol':1.0e-09,'ftol':1.0e-09})
+            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov',jac=None,tol=1.0e-12,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
             self.y[:, t_n] = solver.x
-            y = solver.x
+            y = solver.x + 0.1*random.uniform(-1,1)*PD_deck.Delta_x
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
             else:
                 logger.info( t_n, solver.success )
+            #print solver
         return solver
     
     #Provides a random initial guess based on a linear distribution of the 
@@ -138,8 +139,8 @@ class PD_problem():
     #node, in order to provide an acceptable initial guess
     def provide_random_initial_guess( self, PD_deck ):
         y = np.zeros( ( int(PD_deck.Num_Nodes) ) )
-        for x_i in range(0, int(PD_deck.Num_Nodes)):
-            y[x_i] = self.x[x_i]+0.3*random.random()*PD_deck.Delta_x
+        for x_i in range(1, int(PD_deck.Num_Nodes)):
+            y[x_i] = self.x[x_i]+0.25*random.uniform(-1,1)*PD_deck.Delta_x
         return y
     
     #Exports the data to a CSV file

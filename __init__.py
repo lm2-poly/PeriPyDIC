@@ -25,6 +25,7 @@ problem = PD_problem( data )
 #PD_problem class
 x_0 = problem.provide_random_initial_guess( data ) 
 #x_0 is our initial guess
+#print x_0
 
 #Load the elastic_material class and compute first step PD forces
 #from elastic import elastic_material
@@ -33,11 +34,10 @@ x_0 = problem.provide_random_initial_guess( data )
 #Solve the problem
 problem.quasi_static_solver( x_0, data )
 
-#Check the position of PD nodes at the 3rd time step
-print problem.y[:, 3]
-
+#Check the position of PD nodes
+print np.around(problem.y,decimals=3)
 #Check the PD force value at each node at the 5th time step
-print problem.forces[:, 5]
+#print problem.forces[:, 5]
 
 #Write the results to a CSV file
 problem.write_data_to_csv(data, problem)
