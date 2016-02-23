@@ -13,7 +13,8 @@ import numpy as np
 import random
 
 #Load the PD_deck class and create a PD_deck object
-from deck import PD_deck
+#from deck_elas import PD_deck
+from deck_visco import PD_deck
 data = PD_deck()
 
 #Load the PD_problem class and create a PD_problem object
@@ -35,7 +36,7 @@ x_0 = problem.provide_random_initial_guess( data )
 problem.quasi_static_solver( x_0, data )
 
 #Check the position of PD nodes
-print np.around(problem.y,decimals=3)
+print np.around(problem.y,decimals=5)
 #Check the PD force value at each node at the 5th time step
 #print problem.forces[:, 5]
 

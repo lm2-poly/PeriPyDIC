@@ -9,7 +9,8 @@ Created on Sun Dec 13 12:50:28 2015
 import logging
 from scipy.optimize import fsolve
 import timeit
-from deck import PD_deck
+#from deck_elas import PD_deck
+from deck_visco import PD_deck
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
@@ -27,7 +28,11 @@ class PD_problem():
         
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.y[:,0] = self.x
-        self.forces = Ts = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.forces = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.ext = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        #For viscoelasticity
+        self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
+        self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) ) 
     
     #Creates a loading vector b which describes the force applied on each node
     #at any time step
@@ -84,12 +89,12 @@ class PD_problem():
         return x_family
     
     #Computes the shape tensor (here a scalar) for each node    
-    def compute_m(self, Num_Nodes, y_n):         
+    def compute_m(self, Num_Nodes, y):         
         M = np.zeros( (int(Num_Nodes), int(Num_Nodes)) )
         for x_i in range(0, len(self.x)):
             index_x_family = self.get_index_x_family(self.x, x_i)
             for x_p in index_x_family:
-                M[x_i, x_p] = (y_n[x_p] - y_n[x_i]) / np.absolute(y_n[x_p] - y_n[x_i])
+                M[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
         return M
     
     #Computes the weights for each PD node
@@ -106,18 +111,30 @@ class PD_problem():
     #Comutes the residual vector used in the quasi_static_solver function
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
-        from elastic import elastic_material
+        #from elastic import elastic_material
+        from viscoelastic import viscoelastic_material
         y[0] = 0
-        forces = elastic_material( PD_deck, self, y )
-        self.update_force_data(forces, t_n)
+        #variables = elastic_material( PD_deck, self, y )
+        variables = viscoelastic_material( PD_deck, self, y, t_n)
+        self.update_force_data(variables, t_n)
+        self.update_ext_state_data(variables, t_n)
+        self.update_ext_state_visco_data(variables, t_n)
         for x_i in range(1, len(self.x)):
-            residual[x_i] = forces.Ts[x_i] + self.b[x_i, t_n]
+            residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
         #print residual
         return residual
     
     #Records the force vector at each time step
-    def update_force_data(self, forces, t_n):    
-        self.forces[:, t_n] = forces.Ts
+    def update_force_data(self, variables, t_n):    
+        self.forces[:, t_n] = variables.Ts
+        
+    #Records the ext_state vector at each time step
+    def update_ext_state_data(self, variables, t_n):    
+        self.ext[:, :, t_n] = variables.e  
+    
+    #Records the ext_state_visco vector at each time step
+    def update_ext_state_visco_data(self, variables, t_n):    
+        self.ext_visco[:, :, :, t_n] = variables.e_visco  
     
     #This functtion solves the problem at each time step, using the previous
     #time step solution as an initial guess
@@ -152,18 +169,27 @@ class PD_problem():
             for node in self.x:
                 f.write(","+str(node))
             f.write("\n")
+            
             f.write("Time")
             for node in self.x:
                 f.write(","+str(t_n*PD_deck.Delta_t))
             f.write("\n")
+            
             f.write("Initial_position")
             for position in PD_problem.y[:,1]:
                 f.write(","+str(position))
             f.write("\n")
+            
             f.write("Position")
             for position in self.y[:,t_n]:
                 f.write(","+str(position))
             f.write("\n")
+            
+            f.write("Extension_state")
+            for extension in self.ext[:, :, t_n]:
+                f.write(","+str(extension))
+            f.write("\n")            
+            
             f.write("Force")
             for force in self.forces[:, t_n]:
                 f.write(","+str(force))

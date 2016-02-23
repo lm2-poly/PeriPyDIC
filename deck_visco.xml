@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<data>
+	<Geometry>
+			<Length_Bar>5.0</Length_Bar>
+			<Surface_Bar>1.0</Surface_Bar>
+	</Geometry>
+	<Boundary_Conditions>
+	        <Type>RAMP</Type>
+			<Force>40.0</Force>
+			<Ramp_Time>0.5</Ramp_Time>
+	</Boundary_Conditions>
+	<Discretization>
+			<Final_Time>4.0</Final_Time>
+			<N_Steps_t>8</N_Steps_t>
+			<N_Nodes_Bar>5</N_Nodes_Bar>
+			<Horizon_Factor>1</Horizon_Factor>
+			<Influence_Function>1.0</Influence_Function>
+	</Discretization>
+	<Material>
+	        <Type>VISCOELASTIC</Type>
+			<E_Modulus0>4000.0</E_Modulus0>
+			<E_Modulus1>2000.0</E_Modulus1>
+			<E_Modulus2>1000.0</E_Modulus2>
+			<Relaxation_Time0>NaN</Relaxation_Time0>
+			<Relaxation_Time1>1.0</Relaxation_Time1>
+			<Relaxation_Time2>100.0</Relaxation_Time2>
+	</Material>
+</data>
+
+
