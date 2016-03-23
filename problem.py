@@ -28,6 +28,7 @@ class PD_problem():
         
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.y[:,0] = self.x
+        self.strain = np.zeros( ( int(PD_deck.Num_TimeStep) ) )
         self.forces = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.ext = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         #For viscoelasticity
@@ -143,58 +144,70 @@ class PD_problem():
         for t_n in range(1, PD_deck.Num_TimeStep):
             solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov',jac=None,tol=1.0e-12,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
             self.y[:, t_n] = solver.x
-            y = solver.x + 0.1*random.uniform(-1,1)*PD_deck.Delta_x
+            #y = solver.x + 0.1*random.uniform(-1,1)*PD_deck.Delta_x
+            y = self.random_initial_guess(solver.x, PD_deck)
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
             else:
                 logger.info( t_n, solver.success )
             #print solver
         return solver
-    
-    #Provides a random initial guess based on a linear distribution of the 
-    #nodes along the bar and disturbs it by a small random parameter for each 
-    #node, in order to provide an acceptable initial guess
-    def provide_random_initial_guess( self, PD_deck ):
+
+    def random_initial_guess( self, z, PD_deck ):
         y = np.zeros( ( int(PD_deck.Num_Nodes) ) )
-        for x_i in range(1, int(PD_deck.Num_Nodes)):
-            y[x_i] = self.x[x_i]+0.25*random.uniform(-1,1)*PD_deck.Delta_x
-        return y
+        y = z + 0.1*random.uniform(-1,1)*PD_deck.Delta_x
+        return y    
     
     #Exports the data to a CSV file
     #Sill needs work...
-    def write_data_to_csv(self, PD_deck, PD_problem):
-        f = open('data_csv', 'wr+')
+    def strain_center_bar(self, PD_deck):
+        Mid_Node_1 = int(PD_deck.Num_Nodes/2)
+        print Mid_Node_1
+        Mid_Node_2 = int(PD_deck.Num_Nodes/2)+1       
         for t_n in range(1, PD_deck.Num_TimeStep):
-            f.write("Node")
-            for node in self.x:
-                f.write(","+str(node))
-            f.write("\n")
-            
+            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(self.x[Mid_Node_2] - self.x[Mid_Node_1])) / np.absolute(self.x[Mid_Node_2] - self.x[Mid_Node_1])
+    
+    def write_data_to_csv(self, PD_deck):
+        f = open('data_csv', 'wr+')
+        
+        f.write("Time,0,Position")
+        for node in self.x:
+            f.write(","+str(node))
+        f.write("\n")        
+
+        for t_n in range(1, PD_deck.Num_TimeStep):
+
             f.write("Time")
-            for node in self.x:
-                f.write(","+str(t_n*PD_deck.Delta_t))
-            f.write("\n")
-            
-            f.write("Initial_position")
-            for position in PD_problem.y[:,1]:
-                f.write(","+str(position))
-            f.write("\n")
-            
-            f.write("Position")
+            #for node in self.x:
+            f.write(","+str(t_n*PD_deck.Delta_t))
+            f.write(",Position")
             for position in self.y[:,t_n]:
                 f.write(","+str(position))
             f.write("\n")
-            
-            f.write("Extension_state")
-            for extension in self.ext[:, :, t_n]:
-                f.write(","+str(extension))
-            f.write("\n")            
-            
-            f.write("Force")
-            for force in self.forces[:, t_n]:
-                f.write(","+str(force))
+        f.write("\n")
+
+        f.write("Time,0,Strain,0.0")
+        f.write("\n") 
+        
+        for t_n in range(1, PD_deck.Num_TimeStep):
+
+            f.write("Time")
+            #for node in self.x:
+            f.write(","+str(t_n*PD_deck.Delta_t))
+            f.write(",Strain")
+            f.write(","+str(self.strain[t_n]))
             f.write("\n")
-            f.write("\n")
+            
+            #f.write("Extension_state")
+            #for extension in self.ext[:, :, t_n]:
+            #    f.write(","+str(extension))
+            #f.write("\n")            
+            
+            #f.write("Force")
+            #for force in self.forces[:, t_n]:
+            #    f.write(","+str(force))
+            #f.write("\n")
+            #f.write("\n")
             
     def plot_force(self, PD_deck):
         for t_n in range(1, PD_deck.Num_TimeStep):

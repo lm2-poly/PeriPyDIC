@@ -7,10 +7,10 @@
 	<Boundary_Conditions>
 	        <Type>RAMP</Type>
 			<Force>50.0</Force>
-			<Ramp_Time>2.0</Ramp_Time>
+			<Ramp_Time>0.5</Ramp_Time>
 	</Boundary_Conditions>
 	<Discretization>
-			<Final_Time>2.0</Final_Time>
+			<Final_Time>5.0</Final_Time>
 			<N_Steps_t>4</N_Steps_t>
 			<N_Nodes_Bar>10</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>

@@ -24,7 +24,7 @@ problem = PD_problem( data )
 #Create an initial guess vector here based on a linear distribtuion of the 
 #nodes, disturbed by a small random coefficient using a method provided in the
 #PD_problem class
-x_0 = problem.provide_random_initial_guess( data ) 
+x_0 = problem.random_initial_guess( problem.x, data ) 
 #x_0 is our initial guess
 #print x_0
 
@@ -34,14 +34,18 @@ x_0 = problem.provide_random_initial_guess( data )
 
 #Solve the problem
 problem.quasi_static_solver( x_0, data )
+problem.strain_center_bar( data )
 
-#Check the position of PD nodes
+#Check the position of PD nodes at each time step
 print np.around(problem.y,decimals=5)
+
 #Check the PD force value at each node at the 5th time step
 #print problem.forces[:, 5]
 
+#Check the strain in the middle of the bar at each time step
+print np.around(problem.strain,decimals=10)
 #Write the results to a CSV file
-problem.write_data_to_csv(data, problem)
+problem.write_data_to_csv(data)
 #The problem resolution (time step by time step) is now written in a 
 #csv file called data_csv in the current folder
 
