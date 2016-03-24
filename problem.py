@@ -161,9 +161,8 @@ class PD_problem():
     #Exports the data to a CSV file
     #Sill needs work...
     def strain_center_bar(self, PD_deck):
-        Mid_Node_1 = int(PD_deck.Num_Nodes/2)
-        print Mid_Node_1
-        Mid_Node_2 = int(PD_deck.Num_Nodes/2)+1       
+        Mid_Node_1 = int(PD_deck.Num_Nodes/2)-1
+        Mid_Node_2 = int(PD_deck.Num_Nodes/2)      
         for t_n in range(1, PD_deck.Num_TimeStep):
             self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(self.x[Mid_Node_2] - self.x[Mid_Node_1])) / np.absolute(self.x[Mid_Node_2] - self.x[Mid_Node_1])
     

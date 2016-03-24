@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <data>
 	<Geometry>
-			<Length_Bar>5.0</Length_Bar>
+			<Length_Bar>4.0</Length_Bar>
 			<Surface_Bar>1.0</Surface_Bar>
 	</Geometry>
 	<Boundary_Conditions>
@@ -11,8 +11,8 @@
 	</Boundary_Conditions>
 	<Discretization>
 			<Final_Time>4.0</Final_Time>
-			<N_Steps_t>8</N_Steps_t>
-			<N_Nodes_Bar>5</N_Nodes_Bar>
+			<N_Steps_t>16</N_Steps_t>
+			<N_Nodes_Bar>8</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
 	</Discretization>
