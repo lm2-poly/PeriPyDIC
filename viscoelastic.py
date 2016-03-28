@@ -35,7 +35,6 @@ class viscoelastic_material():
         self.e = e
 
     def compute_ext_state_visco(self, PD_deck, PD_problem, y, t_n):        
-        w = PD_deck.Influence_Function
 
         e_visco = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time)) )
         for x_i in range(0, len(PD_problem.x)):
