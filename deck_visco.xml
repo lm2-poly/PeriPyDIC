@@ -12,8 +12,8 @@
 	<Discretization>
 			<Final_Time>4.0</Final_Time>
 			<N_Steps_t>16</N_Steps_t>
-			<N_Nodes_Bar>8</N_Nodes_Bar>
-			<Horizon_Factor>1</Horizon_Factor>
+			<N_Nodes_Bar>16</N_Nodes_Bar>
+			<Horizon_Factor>3</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
 	</Discretization>
 	<Material>

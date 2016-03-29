@@ -42,9 +42,9 @@ class PD_problem():
         b = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )   
         PD_deck.get_parameters_loading_ramp()
         if PD_deck.Loading_Flag == "RAMP":
-            PD_deck.get_parameters_loading_ramp()
-            for t_n in range(1, int(PD_deck.Num_TimeStep)):
-                b[len(self.x) - PD_deck.Horizon_Factor, t_n] = self.ramp_loading( PD_deck, t_n )
+            for x_i in range(len(self.x) - PD_deck.Horizon_Factor, len(self.x) ):
+                for t_n in range(1, int(PD_deck.Num_TimeStep)):
+                    b[x_i, t_n] = self.ramp_loading( PD_deck, t_n )
         else:
             logger.error("There is a problem with the Boundary Conditions in your XML deck.")
         #print b
@@ -62,13 +62,13 @@ class PD_problem():
     #Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):     
         Time_t = PD_deck.Delta_t*t_n
-        for x_i in range(0, int(PD_deck.Num_Nodes)):
-            if Time_t <= PD_deck.Ramp_Time:
-                result = (PD_deck.Force_Density*Time_t)/PD_deck.Ramp_Time   
-                return result
-            else:
-                result = PD_deck.Force_Density
-                return result
+        #for x_i in range(0, int(PD_deck.Num_Nodes)):
+        if Time_t <= PD_deck.Ramp_Time:
+            result = (PD_deck.Force_Density*Time_t)/PD_deck.Ramp_Time   
+            return result
+        else:
+            result = PD_deck.Force_Density
+            return result
    
     #Computes the horizon        
     def compute_horizon(self, PD_deck):
@@ -114,13 +114,15 @@ class PD_problem():
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         #from elastic import elastic_material
         from viscoelastic import viscoelastic_material
-        y[0] = 0
+        # Clamped Nodes        
+        for x_i in range(0, PD_deck.Horizon_Factor):
+            y[x_i] = self.x[x_i]
         #variables = elastic_material( PD_deck, self, y )
         variables = viscoelastic_material( PD_deck, self, y, t_n)
         self.update_force_data(variables, t_n)
         self.update_ext_state_data(variables, t_n)
         self.update_ext_state_visco_data(variables, t_n)
-        for x_i in range(1, len(self.x)):
+        for x_i in range(PD_deck.Horizon_Factor, len(self.x)):
             residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
         #print residual
         return residual

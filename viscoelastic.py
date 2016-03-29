@@ -30,6 +30,7 @@ class viscoelastic_material():
 
         for x_i in range(0, len(PD_problem.x)):
             index_x_family = PD_problem.get_index_x_family(PD_problem.x, x_i)
+            #print index_x_family
             for x_p in index_x_family: 
                 e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(PD_problem.x[x_p] - PD_problem.x[x_i])       
         self.e = e
