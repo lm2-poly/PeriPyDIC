@@ -62,7 +62,6 @@ class PD_problem():
     #Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):     
         Time_t = PD_deck.Delta_t*t_n
-        #for x_i in range(0, int(PD_deck.Num_Nodes)):
         if Time_t <= PD_deck.Ramp_Time:
             result = (PD_deck.Force_Density*Time_t)/PD_deck.Ramp_Time   
             return result
