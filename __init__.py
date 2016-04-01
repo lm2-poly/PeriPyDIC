@@ -18,7 +18,8 @@ from deck_visco import PD_deck
 data = PD_deck()
 
 #Load the PD_problem class and create a PD_problem object
-from problem import PD_problem
+#from problem import PD_problem
+from problem_sym import PD_problem
 problem = PD_problem( data )
 
 #Create an initial guess vector here based on a linear distribtuion of the 
@@ -39,11 +40,12 @@ problem.strain_center_bar( data )
 #Check the position of PD nodes at each time step
 print np.around(problem.y,decimals=5)
 
+#Check the strain in the middle of the bar at each time step
+print np.around(problem.strain,decimals=10)
+
 #Check the PD force value at each node at the 5th time step
 #print problem.forces[:, 5]
 
-#Check the strain in the middle of the bar at each time step
-print np.around(problem.strain,decimals=10)
 #Write the results to a CSV file
 problem.write_data_to_csv(data)
 #The problem resolution (time step by time step) is now written in a 

@@ -7,7 +7,8 @@ Created on Sun Dec 13 16:16:07 2015
 """
 
 from deck_visco import PD_deck
-from problem import PD_problem
+#from problem import PD_problem
+from problem_sym import PD_problem
 import numpy as np
 
 class viscoelastic_material():
