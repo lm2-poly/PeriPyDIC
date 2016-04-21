@@ -15,6 +15,7 @@ import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
 import random
+import csv
 
 logger = logging.getLogger(__name__)
 
@@ -168,35 +169,37 @@ class PD_problem():
             self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(self.x[Mid_Node_2] - self.x[Mid_Node_1])) / np.absolute(self.x[Mid_Node_2] - self.x[Mid_Node_1])
     
     def write_data_to_csv(self, PD_deck):
-        f = open('data_csv', 'wr+')
+	with open('data_csv', 'wr+') as csvfile:
+	  writer = csv.writer(csvfile, delimiter=',')
         
-        f.write("Time,0,Position")
-        for node in self.x:
-            f.write(","+str(node))
-        f.write("\n")        
+        #f.write("Time,0,Position")
+        #for node in self.x:
+        #    f.write(","+str(node))
+        #f.write("\n")
+        writer.write(["Time,0,Position"] + [self.x])
 
-        for t_n in range(1, PD_deck.Num_TimeStep):
+        #for t_n in range(1, PD_deck.Num_TimeStep):
 
-            f.write("Time")
+         #   f.write("Time")
             #for node in self.x:
-            f.write(","+str(t_n*PD_deck.Delta_t))
-            f.write(",Position")
-            for position in self.y[:,t_n]:
-                f.write(","+str(position))
-            f.write("\n")
-        f.write("\n")
+         #   f.write(","+str(t_n*PD_deck.Delta_t))
+         #   f.write(",Position")
+         #  for position in self.y[:,t_n]:
+         #       f.write(","+str(position))
+         #   f.write("\n")
+        #f.write("\n")
 
-        f.write("Time,0,Strain,0.0")
-        f.write("\n") 
+        #f.write("Time,0,Strain,0.0")
+        #f.write("\n") 
         
-        for t_n in range(1, PD_deck.Num_TimeStep):
+        #for t_n in range(1, PD_deck.Num_TimeStep):
 
-            f.write("Time")
+            #f.write("Time")
             #for node in self.x:
-            f.write(","+str(t_n*PD_deck.Delta_t))
-            f.write(",Strain")
-            f.write(","+str(self.strain[t_n]))
-            f.write("\n")
+            #f.write(","+str(t_n*PD_deck.Delta_t))
+            #f.write(",Strain")
+            #f.write(","+str(self.strain[t_n]))
+            #f.write("\n")
             
             #f.write("Extension_state")
             #for extension in self.ext[:, :, t_n]:
