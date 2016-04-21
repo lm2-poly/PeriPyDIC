@@ -17,6 +17,7 @@ class elastic_material():
         self.compute_ext_state(PD_deck, PD_problem, y )
         self.compute_T(PD_deck, PD_problem, y)
         self.compute_Ts(PD_deck, PD_problem)
+        #self.strain_energy_from_force(PD_problem, PD_deck, y)
         
     #Computes the deformations using the current positions and initial 
     #positions of each node
@@ -56,3 +57,4 @@ class elastic_material():
                 Ts[x_i] = Ts[x_i] + self.T[x_i, x_p] - self.T[x_p, x_i]
             Ts[x_i] = Ts[x_i] * PD_deck.Volume
         self.Ts = Ts
+        
