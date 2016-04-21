@@ -10,7 +10,7 @@ import logging
 from scipy.optimize import fsolve
 import timeit
 #from deck_elas import PD_deck
-from deck_visco import PD_deck
+from deck import PD_deck
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
@@ -28,13 +28,16 @@ class PD_problem():
         self.compute_horizon(PD_deck)
         
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.u = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.energy = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.y[:,0] = self.x
         self.strain = np.zeros( ( int(PD_deck.Num_TimeStep) ) )
         self.forces = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.ext = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        
         #For viscoelasticity
-        self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
-        self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) ) 
+        #self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
+        #self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) ) 
     
     #Creates a loading vector b which describes the force applied on each node
     #at any time step
@@ -112,16 +115,17 @@ class PD_problem():
     #Comutes the residual vector used in the quasi_static_solver function
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
-        #from elastic import elastic_material
-        from viscoelastic import viscoelastic_material
+        from elastic import elastic_material
+        #from viscoelastic import viscoelastic_material
         # Clamped Nodes        
         for x_i in range(0, PD_deck.Horizon_Factor):
             y[x_i] = self.x[x_i]
-        #variables = elastic_material( PD_deck, self, y )
-        variables = viscoelastic_material( PD_deck, self, y, t_n)
+        variables = elastic_material( PD_deck, self, y )
+        #variables = viscoelastic_material( PD_deck, self, y, t_n)
         self.update_force_data(variables, t_n)
         self.update_ext_state_data(variables, t_n)
-        self.update_ext_state_visco_data(variables, t_n)
+        #self.update_energy_data(variables, t_n)
+        #self.update_ext_state_visco_data(variables, t_n)
         for x_i in range(PD_deck.Horizon_Factor, len(self.x)):
             residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
         #print residual
@@ -131,13 +135,17 @@ class PD_problem():
     def update_force_data(self, variables, t_n):    
         self.forces[:, t_n] = variables.Ts
         
+    #Records the force vector at each time step
+    #def update_energy_data(self, variables, t_n):    
+    #    self.energy[:, t_n] = variables.energy
+        
     #Records the ext_state vector at each time step
     def update_ext_state_data(self, variables, t_n):    
         self.ext[:, :, t_n] = variables.e  
-    
-    #Records the ext_state_visco vector at each time step
-    def update_ext_state_visco_data(self, variables, t_n):    
-        self.ext_visco[:, :, :, t_n] = variables.e_visco  
+        
+    #Records the ext_state vector at each time step
+    def update_displacements(self, t_n): 
+        self.u[:, t_n] = self.y[:, t_n] - self.y[:, 0]
     
     #This functtion solves the problem at each time step, using the previous
     #time step solution as an initial guess
@@ -153,12 +161,31 @@ class PD_problem():
             else:
                 logger.info( t_n, solver.success )
             #print solver
+            self.update_displacements( t_n)
         return solver
 
     def random_initial_guess( self, z, PD_deck ):
         y = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         y = z + 0.1*random.uniform(-1,1)*PD_deck.Delta_x
-        return y    
+        return y   
+        
+    #Computes the strain energy density from Ts x u
+    #def strain_energy_from_force(self, PD_problem, PD_deck, y):
+    #    energy = np.zeros( (int(PD_deck.Num_Nodes) ) )
+    #    for x_i in range(0, self.len_x):   
+            #print "Ts"
+            #print self.Ts
+            #print "y[0]"
+            #print y
+    #        energy[x_i] = abs(self.Ts[x_i]) * y[x_i]
+    #    self.energy = energy
+        #print energy                
+    
+    #def strain_energy(self):
+    #    for x_i in range(0, self.len_x):
+    #        index_x_family = self.get_index_x_family( PD_problem.x, x_i)
+    #        for x_p in index_x_family:
+    #            energy[x_i] = 
     
     #Exports the data to a CSV file
     #Sill needs work...
@@ -225,4 +252,6 @@ class PD_problem():
             position_plot.plot(self.y[:,1], self.y[:, t_n], '-+')
         position_plot.legend(title = "position")
         return position_plot
+        
+        
     

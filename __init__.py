@@ -38,10 +38,20 @@ problem.quasi_static_solver( x_0, data )
 problem.strain_center_bar( data )
 
 #Check the position of PD nodes at each time step
+<<<<<<< HEAD
 print (np.around(problem.y,decimals=5))
 
 #Check the strain in the middle of the bar at each time step
 print (np.around(problem.strain,decimals=10))
+=======
+#print np.around(problem.y,decimals=5)
+
+#Check the strain in the middle of the bar at each time step
+#print np.around(problem.strain,decimals=10)
+#for i in range(0, len(problem.energy[0])-1):
+#    print "Timestep, energy", i
+#    print problem.energy[:, i]
+>>>>>>> 49855caaea2fc52175f033131f3c20399c26bf5e
 
 #Check the PD force value at each node at the 5th time step
 #print problem.forces[:, 5]
