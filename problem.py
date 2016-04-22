@@ -38,6 +38,7 @@ class PD_problem():
             (int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.ext = np.zeros(
             (int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
+        self.displacement = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
 
         # For viscoelasticity
         #self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
@@ -247,6 +248,15 @@ class PD_problem():
             # f.write("\n")
             # f.write("\n")
 
+    def read_csv_from_dic(file):
+	with open(file,'r') as csvfile:
+	    reader = csv.reader(csvfile,delimiter=',')
+	    next(reader, None)
+	    i = 0
+	    for row in reader:
+		displacement[i] = np.array(map(float,row[1:]))
+		i +=1
+	      
     def plot_force(self, PD_deck):
         for t_n in range(1, PD_deck.Num_TimeStep):
             force_plot = plt
