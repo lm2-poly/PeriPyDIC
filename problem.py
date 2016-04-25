@@ -40,11 +40,14 @@ class PD_problem():
             (int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.ext = np.zeros(
             (int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
-        self.displacement = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
+        self.experimental_nodes = 3
+        self.exp_displacement = np.zeros((int(PD_deck.Num_TimeStep)-1, self.experimental_nodes))
+        self.exp_times = np.zeros((int(PD_deck.Num_TimeStep)-1))
+        self.exp_init_positions = np.zeros(self.experimental_nodes)
 
         # For viscoelasticity
         #self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
-        #self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) )
+        #self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodesodesodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) )
 
     # Creates a loading vector b which describes the force applied on each node
     # at any time step
@@ -254,16 +257,23 @@ class PD_problem():
             #    f.write(","+str(force))
             # f.write("\n")
             # f.write("\n")
+    
+    def read_csv_from_dic(self, file):
+        with open(file,'r') as csvfile:
+            reader = csv.reader(csvfile,delimiter=',')
+            
+            next(reader, None)
+            i = 0
+            for row in reader:
+                if float(row[0]) == -1:
+                    self.exp_init_positions = map(float, row[1:])
+                else:
+                    self.exp_displacement[i] = np.array(map(float,row[1:]))
+                    self.exp_times[i] = float(row[0])
+                    i +=1
+  
 
-    def read_csv_from_dic(file):
-	with open(file,'r') as csvfile:
-	    reader = csv.reader(csvfile,delimiter=',')
-	    next(reader, None)
-	    i = 0
-	    for row in reader:
-		displacement[i] = np.array(map(float,row[1:]))
-		i +=1
-	      
+          
     def plot_force(self, PD_deck):
         for t_n in range(1, PD_deck.Num_TimeStep):
             force_plot = plt
@@ -277,3 +287,16 @@ class PD_problem():
             position_plot.plot(self.y[:, 1], self.y[:, t_n], '-+')
         position_plot.legend(title="position")
         return position_plot
+        
+    def plot_energy(self,energy,time):
+        for i in range(0,3):
+            e = []
+            for j in range(0,len(energy)):            
+                e.append(abs(energy[j][i]))
+            print len(time) , len(energy)
+            plt.plot(time,e,marker="o")
+        plt.grid()
+        plt.xlabel("Time [s]")
+        plt.ylabel("Strain Energy")
+        plt.show()
+        

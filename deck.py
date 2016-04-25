@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 #records it as variables of the PD_deck class object
 class PD_deck():
     
-    def __init__(self):
-        with open("deck.xml") as deck:
+    def __init__(self, path):
+        with open(path) as deck:
             try:
                 #Here we use the method parse from xmltodict package
                 initial_data = xmltodict.parse( deck.read() )
