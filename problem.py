@@ -16,6 +16,7 @@ import scipy.optimize
 import matplotlib.pyplot as plt
 import random
 import csv
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,6 @@ class PD_problem():
         
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.u = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
-        self.energy = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.y[:,0] = self.x
         self.strain = np.zeros( ( int(PD_deck.Num_TimeStep) ) )
         self.forces = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
@@ -170,22 +170,26 @@ class PD_problem():
         return y   
         
     #Computes the strain energy density from Ts x u
-    #def strain_energy_from_force(self, PD_problem, PD_deck, y):
-    #    energy = np.zeros( (int(PD_deck.Num_Nodes) ) )
-    #    for x_i in range(0, self.len_x):   
-            #print "Ts"
-            #print self.Ts
-            #print "y[0]"
-            #print y
-    #        energy[x_i] = abs(self.Ts[x_i]) * y[x_i]
-    #    self.energy = energy
-        #print energy                
+    def strain_energy_from_force(self, PD_deck):
+        energy = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep) ) )
+        for x_i in range(0, PD_deck.Num_Nodes):   
+            for t_n in range(0, PD_deck.Num_TimeStep):
+                energy[x_i, t_n] = abs(self.forces[x_i, t_n]) * abs(self.u[x_i, t_n]) * PD_deck.Volume
+        self.strain_energy_from_force = energy         
     
-    #def strain_energy(self):
-    #    for x_i in range(0, self.len_x):
-    #        index_x_family = self.get_index_x_family( PD_problem.x, x_i)
-    #        for x_p in index_x_family:
-    #            energy[x_i] = 
+    #Computes the strian energy using the formula iven in the PMB
+    def strain_energy_bond_based(self, PD_deck):
+        energy = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep) ) )
+        for t_n in range(0, PD_deck.Num_TimeStep):
+            for x_i in range(0, PD_deck.Num_Nodes):
+                index_x_family = self.get_index_x_family( self.x, x_i)
+                modulus = PD_deck.get_elastic_material_properties()
+                for x_p in index_x_family:
+                    #Silling-Askari2005, Eq17
+                    stretch = (abs(self.u[x_p, t_n] - self.u[x_i, t_n]) - abs(self.x[x_p]-self.x[x_i]))/abs(self.x[x_p]-self.x[x_i])
+                    #Silling-Askari2005, Eq22
+                    energy[x_i, t_n] = (math.pi*modulus*math.pow(stretch,2)*math.pow(self.Horizon, 4))/4.
+        self.strain_energy = energy
     
     #Exports the data to a CSV file
     #Sill needs work...

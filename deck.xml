@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <data>
 	<Geometry>
-			<Length_Bar>5.0</Length_Bar>
+			<Length_Bar>37.5</Length_Bar>
 			<Surface_Bar>1.0</Surface_Bar>
 	</Geometry>
 	<Boundary_Conditions>
 	        <Type>RAMP</Type>
-			<Force>50.0</Force>
-			<Ramp_Time>0.5</Ramp_Time>
+			<Force>500.0</Force>
+			<Ramp_Time>3.0</Ramp_Time>
 	</Boundary_Conditions>
 	<Discretization>
 			<Final_Time>5.0</Final_Time>
 			<N_Steps_t>4</N_Steps_t>
-			<N_Nodes_Bar>10</N_Nodes_Bar>
+			<N_Nodes_Bar>20</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
 	</Discretization>

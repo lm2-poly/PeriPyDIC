@@ -38,16 +38,22 @@ problem.quasi_static_solver( x_0, data )
 problem.strain_center_bar( data )
 
 #Check the position of PD nodes at each time step
-print (np.around(problem.y,decimals=5))
+#print (np.around(problem.y,decimals=5))
 
 #Check the strain in the middle of the bar at each time step
-print (np.around(problem.strain,decimals=10))
+#print (np.around(problem.strain,decimals=10))
 
 #Check the PD force value at each node at the 5th time step
 #print problem.forces[:, 5]
+energy_from_force = problem.strain_energy_from_force( data )
+energy_from_potential = problem.strain_energy_bond_based( data )
+print "Energy from force:"
+print problem.strain_energy_from_force[:, 3]
+#print "Energy for bond based case:"
+#print problem.strain_energy[:, 3]
 
 #Write the results to a CSV file
-problem.write_data_to_csv(data)
+#problem.write_data_to_csv(data)
 #The problem resolution (time step by time step) is now written in a 
 #csv file called data_csv in the current folder
 
