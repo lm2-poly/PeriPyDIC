@@ -27,7 +27,7 @@ class elastic_material():
         e = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes)) )    
     
         for x_i in range(0, len(PD_problem.x)):
-            index_x_family = PD_problem.get_index_x_family(PD_problem.x, x_i)
+            index_x_family = PD_problem.get_index_x_family(x_i)
             for x_p in index_x_family: 
                 e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(PD_problem.x[x_p] - PD_problem.x[x_i])
         self.e = e
@@ -37,14 +37,14 @@ class elastic_material():
         M = PD_problem.compute_m(PD_deck.Num_Nodes, y)
         tscal = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes) ) )
         for x_i in range(0, self.len_x):
-            index_x_family = PD_problem.get_index_x_family( PD_problem.x, x_i)
+            index_x_family = PD_problem.get_index_x_family( x_i)
             for x_p in index_x_family:
                 tscal[x_i, x_p] = (w/PD_problem.weighted_function(PD_deck, PD_problem.x, x_i))*self.Modulus*self.e[x_i, x_p]
         self.tscal = tscal
         
         T = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes) ) )
         for x_i in range(0, self.len_x):
-            index_x_family = PD_problem.get_index_x_family( PD_problem.x, x_i)
+            index_x_family = PD_problem.get_index_x_family( x_i)
             for x_p in index_x_family:
                 T[x_i, x_p] = tscal[x_i, x_p] * M[x_i, x_p]
         self.T = T
@@ -52,9 +52,10 @@ class elastic_material():
     def compute_Ts(self, PD_deck, PD_problem):
         Ts = np.zeros( (int(PD_deck.Num_Nodes) ) )
         for x_i in range(0, self.len_x):
-            index_x_family = PD_problem.get_index_x_family( PD_problem.x, x_i)
+            index_x_family = PD_problem.get_index_x_family( x_i)
             for x_p in index_x_family:
                 Ts[x_i] = Ts[x_i] + self.T[x_i, x_p] - self.T[x_p, x_i]
             Ts[x_i] = Ts[x_i] * PD_deck.Volume
         self.Ts = Ts
+    
         

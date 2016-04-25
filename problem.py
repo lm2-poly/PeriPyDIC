@@ -16,6 +16,7 @@ import scipy.optimize
 import matplotlib.pyplot as plt
 import random
 import csv
+import pdb
 import math
 
 logger = logging.getLogger(__name__)
@@ -25,11 +26,8 @@ class PD_problem():
 
     def __init__(self, PD_deck):
         # Import initial data
-        self.get_pd_nodes(PD_deck)
-        self.compute_b(PD_deck)
-        self.compute_horizon(PD_deck)
-
-
+        self.x = np.zeros(PD_deck.Num_Nodes)
+        self.family = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes)) )
         self.y = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.u = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.energy = np.zeros(
@@ -44,6 +42,11 @@ class PD_problem():
         self.exp_displacement = np.zeros((int(PD_deck.Num_TimeStep)-1, self.experimental_nodes))
         self.exp_times = np.zeros((int(PD_deck.Num_TimeStep)-1))
         self.exp_init_positions = np.zeros(self.experimental_nodes)
+        
+        self.get_pd_nodes(PD_deck)
+        self.compute_b(PD_deck)
+        self.compute_horizon(PD_deck)
+        self.generate_neighborhood_matrix( PD_deck, self.x)
 
         # For viscoelasticity
         #self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
@@ -68,11 +71,9 @@ class PD_problem():
     # Creates a vector of linearly distributed nodes along the bar
     def get_pd_nodes(self, PD_deck):
         # Define x
-        x = np.zeros(PD_deck.Num_Nodes)
         for i in range(0, PD_deck.Num_Nodes):
-            x[i] = i * PD_deck.Delta_x
+            self.x[i] = i * PD_deck.Delta_x
         # print x
-        self.x = x
 
     # Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):
@@ -92,23 +93,28 @@ class PD_problem():
             PD_deck.Delta_x * safety_small_fraction
 
     # Returns a list of addresses of the neighbors of a point x_i
-    def get_index_x_family(self, x, x_i):
-        x_family = []
-        for x_p in range(0, len(x)):
-            if x_p == x_i:
-                # print "SAME", x_p, x_i
-                pass
-            elif np.absolute(x[x_p] - x[x_i]) <= self.Horizon:
-                x_family.append(x_p)
-            else:
-                pass
-        return x_family
+    def get_index_x_family(self, x_i):
+        #print (np.where( self.family[x_i] == 1 ))[0]
+        return (np.where( self.family[x_i] == 1 ))[0]
+        
+    # Generates matrix neighborhood
+    # Should replace PD_problem.get_index_x_family after some time
+    def generate_neighborhood_matrix(self, PD_deck, x):
+        for x_i in range(0, len(x) ):
+            for x_p in range(0, len(x) ):
+                if x_p == x_i:
+                    pass
+                elif np.absolute(x_i - x_p) <= PD_deck.Horizon_Factor:
+                    self.family[x_i][x_p] = 1
+                else:
+                   pass
+           # return x_family
 
     # Computes the shape tensor (here a scalar) for each node
     def compute_m(self, Num_Nodes, y):
         M = np.zeros((int(Num_Nodes), int(Num_Nodes)))
         for x_i in range(0, len(self.x)):
-            index_x_family = self.get_index_x_family(self.x, x_i)
+            index_x_family = self.get_index_x_family( x_i)
             for x_p in index_x_family:
                 M[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
         return M
@@ -116,7 +122,7 @@ class PD_problem():
     # Computes the weights for each PD node
     def weighted_function(self, PD_deck, x, x_i):
         Horizon = self.compute_horizon(PD_deck)
-        index_x_family = self.get_index_x_family(x, x_i)
+        index_x_family = self.get_index_x_family( x_i)
         Delta_V = PD_deck.Volume
         Influence_Function = PD_deck.Influence_Function
         result = 0
@@ -196,7 +202,7 @@ class PD_problem():
         energy = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep) ) )
         for t_n in range(0, PD_deck.Num_TimeStep):
             for x_i in range(0, PD_deck.Num_Nodes):
-                index_x_family = self.get_index_x_family( self.x, x_i)
+                index_x_family = self.get_index_x_family( x_i)
                 modulus = PD_deck.get_elastic_material_properties()
                 for x_p in index_x_family:
                     #Silling-Askari2005, Eq17
