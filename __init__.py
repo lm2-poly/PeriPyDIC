@@ -57,10 +57,10 @@ def main(argv):
     if materialType == "elastic":
         data = PD_deck(path)
         problem = PD_problem(data)
-        problem.quasi_static_solver(problem.x, data)
+        problem.quasi_static_solver( problem.x, data )
         problem.strain_energy_from_force(data)
-        pdb.set_trace()
-
+        problem.plot_energy(problem.strain_energy_from_force,data.time_steps,problem.x,output+"/elastic_")
+   
     elif materialType == "elastic_dic":
         data = PD_deck(path)
         problem = PD_problem(data)
@@ -71,13 +71,10 @@ def main(argv):
         print problem.exp_init_positions
         exp_w_all = []
         for t in range(0, 13):
-            elastic_dic = elastic_material_dic(data, problem, t)
-            exp_w_all.append(elastic_dic.exp_W)
-        problem.plot_energy(
-            exp_w_all,
-            problem.exp_times,
-            problem.exp_init_positions,
-            output)
+            elastic_dic = elastic_material_dic( data, problem, t)
+            exp_w_all.append( elastic_dic.exp_W )
+        problem.plot_energy(exp_w_all,problem.exp_times,problem.exp_init_positions,output+"/elastic_dic_")
+        #problem.generate_neighborhood_matrix(data, [1, 5, 15, 25] )
 
 
 # Start the function __main__ at __init__ call
