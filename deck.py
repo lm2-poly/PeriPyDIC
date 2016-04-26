@@ -77,6 +77,6 @@ class PD_deck():
         
     def compute_time_steps(self):
         time_steps = []
-        for i in range(0, self.N_Steps_t):
+        for i in range(0, self.Num_TimeStep):
             time_steps.append( i*(self.Final_Time/self.N_Steps_t) )
         self.time_steps = time_steps
