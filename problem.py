@@ -29,10 +29,6 @@ class PD_problem():
     def __init__(self, PD_deck):
         # Import initial data
         self.x = np.zeros(PD_deck.Num_Nodes)
-        self.family = np.zeros(
-            (int(
-                PD_deck.Num_Nodes), int(
-                PD_deck.Num_Nodes)))
         self.y = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.u = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.energy = np.zeros(
@@ -136,16 +132,21 @@ class PD_problem():
         return (np.where(self.family[x_i] == 1))[0]
 
     # Generates matrix neighborhood
-    # Should replace PD_problem.get_index_x_family after some time
     def generate_neighborhood_matrix(self, PD_deck, x):
+        self.family = np.zeros((int(
+                PD_deck.Num_Nodes), int(
+                PD_deck.Num_Nodes)))
         for x_i in range(0, len(x)):
             for x_p in range(0, len(x)):
+                #print x_i, x_p
                 if x_p == x_i:
                     pass
                 elif np.absolute(x_i - x_p) <= PD_deck.Horizon_Factor:
                     self.family[x_i][x_p] = 1
                 else:
                     pass
+        #print "Self Family"
+        #print self.family
             # return x_family
 
     # Computes the shape tensor (here a scalar) for each node
@@ -222,20 +223,20 @@ class PD_problem():
     # This function calls the compute_residual function
     def quasi_static_solver(self, y, PD_deck):
 
-        print ""
+        #print ""
 
         for t_n in range(1, PD_deck.Num_TimeStep):
 
             if PD_deck.Loading_Flag == "LINEAR_DISPLACEMENT":
                 if t_n == 1:
-                    print "x=", self.x
+                    #print "x=", self.x
                     for x_i in range(0, PD_deck.Horizon_Factor):
                         self.y[:, t_n] = self.x
 
             y = self.y[:, t_n]
 
-            print "t_n:", t_n
-            print "Y_before_solver=", y
+            #print "t_n:", t_n
+            #print "Y_before_solver=", y
 
             solver = scipy.optimize.root(
                 self.compute_residual,
@@ -253,8 +254,8 @@ class PD_problem():
                     'xatol': 1.0e-12,
                     'ftol': 1.0e-12})
 
-            print "Y_after_solver=", y
-            print "Forces =", self.forces[:, t_n]
+            #print "Y_after_solver=", y
+            #print "Forces =", self.forces[:, t_n]
 
             # pdb.set_trace()
 
@@ -269,13 +270,13 @@ class PD_problem():
             # Notification if the solver failed
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
-                print solver
+                #print solver
             else:
                 logger.info(t_n, solver.success)
 
             self.update_displacements(t_n)
 
-            print ""
+            #print ""
 
         return solver
 
@@ -368,7 +369,6 @@ class PD_problem():
             next(reader, None)
             i = 0
             for row in reader:
-                print row
                 if float(row[0]) == -1:
                     self.exp_init_positions = map(float, row[1:])
                 else:
@@ -390,14 +390,10 @@ class PD_problem():
             position_plot.plot(self.y[:, 1], self.y[:, t_n], '-+')
         position_plot.legend(title="position")
         return position_plot
-<<<<<<< HEAD
 
-    def plot_energy(self, energy, time, initial, outpath):
-=======
         
     def plot_energy(self,energy,time,initial,outpath):
         print len(energy[0]) , len(time) 
->>>>>>> 1c8f022719cd8ce062812a57fffc166e4cd8f464
         maxvalues = []
         color = []
         for i in range(0, len(initial)):

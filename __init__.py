@@ -15,7 +15,7 @@ import random
 from deck import PD_deck
 from problem import PD_problem
 from elastic_dic import elastic_material_dic
-logger = logging.getLogger(__name__)
+Logger = logging.getLogger(__name__)
 
 
 def main(argv):
@@ -57,10 +57,14 @@ def main(argv):
     if materialType == "elastic":
         data = PD_deck(path)
         problem = PD_problem(data)
-        problem.quasi_static_solver( problem.x, data )
+        problem.quasi_static_solver(problem.x, data)
         problem.strain_energy_from_force(data)
-        problem.plot_energy(problem.strain_energy_from_force,data.time_steps,problem.x,output+"/elastic_")
-   
+        problem.plot_energy(
+            problem.strain_energy_from_force,
+            data.time_steps,
+            problem.x,
+            output + "/elastic_")
+
     elif materialType == "elastic_dic":
         data = PD_deck(path)
         problem = PD_problem(data)
@@ -69,11 +73,17 @@ def main(argv):
         print problem.exp_displacement
         print "Initial positions:"
         print problem.exp_init_positions
+
+        pdb.set_trace()
         exp_w_all = []
-        for t in range(0, 13):
-            elastic_dic = elastic_material_dic( data, problem, t)
-            exp_w_all.append( elastic_dic.exp_W )
-        problem.plot_energy(exp_w_all,problem.exp_times,problem.exp_init_positions,output+"/elastic_dic_")
+        for t_n in range(0, data.N_Steps_t):
+            elastic_dic = elastic_material_dic(data, problem, t_n)
+            exp_w_all.append(elastic_dic.exp_W)
+        problem.plot_energy(
+            exp_w_all,
+            problem.exp_times,
+            problem.exp_init_positions,
+            output + "/elastic_dic_")
         #problem.generate_neighborhood_matrix(data, [1, 5, 15, 25] )
 
 
