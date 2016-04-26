@@ -18,6 +18,7 @@ import random
 import csv
 import pdb
 import math
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -294,10 +295,10 @@ class PD_problem():
         position_plot.legend(title="position")
         return position_plot
         
-    def plot_energy(self,energy,time,initial):
+    def plot_energy(self,energy,time,initial,outpath):
         maxvalues = []
         color = []
-        for i in range(0,3):
+        for i in range(0,len(initial)):
             e = []
             for j in range(0,len(energy)):            
                 e.append(abs(energy[j][i]))
@@ -311,5 +312,4 @@ class PD_problem():
         plt.grid()
         plt.xlabel("Time [s]")
         plt.ylabel("Strain Energy")
-        plt.show()
-        
+        plt.savefig(outpath+"energy_"+str(datetime.datetime.now().strftime("%Y-%m-%d_%H:%M"))+".pdf")

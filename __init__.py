@@ -72,7 +72,7 @@ def main(argv):
         for t in range(0, 13):
             elastic_dic = elastic_material_dic( data, problem, t)
             exp_w_all.append( elastic_dic.exp_W )
-        problem.plot_energy(exp_w_all,problem.exp_times,problem.exp_init_positions)
+        problem.plot_energy(exp_w_all,problem.exp_times,problem.exp_init_positions,output)
         #problem.generate_neighborhood_matrix(data, [1, 5, 15, 25] )
         
         
