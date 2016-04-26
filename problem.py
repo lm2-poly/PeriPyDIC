@@ -258,10 +258,10 @@ class PD_problem():
         
     #Computes the strain energy density from Ts x u
     def strain_energy_from_force(self, PD_deck):
-        energy = np.zeros( (int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep) ) )
-        for x_i in range(0, PD_deck.Num_Nodes):   
-            for t_n in range(0, PD_deck.Num_TimeStep):
-                energy[x_i, t_n] = abs(self.forces[x_i, t_n]) * abs(self.u[x_i, t_n]) * PD_deck.Volume
+        energy = np.zeros( ( int(PD_deck.Num_TimeStep)  , int(PD_deck.Num_Nodes)) )
+        for t_n in range(0, PD_deck.Num_TimeStep ):   
+            for x_i in range(0, PD_deck.Num_Nodes):
+                energy[t_n , x_i] = abs(self.forces[x_i, t_n]) * abs(self.u[x_i, t_n]) * PD_deck.Volume
         self.strain_energy_from_force = energy         
     
     #Computes the strian energy using the formula iven in the PMB

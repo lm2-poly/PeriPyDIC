@@ -57,15 +57,9 @@ def main(argv):
         data = PD_deck(path)
         problem = PD_problem(data)
         problem.quasi_static_solver( problem.x, data )
-<<<<<<< HEAD
         problem.strain_energy_from_force(data)
         problem.plot_energy(problem.strain_energy_from_force,data.time_steps,problem.x,output+"/elastic_")
    
-=======
-        problem.strain_energy_from_force( data)
-        pdb.set_trace()
-        
->>>>>>> 4ac45eb5a614d7ae73424633ef02cf23c9a6608a
     elif materialType == "elastic_dic":
         data = PD_deck(path)
         problem = PD_problem( data )
