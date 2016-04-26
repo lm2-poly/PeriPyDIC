@@ -25,6 +25,7 @@ class PD_deck():
                 self.initial_data = initial_data['data']
                 self.read_data(initial_data['data'])
                 self.compute_volumes()
+                self.compute_time_steps()
             except:
                 logger.error("The XML file is broken")
                 
@@ -73,3 +74,9 @@ class PD_deck():
     def get_elastic_material_properties(self):
         Modulus = float(self.initial_data['Material']['E_Modulus'])  
         return Modulus 
+        
+    def compute_time_steps(self):
+        time_steps = []
+        for i in range(0, self.N_Steps_t):
+            time_steps.append( i*(self.Final_Time/self.N_Steps_t) )
+        self.time_steps = time_steps
