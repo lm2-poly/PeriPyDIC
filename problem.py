@@ -362,6 +362,7 @@ class PD_problem():
         return position_plot
         
     def plot_energy(self,energy,time,initial,outpath):
+        print len(energy[0]) , len(time) 
         maxvalues = []
         color = []
         for i in range(0,len(initial)):
