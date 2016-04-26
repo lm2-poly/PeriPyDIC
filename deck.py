@@ -60,6 +60,10 @@ class PD_deck():
         self.Ramp_Time = float(self.initial_data['Boundary_Conditions']['Ramp_Time'])
         self.Force = float(self.initial_data['Boundary_Conditions']['Force'])
         self.compute_force_density()
+        
+    #Only called if the Type of Boundary Conditions in the XML deck is RAMP
+    def get_parameters_linear_displacement(self):
+        self.Speed = float(self.initial_data['Boundary_Conditions']['Speed'])
 
     #Compute the force density on an elementary volume
     def compute_force_density(self):

@@ -44,7 +44,10 @@ class PD_problem():
         self.exp_init_positions = np.zeros(self.experimental_nodes)
         
         self.get_pd_nodes(PD_deck)
-        self.compute_b(PD_deck)
+        if PD_deck.Loading_Flag == "RAMP":
+            self.compute_b(PD_deck)
+        elif PD_deck.Loading_Flag == "LINEAR_DISPLACEMENT":
+            self.compute_u_load(PD_deck)
         self.compute_horizon(PD_deck)
         self.generate_neighborhood_matrix( PD_deck, self.x)
 
@@ -67,6 +70,20 @@ class PD_problem():
                 "There is a problem with the Boundary Conditions in your XML deck.")
         # print b
         self.b = b
+        
+    #Adds a displacement step to the points on the edges of the bar
+    #Only additional points' (Horizon_Factor) on the edge of the bar are 
+    #concerned by this function 
+    def compute_u_load(self, PD_deck):
+        #We only update the nodes we actually pull (Horizon_Factor)
+        displ_load = np.zeros((int(PD_deck.Horizon_Factor), int(PD_deck.Num_TimeStep)))
+        PD_deck.get_parameters_linear_displacement()
+        for x_i in range( 0, PD_deck.Horizon_Factor ):
+            for t_n in range(1, int(PD_deck.Num_TimeStep)):
+                displ_load[x_i, t_n] = self.linear_displacement_loading(PD_deck, t_n)
+        
+        self.displ_load = displ_load
+        
 
     # Creates a vector of linearly distributed nodes along the bar
     def get_pd_nodes(self, PD_deck):
@@ -84,6 +101,13 @@ class PD_problem():
         else:
             result = PD_deck.Force_Density
             return result
+
+    #Provides linear displacement loading applied on edges of bar
+    def linear_displacement_loading(self, PD_deck, t_n):
+        Time_t = PD_deck.Delta_t * t_n
+        displacement = Time_t * PD_deck.Speed
+        #print t_n, displacement 
+        return displacement
 
     # Computes the horizon
     def compute_horizon(self, PD_deck):
@@ -139,15 +163,26 @@ class PD_problem():
         # Clamped Nodes
         for x_i in range(0, PD_deck.Horizon_Factor):
             y[x_i] = self.x[x_i]
+        # Nodes being pulled
+        for x_i in range( 0, PD_deck.Horizon_Factor):
+            y[len(self.x)-1-x_i] = self.x[len(self.x)-1-x_i] + self.displ_load[x_i, t_n]
+        
         variables = elastic_material(PD_deck, self, y)
         #variables = viscoelastic_material( PD_deck, self, y, t_n)
         self.update_force_data(variables, t_n)
         self.update_ext_state_data(variables, t_n)
         #self.update_energy_data(variables, t_n)
         #self.update_ext_state_visco_data(variables, t_n)
+        
         for x_i in range(PD_deck.Horizon_Factor, len(self.x)):
-            residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
-        # print residual
+            if PD_deck.Loading_Flag == "RAMP":
+                residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
+            else:
+                residual[x_i] = variables.Ts[x_i] 
+                #From johntfoster/1DPDpy, the residual should be set to 0 on Boundary conditions
+                for x_i in range(0, PD_deck.Horizon_Factor):
+                    residual[x_i] = 0
+                    residual[len(self.x)-1-x_i] = 0
         return residual
 
     # Records the force vector at each time step
@@ -170,18 +205,48 @@ class PD_problem():
     # time step solution as an initial guess
     # This function calls the compute_residual function
     def quasi_static_solver(self, y, PD_deck):
+        
+        print ""
+        
         for t_n in range(1, PD_deck.Num_TimeStep):
+        
+            if PD_deck.Loading_Flag == "LINEAR_DISPLACEMENT":
+                if t_n == 1:
+                    print "x=", self.x
+                    for x_i in range( 0, PD_deck.Horizon_Factor):
+                        self.y[:, t_n] = self.x
+            
+            y = self.y[:, t_n]
+            
+            print "Y_before_solver=", y
+                
             solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov', jac=None,
                                          tol=1.0e-12, callback=None, options={'maxiter': 1000, 'xtol': 1.0e-12, 'xatol': 1.0e-12, 'ftol': 1.0e-12})
-            self.y[:, t_n] = solver.x
+            
+            print "Y_after_solver=", y
+            print "Forces =", self.forces[:, t_n]
+            
+            pdb.set_trace()
+            
+            if t_n+1>PD_deck.Num_TimeStep-1:
+                pass
+            else:
+                self.y[:, t_n+1] = solver.x
+            
             #y = solver.x + 0.1*random.uniform(-1,1)*PD_deck.Delta_x
             y = self.random_initial_guess(solver.x, PD_deck)
+            
+            #Notification if the solver failed
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
+                print solver
             else:
                 logger.info(t_n, solver.success)
-            # print solver
+
             self.update_displacements(t_n)
+            
+            print ""
+            
         return solver
 
     def random_initial_guess( self, z, PD_deck ):

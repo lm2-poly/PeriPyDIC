@@ -54,11 +54,9 @@ def main(argv):
         sys.exit(1)
         
     if materialType == "elastic":
-        print "TBD"
         data = PD_deck(path)
         problem = PD_problem(data)
         problem.quasi_static_solver( problem.x, data )
-        pdb.set_trace() 
         
     elif materialType == "elastic_dic":
         data = PD_deck(path)

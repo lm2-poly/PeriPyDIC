@@ -5,13 +5,12 @@
 			<Surface_Bar>1.0</Surface_Bar>
 	</Geometry>
 	<Boundary_Conditions>
-	        <Type>RAMP</Type>
-			<Force>5000.0</Force>
-			<Ramp_Time>50.0</Ramp_Time>
+	        <Type>LINEAR_DISPLACEMENT</Type>
+			<Speed>0.06</Speed>
 	</Boundary_Conditions>
 	<Discretization>
-			<Final_Time>104.0</Final_Time>
-			<N_Steps_t>13</N_Steps_t>
+			<Final_Time>100</Final_Time>
+			<N_Steps_t>200</N_Steps_t>
 			<N_Nodes_Bar>3</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
