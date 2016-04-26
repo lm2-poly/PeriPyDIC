@@ -57,6 +57,7 @@ def main(argv):
         data = PD_deck(path)
         problem = PD_problem(data)
         problem.quasi_static_solver( problem.x, data )
+        problem.strain_energy_from_force( data)
         
     elif materialType == "elastic_dic":
         data = PD_deck(path)

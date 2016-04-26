@@ -219,6 +219,7 @@ class PD_problem():
             
             y = self.y[:, t_n]
             
+            print "t_n:", t_n
             print "Y_before_solver=", y
                 
             solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov', jac=None,
@@ -227,7 +228,7 @@ class PD_problem():
             print "Y_after_solver=", y
             print "Forces =", self.forces[:, t_n]
             
-            pdb.set_trace()
+            #pdb.set_trace()
             
             if t_n+1>PD_deck.Num_TimeStep-1:
                 pass
