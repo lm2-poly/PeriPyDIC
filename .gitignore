@@ -29,3 +29,7 @@
 
 *.*~
 *.pyc
+
+#Generated files
+*.pdf
+
