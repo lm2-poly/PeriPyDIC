@@ -10,7 +10,7 @@
 	</Boundary_Conditions>
 	<Discretization>
 			<Final_Time>100</Final_Time>
-			<N_Steps_t>10</N_Steps_t>
+			<N_Steps_t>13</N_Steps_t>
 			<N_Nodes_Bar>3</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
