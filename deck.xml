@@ -2,7 +2,7 @@
 <data>
 	<Geometry>
 			<Length_Bar>37.5</Length_Bar>
-			<Surface_Bar>1.0</Surface_Bar>
+			<Surface_Bar>0.78</Surface_Bar>
 	</Geometry>
 	<Boundary_Conditions>
 	        <Type>LINEAR_DISPLACEMENT</Type>
@@ -10,8 +10,8 @@
 	</Boundary_Conditions>
 	<Discretization>
 			<Final_Time>104</Final_Time>
-			<N_Steps_t>50</N_Steps_t>
-			<N_Nodes_Bar>3</N_Nodes_Bar>
+			<N_Steps_t>13</N_Steps_t>
+			<N_Nodes_Bar>5</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
 	</Discretization>
@@ -20,5 +20,3 @@
 			<E_Modulus>2200.0</E_Modulus>
 	</Material>
 </data>
-
-

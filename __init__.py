@@ -3,8 +3,8 @@
 Created on Fri Dec 11 19:24:33 2015
 
 @author: ilyass.tabiai@gmail.com
-@author: rolland.delorme@gmail.com
 @author: diehl@ins.uni-bonn.de
+@author: rolland.delorme@gmail.com
 """
 import sys
 import getopt
@@ -59,12 +59,19 @@ def main(argv):
         problem = PD_problem(data)
         problem.quasi_static_solver(problem.x, data)
         problem.strain_energy_from_force(data)
+        
+        energy, x = problem.remove_additional_points(data, problem.x, problem.strain_energy)
         problem.plot_energy(
-            problem.remove_additional_points(data, problem.strain_energy_from_force),
+            energy,
             data.time_steps,
-            problem.x[:len(problem.x)-2],
+            x,
             output + "/elastic_")
+        total_energy = 0.
+        for i in range(0, len(energy[0])):
+            total_energy = total_energy + energy[len(energy)-1][i]
+        print "Elastic case, total energy:", total_energy
         pdb.set_trace()
+        
 
     elif materialType == "elastic_dic":
         data = PD_deck(path)
@@ -75,7 +82,7 @@ def main(argv):
         print "Initial positions:"
         print problem.exp_init_positions
 
-        pdb.set_trace()
+        #pdb.set_trace()
         exp_w_all = []
         for t_n in range(0, data.N_Steps_t):
             elastic_dic = elastic_material_dic(data, problem, t_n)
@@ -85,7 +92,13 @@ def main(argv):
             problem.exp_times,
             problem.exp_init_positions,
             output + "/elastic_dic_")
-        #problem.generate_neighborhood_matrix(data, [1, 5, 15, 25] )
+        total_energy = 0
+        
+        pdb.set_trace()
+        for i in range(0, len(exp_w_all[0])):
+            print exp_w_all[len(exp_w_all)-1][i]
+            total_energy = total_energy + abs(exp_w_all[len(exp_w_all)-1][i])
+        print "DIC Elastic case, total energy:", total_energy
 
 
 # Start the function __main__ at __init__ call

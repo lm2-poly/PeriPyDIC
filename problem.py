@@ -31,8 +31,6 @@ class PD_problem():
         self.x = np.zeros(PD_deck.Num_Nodes)
         self.y = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.u = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
-        self.energy = np.zeros(
-            (int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.y[:, 0] = self.x
         self.strain = np.zeros((int(PD_deck.Num_TimeStep)))
         self.forces = np.zeros(
@@ -56,10 +54,6 @@ class PD_problem():
         self.compute_horizon(PD_deck)
         self.generate_neighborhood_matrix(PD_deck, self.x)
 
-        # For viscoelasticity
-        #self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
-        #self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodesodesodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) )
-
     # Creates a loading vector b which describes the force applied on each node
     # at any time step
     def compute_b(self, PD_deck):
@@ -74,7 +68,6 @@ class PD_problem():
         else:
             logger.error(
                 "There is a problem with the Boundary Conditions in your XML deck.")
-        # print b
         self.b = b
 
     # Adds a displacement step to the points on the edges of the bar
@@ -169,21 +162,18 @@ class PD_problem():
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros((int(PD_deck.Num_Nodes)))
         from elastic import elastic_material
-        
         variables = elastic_material(PD_deck, self, y)
-        self.update_force_data(variables, t_n)
-        self.update_ext_state_data(variables, t_n)
-
+        
         for x_i in range(PD_deck.Horizon_Factor, len(self.x)):
             if PD_deck.Loading_Flag == "RAMP":
                 residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
             else:
                 residual[x_i] = variables.Ts[x_i]
                 # From johntfoster/1DPDpy, the residual should be set to 0 on
-                # Boundary conditions
+                # Boundary conditions' blocks
                 for x_i in range(0, PD_deck.Horizon_Factor):
                     #Clamped node
-                    residual[x_i] = 0
+                    #residual[x_i] = 0
                     #Pulling nodes
                     residual[len(self.x) - 1 - x_i] = 0
         return residual
@@ -202,7 +192,6 @@ class PD_problem():
 
             y = self.y[:, t_n]
             
-            
             # Update the boundary conditions
             # Clamped Nodes
             for x_i in range(0, PD_deck.Horizon_Factor):
@@ -215,10 +204,8 @@ class PD_problem():
             # Else the force is null since equilibrium has been reached
             from elastic import elastic_material
             variables = elastic_material(PD_deck, self, y)
-            self.update_energy_data(variables, t_n)
-            
-            print "t_n", t_n
-            print "BEFORE:", y
+            self.update_ext_state_data(variables, t_n)
+            self.update_force_data( variables, t_n )
 
             solver = scipy.optimize.root(
                 self.compute_residual,
@@ -236,16 +223,10 @@ class PD_problem():
                     'xatol': 1.0e-12,
                     'ftol': 1.0e-12})
 
-            print "AFTER:", solver.x
-
-            # pdb.set_trace()
-
             if t_n + 1 > PD_deck.Num_TimeStep - 1:
                 pass
             else:
                 self.y[:, t_n + 1] = solver.x
-
-            #y = solver.x + 0.1*random.uniform(-1,1)*PD_deck.Delta_x
             y = self.random_initial_guess(solver.x, PD_deck)
 
             # Notification if the solver failed
@@ -259,21 +240,23 @@ class PD_problem():
         return solver
 
 
-
     # Records the force vector at each time step
     def update_force_data(self, variables, t_n):
         self.forces[:, t_n] = variables.Ts
 
     # Records the force vector at each time step
-    def update_energy_data(self, variables, t_n):
-        self.energy = self.strain_energy_from_force
-
+    def update_energy_data(self, PD_deck ):
+        self.strain_energy_from_force( PD_deck )
+        
     # Records the ext_state vector at each time step
     def update_ext_state_data(self, variables, t_n):
         self.ext[:, :, t_n] = variables.e
 
     # Records the ext_state vector at each time step
     def update_displacements(self, t_n):
+        """
+        Updates the problem.u attribute at each time step
+        """
         self.u[:, t_n] = self.y[:, t_n] - self.y[:, 0]
 
     def random_initial_guess(self, z, PD_deck):
@@ -287,13 +270,13 @@ class PD_problem():
         for t_n in range(0, PD_deck.Num_TimeStep ):   
             for x_i in range(0, PD_deck.Num_Nodes):               
                 energy[t_n , x_i] = abs(self.forces[x_i, t_n]) * abs(self.u[x_i, t_n]) * PD_deck.Volume
-                #abs(self.forces[x_i, t_n]), abs(self.u[x_i, t_n]), energy[t_n , x_i]
-        print "ENERGY:",
-        print energy
-        self.strain_energy_from_force = energy         
+        self.strain_energy = energy         
     
-    #Computes the strian energy using the formula iven in the PMB
     def strain_energy_bond_based(self, PD_deck):
+        """
+        Computes the strain energy using the formula given in the PMB
+        Silling-Askari 2005
+        """
         energy = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         for t_n in range(0, PD_deck.Num_TimeStep):
             for x_i in range(0, PD_deck.Num_Nodes):
@@ -306,10 +289,8 @@ class PD_problem():
                     #Silling-Askari2005, Eq22
                     energy[x_i, t_n] = (
                         math.pi * modulus * math.pow(stretch, 2) * math.pow(self.Horizon, 4)) / 4.
-        self.strain_energy = energy
+        self.strain_energy_bond_based = energy
 
-    # Exports the data to a CSV file
-    # Sill needs work...
 
     def strain_center_bar(self, PD_deck):
         Mid_Node_1 = int(PD_deck.Num_Nodes / 2) - 1
@@ -319,18 +300,14 @@ class PD_problem():
                 self.x[Mid_Node_2] - self.x[Mid_Node_1])) / np.absolute(self.x[Mid_Node_2] - self.x[Mid_Node_1])
 
     def write_data_to_csv(self, PD_deck):
-
         f = open('data_csv', 'wr+')
-
         f.write("Time,0,Position")
         for node in self.x:
             f.write("," + str(node))
         f.write("\n")
 
         for t_n in range(1, PD_deck.Num_TimeStep):
-
             f.write("Time")
-            # for node in self.x:
             f.write("," + str(t_n * PD_deck.Delta_t))
             f.write(",Position")
             for position in self.y[:, t_n]:
@@ -350,18 +327,18 @@ class PD_problem():
             f.write("," + str(self.strain[t_n]))
             f.write("\n")
 
-            # f.write("Extension_state")
-            # for extension in self.ext[:, :, t_n]:
-            #    f.write(","+str(extension))
-            # f.write("\n")
-
-            # f.write("Force")
-            # for force in self.forces[:, t_n]:
-            #    f.write(","+str(force))
-            # f.write("\n")
-            # f.write("\n")
 
     def read_csv_from_dic(self, file):
+        """
+        Reads a CSV file organized such as:
+        Time, Point_1   , Point_2   , ...   , Point_n
+        -1  , Initial_1 , Initial_2 , ...   , Initial_n  
+        0   , Position_0, Position_1, ...   , Position_n
+        1   ,   .....
+        
+        Updates the problem class with experimental times, initial positoins
+        and displacement for each point at t_n
+        """
         with open(file, 'r') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
 
@@ -393,30 +370,33 @@ class PD_problem():
     #For simulaiton, we add Horizon_Factor points to the right of the bar to
     #pull and to the left which are fixed. They should be removed before 
     #presenting the results
-    def remove_additional_points(self, PD_deck, energy_list):
+    def remove_additional_points(self, PD_deck, initial, energy_list):
         cleaned_energy_list = []
+        cleaned_initial_x = []
         for t_n in range(0, len(energy_list)):
             energy_t_n = []
             for x_i in range(PD_deck.Horizon_Factor, len(energy_list[t_n])-PD_deck.Horizon_Factor):
                 energy_t_n.append(energy_list[t_n][x_i])
+                if t_n ==1:
+                    cleaned_initial_x.append(initial[x_i])
             cleaned_energy_list.append(energy_t_n)
-        return cleaned_energy_list
-            
-        
+        return cleaned_energy_list, cleaned_initial_x
 
-        
+                
     def plot_energy(self,energy,time,initial,outpath):
-        #print len(energy) , len(time), len(initial) 
-        maxvalues = []
+        pdb.set_trace()
+        #maxvalues = []
         color = []
         for i in range(0, len(initial)):
+            print "i", i, len(initial)
             e = []
             for j in range(0, len(energy)):
+                #print "j", j, len(energy)
                 e.append(abs(energy[j][i]))
-            line = plt.plot(time, e, marker="o")
+            line = plt.plot(time, e, marker="o", label=i)
             color.append(line[0].get_color())
-            maxvalues.append(max(e))
-        #print color
+            #maxvalues.append(max(e))
+
         #plt.plot([0, max(time)], [max(maxvalues) + 100,
         #                         max(maxvalues) + 100], lw=2, c='black')
         #for i in range(len(initial)):
@@ -428,6 +408,7 @@ class PD_problem():
         plt.grid()
         plt.xlabel("Time [s]")
         plt.ylabel("Strain Energy")
+        plt.legend()
         plt.savefig(outpath +
                     "energy_" +
                     str(datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")) +
