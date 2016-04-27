@@ -36,8 +36,8 @@ class PD_deck():
         self.N_Nodes_Bar = int(initial_data['Discretization']['N_Nodes_Bar'])
         #Length of the 1D bar
         self.Length_Bar = float(initial_data['Geometry']['Length_Bar'])
-        #Number of PD nodes "meshing" the bar including the boundary nodes
-        self.Num_Nodes = int(self.N_Nodes_Bar + 2 * self.Horizon_Factor)
+        #Number of PD nodes "meshing" the bar including the boundary nodes      
+        self.Num_Nodes = int(self.N_Nodes_Bar + 2)
         #Distance between each couple of PD nodes
         self.Delta_x = float(self.Length_Bar / self.N_Nodes_Bar)
         #Lenght of the model including the boundary nodes        
@@ -57,13 +57,16 @@ class PD_deck():
         
     #Only called if the Type of Boundary Conditions in the XML deck is RAMP
     def get_parameters_loading_ramp(self):
-        self.Ramp_Time = float(self.initial_data['Boundary_Conditions']['Ramp_Time'])
+        self.Ramp_Time0 = float(self.initial_data['Boundary_Conditions']['Ramp_Time0'])
+        self.Ramp_Time1 = float(self.initial_data['Boundary_Conditions']['Ramp_Time1'])        
+        self.Ramp_Time2 = float(self.initial_data['Boundary_Conditions']['Ramp_Time2'])
         self.Force = float(self.initial_data['Boundary_Conditions']['Force'])
         self.compute_force_density()
 
     #Compute the force density on an elementary volume
     def compute_force_density(self):
-        self.Force_Density = self.Force/self.Volume_Boundary
+        #Madenci approach
+        self.Force_Density = self.Force/self.Volume
         
     #Only called it the Type of material in the XML deck is ELASTIC
     def get_viscoelastic_material_properties(self): 

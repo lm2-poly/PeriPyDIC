@@ -42,12 +42,15 @@ class PD_problem():
         b = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )   
         PD_deck.get_parameters_loading_ramp()
         if PD_deck.Loading_Flag == "RAMP":
-            for x_i in range(0, PD_deck.Horizon_Factor):
-                for t_n in range(1, int(PD_deck.Num_TimeStep)):
-                    b[x_i, t_n] = -self.ramp_loading( PD_deck, t_n )            
-            for x_i in range(len(self.x) - PD_deck.Horizon_Factor, len(self.x) ):
-                for t_n in range(1, int(PD_deck.Num_TimeStep)):
+            for t_n in range(1, int(PD_deck.Num_TimeStep)):         
+                
+                #Madenci approach
+                for x_i in range(0, 1):
+                    b[x_i, t_n] = -self.ramp_loading( PD_deck, t_n )                    
+
+                for x_i in range(len(self.x) - 1, len(self.x) ):
                     b[x_i, t_n] = self.ramp_loading( PD_deck, t_n )
+
         else:
             logger.error("There is a problem with the Boundary Conditions in your XML deck.")
         #print b
@@ -66,11 +69,17 @@ class PD_problem():
     #Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):     
         Time_t = PD_deck.Delta_t*t_n
-        if Time_t <= PD_deck.Ramp_Time:
-            result = (PD_deck.Force_Density*Time_t)/PD_deck.Ramp_Time   
+        if Time_t <= PD_deck.Ramp_Time0:
+            result = (PD_deck.Force_Density*Time_t)/PD_deck.Ramp_Time0
+            return result
+        elif Time_t > PD_deck.Ramp_Time0 and Time_t <= PD_deck.Ramp_Time1:
+            result = PD_deck.Force_Density
+            return result
+        elif Time_t > PD_deck.Ramp_Time1 and Time_t <= PD_deck.Ramp_Time2: 
+            result = PD_deck.Force_Density - PD_deck.Force_Density*(Time_t - PD_deck.Ramp_Time1)/(PD_deck.Ramp_Time2 - PD_deck.Ramp_Time1)
             return result
         else:
-            result = PD_deck.Force_Density
+            result = 0
             return result
    
     #Computes the horizon        
@@ -90,6 +99,7 @@ class PD_problem():
                 x_family.append( x_p )
             else:
                 pass
+        #print x_family
         return x_family
     
     #Computes the shape tensor (here a scalar) for each node    
