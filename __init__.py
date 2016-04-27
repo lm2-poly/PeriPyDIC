@@ -12,7 +12,7 @@ import logging
 import pdb
 import numpy as np
 import random
-from deck import PD_deck
+from PD_deck import PD_deck
 from problem import PD_problem
 from elastic_dic import elastic_material_dic
 Logger = logging.getLogger(__name__)
