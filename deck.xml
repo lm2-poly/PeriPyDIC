@@ -9,15 +9,15 @@
 			<Speed>0.06</Speed>
 	</Boundary_Conditions>
 	<Discretization>
-			<Final_Time>100</Final_Time>
-			<N_Steps_t>13</N_Steps_t>
+			<Final_Time>104</Final_Time>
+			<N_Steps_t>50</N_Steps_t>
 			<N_Nodes_Bar>3</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
 	</Discretization>
 	<Material>
 	        <Type>ELASTIC</Type>
-			<E_Modulus>5000.0</E_Modulus>
+			<E_Modulus>2200.0</E_Modulus>
 	</Material>
 </data>
 
