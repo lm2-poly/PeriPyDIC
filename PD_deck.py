@@ -4,6 +4,7 @@ Created on Fri Dec 11 18:49:10 2015
 
 @author: ilyass.tabiai@gmail.com
 @author: rolland.delorme@gmail.com
+@author: diehl@ins.uni-bonn.de
 """
 
 import xmltodict
@@ -19,14 +20,15 @@ logger = logging.getLogger(__name__)
 
 class PD_deck():
 
-    def __init__(self):
-        with open("deck.xml") as deck:
+    def __init__(self, path):
+        with open(path) as deck:
             try:
                 # Here we use the method parse from xmltodict package
                 initial_data = xmltodict.parse(deck.read())
                 self.initial_data = initial_data['data']
                 self.read_data(initial_data['data'])
                 self.compute_volumes()
+                self.compute_time_steps()
             except:
                 logger.error("The XML file is broken")
 
@@ -66,6 +68,10 @@ class PD_deck():
         self.Force = float(self.initial_data['Boundary_Conditions']['Force'])
         self.compute_force_density()
 
+    # Only called if the Type of Boundary Conditions in the XML deck is RAMP
+    def get_parameters_linear_displacement(self):
+        self.Speed = float(self.initial_data['Boundary_Conditions']['Speed'])
+
     # Compute the force density on an elementary volume
     def compute_force_density(self):
         self.Force_Density = self.Force / self.Volume_Boundary
@@ -74,3 +80,9 @@ class PD_deck():
     def get_elastic_material_properties(self):
         Modulus = float(self.initial_data['Material']['E_Modulus'])
         return Modulus
+
+    def compute_time_steps(self):
+        time_steps = []
+        for i in range(0, self.Num_TimeStep):
+            time_steps.append(i * (self.Final_Time / self.N_Steps_t))
+        self.time_steps = time_steps

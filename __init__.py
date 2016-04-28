@@ -4,50 +4,90 @@ Created on Fri Dec 11 19:24:33 2015
 
 @author: ilyass.tabiai@gmail.com
 @author: rolland.delorme@gmail.com
+@author: diehl@ins.uni-bonn.de
 """
-#from Class_1D-PD-elastic-problem import PD_1D_elastic_problem
+import sys
+import getopt
 import logging
-logger = logging.getLogger(__name__)
-
+import pdb
 import numpy as np
 import random
+from PD_deck import PD_deck
+from problem import PD_problem
+from elastic_dic import elastic_material_dic
+Logger = logging.getLogger(__name__)
 
-#Load the PD_deck class and create a PD_deck object
-#from deck_elas import PD_deck
-from deck_visco import PD_deck
-data = PD_deck()
 
-#Load the PD_problem class and create a PD_problem object
-#from problem import PD_problem
-from problem_sym import PD_problem
-problem = PD_problem( data )
+def main(argv):
+    """
+    Main
+    """
+    types = ['elastic', 'elastic_dic']
+    path = ''
+    output = ''
+    materialType = -1
+    helpText = "__init__.py -i <inputfile> -o <outputfile> -t <type> \n" \
+        "Help text"
+    print sys.argv
+    if len(sys.argv) != 7:
+        print(helpText)
+        sys.exit(1)
 
-#Create an initial guess vector here based on a linear distribtuion of the 
-#nodes, disturbed by a small random coefficient using a method provided in the
-#PD_problem class
-x_0 = problem.random_initial_guess( problem.x, data ) 
-#x_0 is our initial guess
-#print x_0
+    try:
+        opts, args = getopt.getopt(
+            argv, "hi:o:t:", ["ifile=", "ofile=", "type="])
+    except getopt.GetoptError:
+        print(helpText)
+        sys.exit(0)
 
-#Load the elastic_material class and compute first step PD forces
-#from elastic import elastic_material
-#forces = elastic_material( data, problem, x_0 )
+    for opt, arg in opts:
+        if opt == '-h':
+            print(helpText)
+            sys.exit(0)
+        elif opt in ("-i", "--ifile"):
+            path = arg
+        elif opt in ("-o", "--ofile"):
+            output = arg
+        elif opt in ("-t", "--type"):
+            materialType = arg
+    if materialType not in types:
+        print("Error: Only elastic and elastic_dic types are supported")
+        sys.exit(1)
 
-#Solve the problem
-problem.quasi_static_solver( x_0, data )
-problem.strain_center_bar( data )
+    if materialType == "elastic":
+        data = PD_deck(path)
+        problem = PD_problem(data)
+        problem.quasi_static_solver(problem.x, data)
+        problem.strain_energy_from_force(data)
+        problem.plot_energy(
+            problem.remove_additional_points(data, problem.strain_energy_from_force),
+            data.time_steps,
+            problem.x[:len(problem.x)-2],
+            output + "/elastic_")
+        pdb.set_trace()
 
-#Check the position of PD nodes at each time step
-print np.around(problem.y,decimals=5)
+    elif materialType == "elastic_dic":
+        data = PD_deck(path)
+        problem = PD_problem(data)
+        problem.read_csv_from_dic("data/tracking_results.csv")
+        print "Experimental displacements:"
+        print problem.exp_displacement
+        print "Initial positions:"
+        print problem.exp_init_positions
 
-#Check the strain in the middle of the bar at each time step
-print np.around(problem.strain,decimals=10)
+        pdb.set_trace()
+        exp_w_all = []
+        for t_n in range(0, data.N_Steps_t):
+            elastic_dic = elastic_material_dic(data, problem, t_n)
+            exp_w_all.append(elastic_dic.exp_W)
+        problem.plot_energy(
+            exp_w_all,
+            problem.exp_times,
+            problem.exp_init_positions,
+            output + "/elastic_dic_")
+        #problem.generate_neighborhood_matrix(data, [1, 5, 15, 25] )
 
-#Check the PD force value at each node at the 5th time step
-#print problem.forces[:, 5]
 
-#Write the results to a CSV file
-problem.write_data_to_csv(data)
-#The problem resolution (time step by time step) is now written in a 
-#csv file called data_csv in the current folder
-
+# Start the function __main__ at __init__ call
+if __name__ == "__main__":
+    main(sys.argv[1:])
