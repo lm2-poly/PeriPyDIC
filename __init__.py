@@ -17,18 +17,6 @@ from problem import PD_problem
 from elastic_dic import elastic_material_dic
 Logger = logging.getLogger(__name__)
 
-<<<<<<< HEAD
-=======
-#Load the PD_deck class and create a PD_deck object
-#from deck_elas import PD_deck
-from deck import PD_deck
-data = PD_deck()
-
-#Load the PD_problem class and create a PD_problem object
-#from problem import PD_problem
-from problem_sym import PD_problem
-problem = PD_problem( data )
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
 
 def main(argv):
     """
@@ -66,7 +54,6 @@ def main(argv):
         print("Error: Only elastic and elastic_dic types are supported")
         sys.exit(1)
 
-<<<<<<< HEAD
     if materialType == "elastic":
         data = PD_deck(path)
         problem = PD_problem(data)
@@ -77,7 +64,6 @@ def main(argv):
             data.time_steps,
             problem.x[:len(problem.x)-2],
             output + "/elastic_")
-        pdb.set_trace()
 
     elif materialType == "elastic_dic":
         data = PD_deck(path)
@@ -87,15 +73,6 @@ def main(argv):
         print problem.exp_displacement
         print "Initial positions:"
         print problem.exp_init_positions
-=======
-#Check the position of PD nodes at each time step
-#print np.around(problem.y,decimals=5)
-
-#Check the strain in the middle of the bar at each time step
-print np.around(problem.strain,decimals=6)
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
-
-        pdb.set_trace()
         exp_w_all = []
         for t_n in range(0, data.N_Steps_t):
             elastic_dic = elastic_material_dic(data, problem, t_n)
@@ -105,8 +82,6 @@ print np.around(problem.strain,decimals=6)
             problem.exp_times,
             problem.exp_init_positions,
             output + "/elastic_dic_")
-        #problem.generate_neighborhood_matrix(data, [1, 5, 15, 25] )
-
 
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":

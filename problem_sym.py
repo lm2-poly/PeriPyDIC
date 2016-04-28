@@ -25,7 +25,6 @@ class PD_problem():
         self.get_pd_nodes(PD_deck)
         self.compute_b(PD_deck)
         self.compute_horizon(PD_deck)
-<<<<<<< HEAD
 
         self.y = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.y[:, 0] = self.x
@@ -62,8 +61,7 @@ class PD_problem():
                              PD_deck.Horizon_Factor, len(self.x)):
                 for t_n in range(1, int(PD_deck.Num_TimeStep)):
                     b[x_i, t_n] = self.ramp_loading(PD_deck, t_n)
-=======
-        
+
         self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.y[:,0] = self.x
         self.strain = np.zeros( ( int(PD_deck.Num_TimeStep) ) )
@@ -94,7 +92,6 @@ class PD_problem():
                 for x_i in range(len(self.x) - 1, len(self.x) ):
                     b[x_i, t_n] = self.ramp_loading( PD_deck, t_n )
 
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
         else:
             logger.error(
                 "There is a problem with the Boundary Conditions in your XML deck.")
@@ -110,29 +107,29 @@ class PD_problem():
             x[i] = (i - int(PD_deck.Num_Nodes / 2)) * PD_deck.Delta_x
         # print x
         self.x = x
-<<<<<<< HEAD
+
 
     # Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):
         Time_t = PD_deck.Delta_t * t_n
         if Time_t <= PD_deck.Ramp_Time:
             result = (PD_deck.Force_Density * Time_t) / PD_deck.Ramp_Time
-=======
+
     
     #Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):     
         Time_t = PD_deck.Delta_t*t_n
         if Time_t <= PD_deck.Ramp_Time0:
             result = (PD_deck.Force_Density*Time_t)/PD_deck.Ramp_Time0
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
+
             return result
         elif Time_t > PD_deck.Ramp_Time0 and Time_t <= PD_deck.Ramp_Time1:
             result = PD_deck.Force_Density
             return result
-<<<<<<< HEAD
+
 
     # Computes the horizon
-=======
+
         elif Time_t > PD_deck.Ramp_Time1 and Time_t <= PD_deck.Ramp_Time2: 
             result = PD_deck.Force_Density - PD_deck.Force_Density*(Time_t - PD_deck.Ramp_Time1)/(PD_deck.Ramp_Time2 - PD_deck.Ramp_Time1)
             return result
@@ -141,7 +138,7 @@ class PD_problem():
             return result
    
     #Computes the horizon        
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
+
     def compute_horizon(self, PD_deck):
         # Be sure that points are IN the horizon
         safety_small_fraction = 1.01
@@ -184,7 +181,7 @@ class PD_problem():
 
     # Comutes the residual vector used in the quasi_static_solver function
     def compute_residual(self, y, PD_deck, t_n):
-<<<<<<< HEAD
+
         residual = np.zeros((int(PD_deck.Num_Nodes)))
         #from elastic import elastic_material
         from viscoelastic import viscoelastic_material
@@ -196,7 +193,7 @@ class PD_problem():
         self.update_force_data(variables, t_n)
         self.update_ext_state_data(variables, t_n)
         self.update_ext_state_visco_data(variables, t_n)
-=======
+
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
         # Middle node doesn't move        
         Mid_Node = int(PD_deck.Num_Nodes/2)
@@ -218,7 +215,7 @@ class PD_problem():
             logger.error("There is a problem with the Type of Material in your XML deck.")            
         
         # Computation of the residual
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
+
         for x_i in range(0, Mid_Node):
             residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
         for x_i in range(Mid_Node + 1, len(self.x)):

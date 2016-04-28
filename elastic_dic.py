@@ -102,7 +102,7 @@ class elastic_material_dic():
             for e_i in range(0, len(self.exp_e[x_i])):
                 self.exp_T[x_i,
                            e_i] = self.exp_M[x_i,
-                                             e_i] * (w / self.weighted_function(PD_problem,                                                                              PD_deck,PD_problem.exp_init_positions[x_i], x_i)) * self.Modulus * self.exp_e[x_i, e_i]
+                                             e_i] * (w / self.weighted_function(PD_problem, PD_deck,PD_problem.exp_init_positions[x_i], x_i)) * self.Modulus * self.exp_e[x_i, e_i]
 
     def compute_Ts(self, PD_deck):
         for x_i in range(0, self.Exp_Num_Nodes):

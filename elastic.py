@@ -15,13 +15,9 @@ class elastic_material():
 
     def __init__(self, PD_deck, PD_problem, y):
         self.len_x = len(PD_problem.x)
-<<<<<<< HEAD
         self.Modulus = PD_deck.get_elastic_material_properties()
         self.compute_ext_state(PD_deck, PD_problem, y)
-=======
-        self.Modulus = PD_deck.get_material_properties()
         self.compute_ext_state(PD_deck, PD_problem, y )
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
         self.compute_T(PD_deck, PD_problem, y)
         self.compute_Ts(PD_deck, PD_problem)
         #self.strain_energy_from_force(PD_problem, PD_deck, y)
