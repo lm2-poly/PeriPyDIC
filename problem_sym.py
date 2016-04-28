@@ -9,8 +9,7 @@ Created on Sun Dec 13 12:50:28 2015
 import logging
 from scipy.optimize import fsolve
 import timeit
-#from deck_elas import PD_deck
-from deck_visco import PD_deck
+from deck import PD_deck
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
@@ -26,6 +25,7 @@ class PD_problem():
         self.get_pd_nodes(PD_deck)
         self.compute_b(PD_deck)
         self.compute_horizon(PD_deck)
+<<<<<<< HEAD
 
         self.y = np.zeros((int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)))
         self.y[:, 0] = self.x
@@ -62,6 +62,39 @@ class PD_problem():
                              PD_deck.Horizon_Factor, len(self.x)):
                 for t_n in range(1, int(PD_deck.Num_TimeStep)):
                     b[x_i, t_n] = self.ramp_loading(PD_deck, t_n)
+=======
+        
+        self.y = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.y[:,0] = self.x
+        self.strain = np.zeros( ( int(PD_deck.Num_TimeStep) ) )
+        self.forces = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        self.ext = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
+        
+        if PD_deck.Material_Flag == "ELASTIC":
+            self.Modulus = PD_deck.get_material_properties()
+        elif PD_deck.Material_Flag == "VISCOELASTIC":
+            self.Modulus, self.Relaxation_Time = PD_deck.get_material_properties()
+            self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) ) 
+        else:
+            logger.error("There is a problem with the Type of Material in your XML deck.")                        
+    
+    #Creates a loading vector b which describes the force applied on each node
+    #at any time step
+    def compute_b(self, PD_deck):       
+        #Build  matrix b[row = node, column = time]
+        b = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )   
+        PD_deck.get_parameters_loading_ramp()
+        if PD_deck.Loading_Flag == "RAMP":
+            for t_n in range(1, int(PD_deck.Num_TimeStep)):         
+                
+                #Madenci approach
+                for x_i in range(0, 1):
+                    b[x_i, t_n] = -self.ramp_loading( PD_deck, t_n )                    
+
+                for x_i in range(len(self.x) - 1, len(self.x) ):
+                    b[x_i, t_n] = self.ramp_loading( PD_deck, t_n )
+
+>>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
         else:
             logger.error(
                 "There is a problem with the Boundary Conditions in your XML deck.")
@@ -77,18 +110,38 @@ class PD_problem():
             x[i] = (i - int(PD_deck.Num_Nodes / 2)) * PD_deck.Delta_x
         # print x
         self.x = x
+<<<<<<< HEAD
 
     # Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n):
         Time_t = PD_deck.Delta_t * t_n
         if Time_t <= PD_deck.Ramp_Time:
             result = (PD_deck.Force_Density * Time_t) / PD_deck.Ramp_Time
+=======
+    
+    #Provides ramp force values to compute the load vector b
+    def ramp_loading(self, PD_deck, t_n):     
+        Time_t = PD_deck.Delta_t*t_n
+        if Time_t <= PD_deck.Ramp_Time0:
+            result = (PD_deck.Force_Density*Time_t)/PD_deck.Ramp_Time0
+>>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
             return result
-        else:
+        elif Time_t > PD_deck.Ramp_Time0 and Time_t <= PD_deck.Ramp_Time1:
             result = PD_deck.Force_Density
             return result
+<<<<<<< HEAD
 
     # Computes the horizon
+=======
+        elif Time_t > PD_deck.Ramp_Time1 and Time_t <= PD_deck.Ramp_Time2: 
+            result = PD_deck.Force_Density - PD_deck.Force_Density*(Time_t - PD_deck.Ramp_Time1)/(PD_deck.Ramp_Time2 - PD_deck.Ramp_Time1)
+            return result
+        else:
+            result = 0
+            return result
+   
+    #Computes the horizon        
+>>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
     def compute_horizon(self, PD_deck):
         # Be sure that points are IN the horizon
         safety_small_fraction = 1.01
@@ -105,6 +158,7 @@ class PD_problem():
                 x_family.append(x_p)
             else:
                 pass
+        #print x_family
         return x_family
 
     # Computes the shape tensor (here a scalar) for each node
@@ -130,6 +184,7 @@ class PD_problem():
 
     # Comutes the residual vector used in the quasi_static_solver function
     def compute_residual(self, y, PD_deck, t_n):
+<<<<<<< HEAD
         residual = np.zeros((int(PD_deck.Num_Nodes)))
         #from elastic import elastic_material
         from viscoelastic import viscoelastic_material
@@ -141,6 +196,29 @@ class PD_problem():
         self.update_force_data(variables, t_n)
         self.update_ext_state_data(variables, t_n)
         self.update_ext_state_visco_data(variables, t_n)
+=======
+        residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
+        # Middle node doesn't move        
+        Mid_Node = int(PD_deck.Num_Nodes/2)
+        y[Mid_Node] = self.x[Mid_Node]
+        
+        # Choice of the material class
+        if PD_deck.Material_Flag == "ELASTIC":
+            from elastic import elastic_material
+            variables = elastic_material( PD_deck, self, y )
+            self.update_force_data(variables, t_n)
+            self.update_ext_state_data(variables, t_n)
+        elif PD_deck.Material_Flag == "VISCOELASTIC":
+            from viscoelastic import viscoelastic_material
+            variables = viscoelastic_material( PD_deck, self, y, t_n)
+            self.update_force_data(variables, t_n)
+            self.update_ext_state_data(variables, t_n)
+            self.update_ext_state_visco_data(variables, t_n)
+        else:
+            logger.error("There is a problem with the Type of Material in your XML deck.")            
+        
+        # Computation of the residual
+>>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
         for x_i in range(0, Mid_Node):
             residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
         for x_i in range(Mid_Node + 1, len(self.x)):

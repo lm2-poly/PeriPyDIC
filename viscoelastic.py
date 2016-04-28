@@ -6,7 +6,7 @@ Created on Sun Dec 13 16:16:07 2015
 @author: rolland.delorme@gmail.com
 """
 
-from deck_visco import PD_deck
+from deck import PD_deck
 #from problem import PD_problem
 from problem_sym import PD_problem
 import numpy as np
@@ -16,7 +16,7 @@ class viscoelastic_material():
 
     def __init__(self, PD_deck, PD_problem, y, t_n):
         self.len_x = len(PD_problem.x)
-        self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
+        self.Modulus, self.Relaxation_Time = PD_deck.get_material_properties()
         self.compute_ext_state(PD_deck, PD_problem, y)
         self.compute_ext_state_visco(PD_deck, PD_problem, y, t_n)
         self.compute_t_visco(PD_deck, PD_problem, y)
