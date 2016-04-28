@@ -9,8 +9,7 @@ Created on Sun Dec 13 12:50:28 2015
 import logging
 from scipy.optimize import fsolve
 import timeit
-#from deck_elas import PD_deck
-from deck_visco import PD_deck
+from deck import PD_deck
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
@@ -31,9 +30,14 @@ class PD_problem():
         self.strain = np.zeros( ( int(PD_deck.Num_TimeStep) ) )
         self.forces = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
         self.ext = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), int(PD_deck.Num_TimeStep)) )
-        #For viscoelasticity
-        self.Modulus, self.Relaxation_Time = PD_deck.get_viscoelastic_material_properties()
-        self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) ) 
+        
+        if PD_deck.Material_Flag == "ELASTIC":
+            self.Modulus = PD_deck.get_material_properties()
+        elif PD_deck.Material_Flag == "VISCOELASTIC":
+            self.Modulus, self.Relaxation_Time = PD_deck.get_material_properties()
+            self.ext_visco = np.zeros( ( int(PD_deck.Num_Nodes), int(PD_deck.Num_Nodes), len(self.Relaxation_Time), int(PD_deck.Num_TimeStep)) ) 
+        else:
+            logger.error("There is a problem with the Type of Material in your XML deck.")                        
     
     #Creates a loading vector b which describes the force applied on each node
     #at any time step
@@ -125,16 +129,26 @@ class PD_problem():
     #Comutes the residual vector used in the quasi_static_solver function
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( int(PD_deck.Num_Nodes) ) )
-        #from elastic import elastic_material
-        from viscoelastic import viscoelastic_material
         # Middle node doesn't move        
         Mid_Node = int(PD_deck.Num_Nodes/2)
         y[Mid_Node] = self.x[Mid_Node]
-        #variables = elastic_material( PD_deck, self, y )
-        variables = viscoelastic_material( PD_deck, self, y, t_n)
-        self.update_force_data(variables, t_n)
-        self.update_ext_state_data(variables, t_n)
-        self.update_ext_state_visco_data(variables, t_n)
+        
+        # Choice of the material class
+        if PD_deck.Material_Flag == "ELASTIC":
+            from elastic import elastic_material
+            variables = elastic_material( PD_deck, self, y )
+            self.update_force_data(variables, t_n)
+            self.update_ext_state_data(variables, t_n)
+        elif PD_deck.Material_Flag == "VISCOELASTIC":
+            from viscoelastic import viscoelastic_material
+            variables = viscoelastic_material( PD_deck, self, y, t_n)
+            self.update_force_data(variables, t_n)
+            self.update_ext_state_data(variables, t_n)
+            self.update_ext_state_visco_data(variables, t_n)
+        else:
+            logger.error("There is a problem with the Type of Material in your XML deck.")            
+        
+        # Computation of the residual
         for x_i in range(0, Mid_Node):
             residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
         for x_i in range(Mid_Node+1, len(self.x)):

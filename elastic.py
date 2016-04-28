@@ -5,7 +5,7 @@ Created on Sun Dec 13 16:16:07 2015
 @author: ilyass.tabiai@gmail.com
 @author: rolland.delorme@gmail.com
 """
-from deck_elas import PD_deck
+from deck import PD_deck
 from problem import PD_problem
 import numpy as np
 
@@ -13,7 +13,7 @@ class elastic_material():
     
     def __init__(self, PD_deck, PD_problem, y):
         self.len_x = len(PD_problem.x)
-        self.Modulus = PD_deck.get_elastic_material_properties()
+        self.Modulus = PD_deck.get_material_properties()
         self.compute_ext_state(PD_deck, PD_problem, y )
         self.compute_T(PD_deck, PD_problem, y)
         self.compute_Ts(PD_deck, PD_problem)

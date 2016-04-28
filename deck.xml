@@ -6,19 +6,30 @@
 	</Geometry>
 	<Boundary_Conditions>
 	        <Type>RAMP</Type>
-			<Force>50.0</Force>
-			<Ramp_Time>0.5</Ramp_Time>
+			<Force>40.0</Force>
+			<Ramp_Time0>1.0</Ramp_Time0>
+			<Ramp_Time1>8.0</Ramp_Time1>
+			<Ramp_Time2>11.0</Ramp_Time2>
 	</Boundary_Conditions>
 	<Discretization>
 			<Final_Time>5.0</Final_Time>
-			<N_Steps_t>4</N_Steps_t>
-			<N_Nodes_Bar>10</N_Nodes_Bar>
+			<N_Steps_t>10</N_Steps_t>
+			<N_Nodes_Bar>5</N_Nodes_Bar>
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
 	</Discretization>
 	<Material>
 	        <Type>ELASTIC</Type>
-			<E_Modulus>5000.0</E_Modulus>
+			<E_Modulus>4000.0</E_Modulus>
+		<!--
+	        <Type>VISCOELASTIC</Type>
+			<E_Modulus0>4000.0</E_Modulus0>
+			<E_Modulus1>2000.0</E_Modulus1>
+			<E_Modulus2>1000.0</E_Modulus2>
+			<Relaxation_Time0>NaN</Relaxation_Time0>
+			<Relaxation_Time1>1.0</Relaxation_Time1>
+			<Relaxation_Time2>100.0</Relaxation_Time2>
+		-->
 	</Material>
 </data>
 
