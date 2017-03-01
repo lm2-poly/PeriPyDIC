@@ -11,7 +11,7 @@ import logging
 from scipy.optimize import fsolve
 import timeit
 #from deck_elas import PD_deck
-from PD_deck import PD_deck
+import IO.PD_deck
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt

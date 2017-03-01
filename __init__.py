@@ -12,9 +12,9 @@ import logging
 import pdb
 import numpy as np
 import random
-from PD_deck import PD_deck
+import IO.PD_deck
 from problem import PD_problem
-from elastic_dic import elastic_material_dic
+from dic.elastic_dic import elastic_material_dic
 Logger = logging.getLogger(__name__)
 
 
@@ -28,7 +28,7 @@ def main(argv):
     materialType = -1
     helpText = "__init__.py -i <inputfile> -o <outputfile> -t <type> \n" \
         "Help text"
-    print sys.argv
+    
     if len(sys.argv) != 7:
         print(helpText)
         sys.exit(1)
