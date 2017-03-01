@@ -9,7 +9,7 @@ Created on Sun Dec 13 12:50:28 2015
 import logging
 from scipy.optimize import fsolve
 import timeit
-from deck import PD_deck
+import IO.PD_deck
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
