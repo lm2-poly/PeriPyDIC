@@ -1,39 +1,35 @@
 <?xml version="1.0"?>
 <data>
 	<Geometry>
-			<Length_Bar>37.5</Length_Bar>
+			<Length_Bar>5.0</Length_Bar>
 			<Surface_Bar>1.0</Surface_Bar>
 	</Geometry>
-	<Boundary_Conditions>
-<<<<<<< HEAD
-	        <Type>LINEAR_DISPLACEMENT</Type>
-			<Speed>0.06</Speed>
-	</Boundary_Conditions>
-	<Discretization>
-			<Final_Time>104</Final_Time>
-			<N_Steps_t>50</N_Steps_t>
-			<N_Nodes_Bar>3</N_Nodes_Bar>
-=======
-	        <Type>RAMP</Type>
+	<Load_Type>
+	        <Type>FORCE</Type>
 			<Force>40.0</Force>
+		<!--
+	        <Type>DISPLACEMENT</Type>
+			<Disp>5.05</Disp>
+		-->
+	</Load_Type>
+	<Load_Shape>
+	        <Type>RAMP</Type>
 			<Ramp_Time0>1.0</Ramp_Time0>
 			<Ramp_Time1>8.0</Ramp_Time1>
 			<Ramp_Time2>11.0</Ramp_Time2>
-	</Boundary_Conditions>
+	</Load_Shape>
 	<Discretization>
-			<Final_Time>5.0</Final_Time>
-			<N_Steps_t>10</N_Steps_t>
+			<Final_Time>20.0</Final_Time>
+			<N_Steps_t>40</N_Steps_t>
 			<N_Nodes_Bar>5</N_Nodes_Bar>
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
 			<Horizon_Factor>1</Horizon_Factor>
 			<Influence_Function>1.0</Influence_Function>
 	</Discretization>
 	<Material>
+
 	        <Type>ELASTIC</Type>
-<<<<<<< HEAD
-			<E_Modulus>2200.0</E_Modulus>
-=======
 			<E_Modulus>4000.0</E_Modulus>
+
 		<!--
 	        <Type>VISCOELASTIC</Type>
 			<E_Modulus0>4000.0</E_Modulus0>
@@ -43,7 +39,6 @@
 			<Relaxation_Time1>1.0</Relaxation_Time1>
 			<Relaxation_Time2>100.0</Relaxation_Time2>
 		-->
->>>>>>> 6fddd7e58c5c4a1e8728ef07a882a8506451a22e
 	</Material>
 </data>
 
