@@ -4,7 +4,7 @@ Created on Fri Dec 11 19:24:33 2015
 
 @author: ilyass.tabiai@gmail.com
 @author: rolland.delorme@gmail.com
-@author: diehl@ins.uni-bonn.de
+@author: patrick.diehl@polymtl.ca
 """
 import sys
 import getopt
