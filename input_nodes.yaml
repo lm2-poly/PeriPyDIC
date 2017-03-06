@@ -10,6 +10,7 @@ Material:
     Type: Elastic
     E_Modulus: 4000.0
 Boundary:
-    Type: Force
-    Value: 40.0
-       
+    Condition:
+        Type: Force
+        Value: 40.0
+        File: condition.csv

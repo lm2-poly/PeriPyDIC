@@ -40,8 +40,7 @@ def main(argv):
 
     if typeIn == types[0]:
         deck = IO.deck.Deck(inputFile)
-    
-
+        
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -1,12 +1,12 @@
-
 import yaml
 import os.path
 import geometry
 import sys
+import util.condition
 
 class Deck():
     
-    dim = 0
+    conditions = []
     
     def __init__(self,inputFile):
             if not os.path.exists(inputFile):
@@ -73,8 +73,10 @@ class Deck():
                                 self.length_x = float(self.doc["Discretization"]["Bar"]["Length_X"])
                             else:
                                 self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
+                                self.conditions.append(util.condition.Condition(self.doc["Boundary"]["Condition"]))
                                 print self.geometry.pos_x
                                 print self.geometry.volumes
+                                print self.conditions[0].id
                                 
                                 
                                 

@@ -58,7 +58,6 @@ class Geometry():
             self.volume_boundary += self.volumes[i]
     
     def readNodes(self,dim,inFile):
-        print "Nodes"
         if not os.path.exists(inFile):
                 print "Error: Could not find " + inputFile
                 sys.exit(1)
@@ -91,4 +90,4 @@ class Geometry():
                 self.volumes[i] = float(row[dim+1])
                 i +=1
         
-    #def read_bc():
+
