@@ -5,10 +5,17 @@ import numpy as np
 
 class Condition():
 
-    def __init__(self, data):
+    def __init__(self, data,volume_boundary):
         self.type = data["Type"]
         self.value = data["Value"]
-        self.id = self.readCondition(data["File"])
+        if "File" in data:
+            self.id = self.readCondition(data["File"])
+        self.symmetry = data["Symmetry"]
+        if self.type == "Force":
+            if self.symmetry == True:
+                self.force_density = self.value / volume_boundary * 2.0
+            else:
+                self.force_density = self.value / volume_boundary
 
     def readCondition(self, inFile):
         if not os.path.exists(inFile):

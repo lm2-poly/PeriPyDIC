@@ -36,20 +36,21 @@ class Geometry():
     
         self.volume_boundary = 0.
     
-    def generateGrid(self,dim,data,horizon_factor):
+    def generateGrid(self,dim,data,horizon_factor,delta_x):
         if dim == 1:
-            self.generateGrid1D(data)
-            self.generateVolume1D(data,horizon_factor)
+            self.generateGrid1D(data,delta_x)
+            self.generateVolume1D(data,horizon_factor,delta_x)
             
-    def generateGrid1D(self,data):
+    def generateGrid1D(self,data,delta_x):
         x = np.zeros(int(data["Nodes_X"]))
         for i in range(0, int(data["Nodes_X"])):
-            x[i] = (i - int(int(data["Nodes_X"]) / 2)) * data["Nodes_X"]
+            x[i] = (i - int(int(data["Nodes_X"]) / 2)) * delta_x
         self.pos_x = x  
         
-    def generateVolume1D(self,data,horizon_factor):
+    def generateVolume1D(self,data,horizon_factor,delta_x):
         self.volumes = np.empty(int(data["Nodes_X"]))
-        self.volumes.fill(float(data["Length_X"])*float(data["Surface_X"]))
+        self.volumes.fill(delta_x
+                          *float(data["Surface_X"]))
        
         for i in range(0, int(horizon_factor)):
             self.volume_boundary += self.volumes[i]

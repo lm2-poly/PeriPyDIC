@@ -12,6 +12,13 @@ Material:
     Type: Elastic
     E_Modulus: 4000.0
 Boundary:
-    Type: Force
-    Value: 40.0
-       
+    Condition:
+        Type: Force
+        Symmetry: True
+        Value: 40.0
+    Shape:
+        Type: Ramp
+        Values:
+            - 1.0
+            - 8.0
+            - 11.0
