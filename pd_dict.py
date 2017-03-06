@@ -40,6 +40,8 @@ def main(argv):
 
     if typeIn == types[0]:
         deck = IO.deck.Deck(inputFile)
+        if deck.material_type == "Elastic":
+
         
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
