@@ -17,6 +17,7 @@ class Deck():
     delta_t = 0.0
     shape_type = "None"
     shape_values = []
+    discretization_type = "None"
     
     def __init__(self,inputFile):
             if not os.path.exists(inputFile):
@@ -57,8 +58,8 @@ class Deck():
                             print "Error: No Time_Steps tag found"
                             sys.exit(1)
                         else:
-                            self.time_steps = int(self.doc["Discretization"]["Time_Steps"])
-                            self.delta_t = float(self.final_time / self.time_steps)
+                            self.time_steps = int(self.doc["Discretization"]["Time_Steps"]) + 1
+                            self.delta_t = float(self.final_time  / (self.time_steps-1)) 
                         if not "Horizon_Factor" in self.doc["Discretization"]:
                             print "Error: No Horizon_Factor tag found"
                             sys.exit(1)
@@ -69,26 +70,22 @@ class Deck():
                             sys.exit(1)
                         else:
                             self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
-                        if not( "Bar") in self.doc["Discretization"] and not( "File") in self.doc["Discretization"]:
-                            print "Error: No Bar or File tag found"
+                        if not( "File") in self.doc["Discretization"]:
+                            print "Error: No File tag found"
                             sys.exit(1)
-                        if "Bar" in self.doc["Discretization"] and "File" in self.doc["Discretization"]:
-                            print "Error: Bar tag and File tag found. Only one type of discretization is allowd"
-                        else:
-                            self.geometry = geometry.Geometry()
-                            if "Bar" in self.doc["Discretization"]:
-                                self.length_x = float(self.doc["Discretization"]["Bar"]["Length_X"])
-                                self.number_of_nodes_x = int(self.doc["Discretization"]["Bar"]["Nodes_X"])
-                                self.delta_x = float(self.length_x / self.number_of_nodes_x)
-                                self.geometry.generateGrid(self.dim,self.doc["Discretization"]["Bar"],self.horizon_factor,self.delta_x)
-                                self.surface_x = float(self.doc["Discretization"]["Bar"]["Surface_X"])
-                            else:
-                                self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
-                            self.conditions.append(util.condition.Condition(self.doc["Boundary"]["Condition"],self.geometry.volume_boundary))
-                            self.num_nodes_x = len(self.geometry.pos_x)
+                        self.geometry = geometry.Geometry()
+                        self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
+                        self.discretization_type = "File"
+                        for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
+                            self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
+                        self.num_nodes_x = len(self.geometry.pos_x)
                         if "Shape" in self.doc["Boundary"]:
                             self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
                             self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
+                    if not "Solver" in self.doc:
+                        print "Error: No solver tag found"
+                        sys.exit(1)
+                    self.solver_symmetry = self.doc["Solver"]["Symmetry"]
                         
                             
                                 

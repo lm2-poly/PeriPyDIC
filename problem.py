@@ -19,6 +19,7 @@ import csv
 import pdb
 import math
 import datetime
+import util.condition as condition
 
 logger = logging.getLogger(__name__)
 
@@ -60,44 +61,41 @@ class PD_problem():
     #at any time step
     def compute_b(self, PD_deck):       
         #Build  matrix b[row = node, column = time]
-        for con in PD_deck.conditions:
-            if con.type == "Force":
-                b = np.zeros( ( self.len_x, int(PD_deck.time_steps)) )
-                for t_n in range(1, int(PD_deck.time_steps)):         
-                
-                    #Madenci approach
-                    for x_i in range(0, int(PD_deck.horizon_factor)):
-                        b[x_i, t_n] = -self.ramp_loading( PD_deck, t_n )                    
-
-                    for x_i in range(len(PD_deck.geometry.pos_x) - int(PD_deck.horizon_factor), len(PD_deck.geometry.pos_x) ):
-                        b[x_i, t_n] = self.ramp_loading( PD_deck, t_n )
-                    #print b
-                    self.b = b
+        
+        b = np.zeros( ( self.len_x, int(PD_deck.time_steps)) )
+        for t_n in range(1, int(PD_deck.time_steps)): 
+            for con in PD_deck.conditions:
+                #Madenci approach
+                for x_i in con.id:
+                    print "Id= " , x_i
+                    b[x_i, t_n] = self.ramp_loading( PD_deck, t_n , con )
+                print b
+            self.b = b
         
     #Provides ramp force values to compute the load vector b
-    def ramp_loading(self, PD_deck, t_n):     
-        Time_t = PD_deck.delta_t*t_n
+    def ramp_loading(self, PD_deck, t_n, con):     
+        Time_t = PD_deck.delta_t*(t_n)
+        print Time_t , t_n , PD_deck.delta_t
         if PD_deck.shape_type == "Ramp":
-            for con in PD_deck.conditions:
-                if con.type == "Force":                                      
-                    if Time_t <= PD_deck.shape_values[0]:
-                        result = (con.force_density*Time_t)/PD_deck.shape_values[0]
-                        return result
-                    elif Time_t > PD_deck.shape_values[0] and Time_t <= PD_deck.shape_values[1]:
-                        result = con.force_density
-                        return result
-                    elif Time_t > PD_deck.shape_values[1] and Time_t <= PD_deck.shape_values[2]: 
-                        result = con.force_density - con.force_density*(Time_t - PD_deck.shape_values[1])/(PD_deck.shape_values[2] - PD_deck.shape_values[1])
-                        return result
-                    else:
-                        result = 0
-                        return result
-                elif PD_deck.LoadType_Flag == "DISPLACEMENT":
-                    logger.error("Ramp loading in displacement: coming soon. See compute_u_load(PD_deck)")
+            if con.type == "Force":                                      
+                if Time_t <= PD_deck.shape_values[0]:
+                    result = (con.force_density*Time_t)/PD_deck.shape_values[0]
+                    return result
+                elif Time_t > PD_deck.shape_values[0] and Time_t <= PD_deck.shape_values[1]:
+                    result = con.force_density
+                    return result
+                elif Time_t > PD_deck.shape_values[1] and Time_t <= PD_deck.shape_values[2]: 
+                    result = con.force_density - con.force_density*(Time_t - PD_deck.shape_values[1])/(PD_deck.shape_values[2] - PD_deck.shape_values[1])
+                    return result
                 else:
-                    logger.error("There is a problem with the Type of Load_Type in your XML deck.")
+                    result = 0
+                    return result
+            elif PD_deck.LoadType_Flag == "DISPLACEMENT":
+                logger.error("Ramp loading in displacement: coming soon. See compute_u_load(PD_deck)")
             else:
-                logger.error("There is a problem with the Type of Load_Shape in your XML deck.")
+                logger.error("There is a problem with the Type of Load_Type in your XML deck.")
+        else:
+            logger.error("There is a problem with the Type of Load_Shape in your XML deck.")
                    
     # Computes the horizon        
     def compute_horizon(self, PD_deck):
@@ -142,30 +140,32 @@ class PD_problem():
     #Computes the residual vector used in the quasi_static_solver function
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( self.len_x ) )
-        # Middle node doesn't move        
-        Mid_Node = int(PD_deck.num_nodes_x/2)
-        y[Mid_Node] = PD_deck.geometry.pos_x[Mid_Node]
         
-        # Choice of the material class
-        if PD_deck.material_type == "Elastic":
-            from materials.elastic import elastic_material
-            variables = elastic_material( PD_deck, self, y )
-            self.update_force_data(variables, t_n)
-            self.update_ext_state_data(variables, t_n)
-        elif PD_deck.material_type == "Viscoelastic":
-            from materials.viscoelastic import viscoelastic_material
-            variables = viscoelastic_material( PD_deck, self, y, t_n)
-            self.update_force_data(variables, t_n)
-            self.update_ext_state_data(variables, t_n)
-            self.update_ext_state_visco_data(variables, t_n)
-        else:
-            logger.error("There is a problem with the Type of Material in your XML deck.")            
-        
-        # Computation of the residual
-        for x_i in range(0, Mid_Node):
-            residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
-        for x_i in range(Mid_Node+1, len(PD_deck.geometry.pos_x)):
-            residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
+        if PD_deck.solver_symmetry == True:
+            # Middle node doesn't move        
+            Mid_Node = int(PD_deck.num_nodes_x/2)
+            y[Mid_Node] = PD_deck.geometry.pos_x[Mid_Node]
+            
+            # Choice of the material class
+            if PD_deck.material_type == "Elastic":
+                from materials.elastic import elastic_material
+                variables = elastic_material( PD_deck, self, y )
+                self.update_force_data(variables, t_n)
+                self.update_ext_state_data(variables, t_n)
+            elif PD_deck.material_type == "Viscoelastic":
+                from materials.viscoelastic import viscoelastic_material
+                variables = viscoelastic_material( PD_deck, self, y, t_n)
+                self.update_force_data(variables, t_n)
+                self.update_ext_state_data(variables, t_n)
+                self.update_ext_state_visco_data(variables, t_n)
+            else:
+                logger.error("There is a problem with the Type of Material in your XML deck.")            
+            
+            # Computation of the residual
+            for x_i in range(0, Mid_Node):
+                residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
+            for x_i in range(Mid_Node+1, len(PD_deck.geometry.pos_x)):
+                residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
         #print residual
         return residual
 
@@ -182,7 +182,7 @@ class PD_problem():
                 logger.warning("Convergence could not be reached.")
             else:
                 logger.info( t_n, solver.success )
-            #print solver
+            print y
         return solver
 
 #NON SYMMETRIC LOADING    

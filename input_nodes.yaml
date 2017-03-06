@@ -1,7 +1,7 @@
 Discretization:
     Dim: 1
-    Final_Time: 20.0
-    Time_Steps: 40
+    Final_Time: 2.0
+    Time_Steps: 4
     Horizon_Factor: 1.0
     Influence_Function: 1.0
     File: 
@@ -12,5 +12,17 @@ Material:
 Boundary:
     Condition:
         Type: Force
-        Value: 40.0
-        File: condition.csv
+        Value: 
+            - 40.0
+            - -40.0
+        File: 
+            - condition_front.csv
+            - condition_back.csv
+    Shape:
+        Type: Ramp
+        Values:
+            - 1.0
+            - 8.0
+            - 11.0
+Solver:
+    Symmetry: True
