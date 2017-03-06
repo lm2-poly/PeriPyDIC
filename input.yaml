@@ -1,0 +1,17 @@
+Discretization:
+    Dim: 1
+    Final_Time: 20.0
+    Time_Steps: 40
+    Horizon_Factor: 1.0
+    Influence_Function: 1.0
+    Bar:
+        Length_X: 5.0
+        Surface_X: 1
+        Nodes_X: 5        
+Material:
+    Type: Elastic
+    E_Modulus: 4000.0
+Boundary:
+    Type: Force
+    Value: 40.0
+       

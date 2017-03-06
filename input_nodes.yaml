@@ -1,0 +1,16 @@
+Discretization:
+    Dim: 1
+    Final_Time: 20.0
+    Time_Steps: 40
+    Horizon_Factor: 1.0
+    Influence_Function: 1.0
+    File: 
+        Name: geometry.csv
+Material:
+    Type: Elastic
+    E_Modulus: 4000.0
+Boundary:
+    Condition:
+        Type: Force
+        Value: 40.0
+        File: condition.csv
