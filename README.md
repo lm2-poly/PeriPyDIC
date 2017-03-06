@@ -14,7 +14,7 @@
 
    The following python packages are **required**:
    * `numpy`
-   * `xmltodict`
+   * `pyyaml`
    * `scipy.optimize`
 
    Optional packages:
