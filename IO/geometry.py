@@ -36,27 +36,6 @@ class Geometry():
     
         self.volume_boundary = 0.
     
-    def generateGrid(self,dim,data,horizon_factor):
-        if dim == 1:
-            self.generateGrid1D(data)
-            self.generateVolume1D(data,horizon_factor)
-            
-    def generateGrid1D(self,data):
-        x = np.zeros(int(data["Nodes_X"]))
-        for i in range(0, int(data["Nodes_X"])):
-            x[i] = (i - int(int(data["Nodes_X"]) / 2)) * data["Nodes_X"]
-        self.pos_x = x  
-        
-    def generateVolume1D(self,data,horizon_factor):
-        self.volumes = np.empty(int(data["Nodes_X"]))
-        self.volumes.fill(float(data["Length_X"])*float(data["Surface_X"]))
-       
-        for i in range(0, int(horizon_factor)):
-            self.volume_boundary += self.volumes[i]
-
-        for i in range(len(self.volumes) - int(horizon_factor), len(self.volumes) ):
-            self.volume_boundary += self.volumes[i]
-    
     def readNodes(self,dim,inFile):
         if not os.path.exists(inFile):
                 print "Error: Could not find " + inputFile

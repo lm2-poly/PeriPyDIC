@@ -2,14 +2,16 @@
 """
 Created on Fri Dec 11 19:24:33 2015
 
-@author: ilyass.tabiai@gmail.com
-@author: rolland.delorme@gmail.com
-@author: diehl@ins.uni-bonn.de
+@author: ilyass.tabiai@polymtl.ca
+@author: rolland.delorme@polymtl.ca
+@author: patrick.diehl@polymtl.ca
 """
 
 import sys
 import getopt
 import IO.deck
+import problem
+import numpy as np
 
 def main(argv):
     """
@@ -41,7 +43,14 @@ def main(argv):
     if typeIn == types[0]:
         deck = IO.deck.Deck(inputFile)
         if deck.material_type == "Elastic":
+            simulation(deck)
+            
 
+def simulation(data):
+    solver = problem.PD_problem(data)
+    solver.quasi_static_solver(data.geometry.pos_x, data)
+    solver.strain_center_bar( data )
+    print np.around(solver.strain,decimals=6)
         
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
