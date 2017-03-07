@@ -64,11 +64,12 @@ class PD_problem():
         b = np.zeros( ( self.len_x, PD_deck.time_steps) )
         for t_n in range(1, PD_deck.time_steps): 
             for con in PD_deck.conditions:
-                #Madenci approach
-                for x_i in con.id:
-                    b[x_i, t_n] = self.ramp_loading( PD_deck, t_n , con )
-                #print b
-            self.b = b
+                if con.type == "Force":
+                    #Madenci approach
+                    for x_i in con.id:
+                        b[x_i, t_n] = self.ramp_loading( PD_deck, t_n , con )
+            
+                self.b = b
         
     #Provides ramp force values to compute the load vector b
     
@@ -141,31 +142,39 @@ class PD_problem():
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( self.len_x ) )
         
-        if PD_deck.solver_symmetry == True:
-            # Middle node doesn't move        
-            Mid_Node = int(self.len_x/2)
-            y[Mid_Node] = PD_deck.geometry.pos_x[Mid_Node]
-            
-            # Choice of the material class
-            if PD_deck.material_type == "Elastic":
-                from materials.elastic import elastic_material
-                variables = elastic_material( PD_deck, self, y )
-                self.update_force_data(variables, t_n)
-                self.update_ext_state_data(variables, t_n)
-            elif PD_deck.material_type == "Viscoelastic":
-                from materials.viscoelastic import viscoelastic_material
-                variables = viscoelastic_material( PD_deck, self, y, t_n)
-                self.update_force_data(variables, t_n)
-                self.update_ext_state_data(variables, t_n)
-                self.update_ext_state_visco_data(variables, t_n)
-            else:
-                logger.error("There is a problem with the Type of Material in your XML deck.")            
-            
-            # Computation of the residual
-            for x_i in range(0, Mid_Node):
+       
+       
+        for con in PD_deck.conditions:
+            if con.type == "Displacement": 
+                for id in con.id:
+                    y[id] = con.value
+                        
+    # Choice of the material class
+        if PD_deck.material_type == "Elastic":
+            from materials.elastic import elastic_material
+            variables = elastic_material( PD_deck, self, y )
+            self.update_force_data(variables, t_n)
+            self.update_ext_state_data(variables, t_n)
+        elif PD_deck.material_type == "Viscoelastic":
+            from materials.viscoelastic import viscoelastic_material
+            variables = viscoelastic_material( PD_deck, self, y, t_n)
+            self.update_force_data(variables, t_n)
+            self.update_ext_state_data(variables, t_n)
+            self.update_ext_state_visco_data(variables, t_n)
+        else:
+            logger.error("There is a problem with the Type of Material in your XML deck.")            
+         
+    
+        for x_i in range(0,self.len_x):
+            found = False
+            for con in PD_deck.conditions:
+                if con.type == "Displacement":  
+                    if x_i in con.id:
+                        found = True
+            if found == False:
                 residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
-            for x_i in range(Mid_Node+1, len(PD_deck.geometry.pos_x)):
-                residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
+                            
+            
         #print residual
         return residual
 

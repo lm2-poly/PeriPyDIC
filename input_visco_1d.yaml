@@ -18,18 +18,21 @@ Material:
         - 100.0
 Boundary:
     Condition:
-        Type: Force
+        Type: 
+            - Force
+            - Force
+            - Displacement
         Value: 
             - 40.0
             - -40.0
+            - 0.0
         File: 
-            - condition_front.csv
-            - condition_back.csv
+            - force_condition_1.csv
+            - force_condition_2.csv
+            - displ_condition_1.csv
     Shape:
         Type: Ramp
         Values:
             - 1.0
             - 8.0
             - 11.0
-Solver:
-    Symmetry: True

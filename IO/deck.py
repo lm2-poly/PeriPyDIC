@@ -103,15 +103,11 @@ class PD_deck():
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
                         self.delta_x = self.geometry.getMinDist(1)
                         for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
-                            self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
+                            self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
                         self.num_nodes_x = len(self.geometry.pos_x)
                         if "Shape" in self.doc["Boundary"]:
                             self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
                             self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
-                    if not "Solver" in self.doc:
-                        print "Error: No solver tag found"
-                        sys.exit(1)
-                    self.solver_symmetry = self.doc["Solver"]["Symmetry"]
                         
                             
                                 
