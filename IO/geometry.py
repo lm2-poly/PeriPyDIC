@@ -69,4 +69,29 @@ class Geometry():
                 self.volumes[i] = float(row[dim+1])
                 i +=1
         
-
+    def getMinDist(self,direction):
+        tmp = float('inf')
+        if direction == 1:
+            for i in range(0,len(self.pos_x)):
+                for j in range(0,len(self.pos_x)):
+                    if i != j:
+                        val = abs(self.pos_x[j]-self.pos_x[i])
+                        if val < tmp:
+                            tmp = val
+        if direction == 2:
+            for i in range(0,len(self.pos_y)):
+                for j in range(0,len(self.pos_y)):
+                    if i != j:
+                        val = abs(self.pos_y[j]-self.pos_y[i])
+                        if val < tmp:
+                            tmp = val
+        if direction == 3:
+            for i in range(0,len(self.pos_z)):
+                for j in range(0,len(self.pos_z)):
+                    if i != j:
+                        val = abs(self.pos_z[j]-self.pos_z[i])
+                        if val < tmp:
+                            tmp = val
+        return tmp
+                    
+        

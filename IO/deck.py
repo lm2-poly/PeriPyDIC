@@ -1,14 +1,25 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tues Mar 07 10:00:00 2017
+
+@author: ilyass.tabiai@polymtl.ca
+@author: rolland.delorme@polymtl.ca
+@author: patrick.diehl@polymtl.ca
+"""
+
 import yaml
 import os.path
 import geometry
 import sys
 import util.condition
 
-class Deck():
+class PD_deck():
     
     conditions = []
     material_type = ""
     e_modulus = 0.0
+    relax_modulus = []
+    relax_time = []
     num_nodes_x = 0.0
     delta_x = 0.0
     horizon_factor = 0.0
@@ -17,7 +28,6 @@ class Deck():
     delta_t = 0.0
     shape_type = "None"
     shape_values = []
-    discretization_type = "None"
     
     def __init__(self,inputFile):
             if not os.path.exists(inputFile):
@@ -34,12 +44,28 @@ class Deck():
                         sys.exit(1)
                     else:
                         self.material_type = self.doc["Material"]["Type"]
-                    if not "E_Modulus" in self.doc["Material"]:
-                        print "Error: No E_Modulus tag found"
-                        sys.exit(1)
-                    else:
-                        self.e_modulus = float(self.doc["Material"]["E_Modulus"])
-                        
+                        if self.material_type == "Elastic":
+                            if not "E_Modulus" in self.doc["Material"]:
+                                print "Error: No E_Modulus tag found"
+                                sys.exit(1)
+                            else:
+                                self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                        elif self.material_type == "Viscoelastic":
+                            if not "Relax_Modulus" in self.doc["Material"]:
+                                print "Error: No Relax_Modulus tag found"
+                                sys.exit(1)
+                            else:
+                                self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                print self.relax_modulus
+                            if not "Relax_Time" in self.doc["Material"]:
+                                print "Error: No Relax_Time tag found"
+                                sys.exit(1)
+                            else:
+                                self.relax_time = self.doc["Material"]["Relax_Time"]
+                                print self.relax_time
+                        else:
+                            print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
+                            sys.exit(1)
                     if not "Discretization" in self.doc:
                         print "Error: Specific a discretization tag in your yaml"
                         sys.exit(1)
@@ -75,17 +101,13 @@ class Deck():
                             sys.exit(1)
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
-                        self.discretization_type = "File"
+                        self.delta_x = self.geometry.getMinDist(1)
                         for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
-                            self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
+                            self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
                         self.num_nodes_x = len(self.geometry.pos_x)
                         if "Shape" in self.doc["Boundary"]:
                             self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
                             self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
-                    if not "Solver" in self.doc:
-                        print "Error: No solver tag found"
-                        sys.exit(1)
-                    self.solver_symmetry = self.doc["Solver"]["Symmetry"]
                         
                             
                                 

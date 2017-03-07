@@ -1,0 +1,38 @@
+Discretization:
+    Dim: 1
+    Final_Time: 20.0
+    Time_Steps: 40
+    Horizon_Factor: 1.0
+    Influence_Function: 1.0
+    File: 
+        Name: geometry.csv
+Material:
+    Type: Viscoelastic
+    Relax_Modulus: 
+        - 4000.0
+        - 2000.0
+        - 1000.0
+    Relax_Time:
+        - NaN
+        - 1.0
+        - 100.0
+Boundary:
+    Condition:
+        Type: 
+            - Force
+            - Force
+            - Displacement
+        Value: 
+            - 40.0
+            - -40.0
+            - 0.0
+        File: 
+            - force_condition_1.csv
+            - force_condition_2.csv
+            - displ_condition_1.csv
+    Shape:
+        Type: Ramp
+        Values:
+            - 1.0
+            - 8.0
+            - 11.0

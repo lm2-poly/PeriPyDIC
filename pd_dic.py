@@ -12,6 +12,7 @@ import getopt
 import IO.deck
 import problem
 import numpy as np
+import time
 
 def main(argv):
     """
@@ -41,16 +42,26 @@ def main(argv):
         sys.exit(1)    
 
     if typeIn == types[0]:
-        deck = IO.deck.Deck(inputFile)
+        deck = IO.deck.PD_deck(inputFile)
         if deck.material_type == "Elastic":
             simulation(deck)
+        elif deck.material_type == "Viscoelastic":
+            simulation(deck)
+        else:
+            print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
             
 
 def simulation(data):
+    t0 = time.time()
     solver = problem.PD_problem(data)
-    solver.quasi_static_solver(data.geometry.pos_x, data)
+    x_0 = solver.random_initial_guess( data.geometry.pos_x, data )
+    solver.quasi_static_solver(x_0, data)
     solver.strain_center_bar( data )
+    print "Strain = " 
     print np.around(solver.strain,decimals=6)
+    print "Nodes positions = "
+    print solver.y
+    print time.time()- t0, "seconds"
         
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
