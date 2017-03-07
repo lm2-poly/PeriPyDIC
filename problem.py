@@ -349,6 +349,7 @@ class PD_problem():
         self.u[:, t_n] = self.y[:, t_n] - self.y[:, 0]
 
     def random_initial_guess(self, z, PD_deck):
+        #Do not forget to do this for each direction, not only x
         y = np.zeros((self.len_x))
         y = z + 0.1 * random.uniform(-1, 1) * PD_deck.delta_x
         return y

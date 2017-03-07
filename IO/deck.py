@@ -21,14 +21,13 @@ class PD_deck():
     relax_modulus = []
     relax_time = []
     num_nodes_x = 0.0
-    delta_x = 1.0
+    delta_x = 0.0
     horizon_factor = 0.0
     time_steps = 0
     e_modulus = 0.0
     delta_t = 0.0
     shape_type = "None"
     shape_values = []
-    discretization_type = "None"
     
     def __init__(self,inputFile):
             if not os.path.exists(inputFile):
@@ -102,7 +101,7 @@ class PD_deck():
                             sys.exit(1)
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
-                        self.discretization_type = "File"
+                        self.delta_x = self.geometry.getMinDist(1)
                         for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
                             self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
                         self.num_nodes_x = len(self.geometry.pos_x)
