@@ -1,14 +1,25 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tues Mar 07 10:00:00 2017
+
+@author: ilyass.tabiai@polymtl.ca
+@author: rolland.delorme@polymtl.ca
+@author: patrick.diehl@polymtl.ca
+"""
+
 import yaml
 import os.path
 import geometry
 import sys
 import util.condition
 
-class Deck():
+class PD_deck():
     
     conditions = []
     material_type = ""
     e_modulus = 0.0
+    relax_modulus = []
+    relax_time = []
     num_nodes_x = 0.0
     delta_x = 0.0
     horizon_factor = 0.0
@@ -34,12 +45,28 @@ class Deck():
                         sys.exit(1)
                     else:
                         self.material_type = self.doc["Material"]["Type"]
-                    if not "E_Modulus" in self.doc["Material"]:
-                        print "Error: No E_Modulus tag found"
-                        sys.exit(1)
-                    else:
-                        self.e_modulus = float(self.doc["Material"]["E_Modulus"])
-                        
+                        if self.material_type == "Elastic":
+                            if not "E_Modulus" in self.doc["Material"]:
+                                print "Error: No E_Modulus tag found"
+                                sys.exit(1)
+                            else:
+                                self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                        elif self.material_type == "Viscoelastic":
+                            if not "Relax_Modulus" in self.doc["Material"]:
+                                print "Error: No Relax_Modulus tag found"
+                                sys.exit(1)
+                            else:
+                                self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                print self.relax_modulus
+                            if not "Relax_Time" in self.doc["Material"]:
+                                print "Error: No Relax_Time tag found"
+                                sys.exit(1)
+                            else:
+                                self.relax_time = self.doc["Material"]["Relax_Time"]
+                                print self.relax_time
+                        else:
+                            print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
+                            sys.exit(1)
                     if not "Discretization" in self.doc:
                         print "Error: Specific a discretization tag in your yaml"
                         sys.exit(1)

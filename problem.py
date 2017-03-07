@@ -11,7 +11,7 @@ import logging
 from scipy.optimize import fsolve
 import timeit
 #Import PD_deck
-import IO.PD_deck
+#import IO.PD_deck
 import numpy as np
 import scipy.optimize
 import random
@@ -41,41 +41,38 @@ class PD_problem():
         self.forces = np.zeros( ( self.len_x, int(PD_deck.time_steps) ) )
         self.ext = np.zeros( ( self.len_x, self.len_x, int(PD_deck.time_steps) ) )
         
-        self.energy = np.zeros( (self.len_x, int(PD_deck.time_steps) ) )
-
+        if PD_deck.material_type == "Elastic":
+            self.Modulus = PD_deck.e_modulus
+        elif PD_deck.material_type == "Viscoelastic":
+            self.Relax_Modulus = PD_deck.relax_modulus
+            self.Relax_Time = PD_deck.relax_time
+            self.ext_visco = np.zeros( ( self.len_x, self.len_x, len(self.Relax_Time), int(PD_deck.time_steps)) ) 
+        else:
+            logger.error("Error in problem.py: Material type unknown, please use Elastic or Viscoelastic.")      
+        
         #self.experimental_nodes = 3
         #self.exp_displacement = np.zeros((int(PD_deck.time_steps) - 1, self.experimental_nodes))
         #self.exp_times = np.zeros((int(PD_deck.time_steps) - 1))
         #self.exp_init_positions = np.zeros(self.experimental_nodes)
-        
-        if PD_deck.material_type == "Elastic":
-            self.Modulus = PD_deck.e_modulus
-        elif PD_deck.material_type == "Viscoelastic":
-            self.Modulus, self.Relaxation_Time = PD_deck.get_material_properties()
-            self.ext_visco = np.zeros( ( self.len_x, self.len_x, len(self.Relaxation_Time), int(PD_deck.time_steps)) ) 
-        else:
-            logger.error("There is a problem with the Type of Material in your XML deck.")      
-        
+        #self.energy = np.zeros( (self.len_x, int(PD_deck.time_steps) ) )
 
     #Creates a loading vector b which describes the force applied on each node
     #at any time step
     def compute_b(self, PD_deck):       
         #Build  matrix b[row = node, column = time]
-        
         b = np.zeros( ( self.len_x, int(PD_deck.time_steps)) )
         for t_n in range(1, int(PD_deck.time_steps)): 
             for con in PD_deck.conditions:
                 #Madenci approach
                 for x_i in con.id:
-                    print "Id= " , x_i
                     b[x_i, t_n] = self.ramp_loading( PD_deck, t_n , con )
-                print b
+                #print b
             self.b = b
         
     #Provides ramp force values to compute the load vector b
     def ramp_loading(self, PD_deck, t_n, con):     
         Time_t = PD_deck.delta_t*(t_n)
-        print Time_t , t_n , PD_deck.delta_t
+        #print Time_t , t_n , PD_deck.delta_t
         if PD_deck.shape_type == "Ramp":
             if con.type == "Force":                                      
                 if Time_t <= PD_deck.shape_values[0]:
@@ -176,13 +173,12 @@ class PD_problem():
         for t_n in range(1, PD_deck.time_steps):
             solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov',jac=None,tol=1.0e-12,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
             self.y[:, t_n] = solver.x
-            #y = solver.x + 0.1*random.uniform(-1,1)*PD_deck.delta_x
             y = self.random_initial_guess(solver.x, PD_deck)
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
             else:
                 logger.info( t_n, solver.success )
-            print y
+            #print y
         return solver
 
 #NON SYMMETRIC LOADING    
