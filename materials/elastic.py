@@ -10,7 +10,7 @@ Created on Sun Dec 13 16:16:07 2015
 import numpy as np
 
 class elastic_material():
-    @profile
+  
     def __init__(self, PD_deck, PD_problem, y):
         self.len_x = PD_deck.num_nodes_x
         self.E_Modulus = PD_deck.e_modulus
@@ -21,7 +21,7 @@ class elastic_material():
     # Computes the deformations using the current positions and initial
     # positions of each node
     # Reminder: y[xi, t] = x[xi] + u[xi, t]
-    @profile
+  
     def compute_ext_state(self, PD_deck, PD_problem, y):
         # Initialization for e
         e = np.zeros((self.len_x, self.len_x))
@@ -30,7 +30,7 @@ class elastic_material():
             for x_p in index_x_family:
                 e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(PD_deck.geometry.pos_x[x_p] - PD_deck.geometry.pos_x[x_i])
         self.e = e
-    @profile
+    
     def compute_T(self, PD_deck, PD_problem, y):
         w = PD_deck.influence_function
         M = PD_problem.compute_m(y)
@@ -47,7 +47,7 @@ class elastic_material():
             for x_p in index_x_family:
                 T[x_i, x_p] = tscal[x_i, x_p] * M[x_i, x_p]
         self.T = T
-    @profile
+    
     def compute_Ts(self, PD_deck, PD_problem):
         Ts = np.zeros((self.len_x))
         for x_i in range(0, self.len_x):

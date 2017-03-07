@@ -50,12 +50,11 @@ def main(argv):
         else:
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
             
-@profile
+
 def simulation(data):
     t0 = time.time()
     solver = problem.PD_problem(data)
     x_0 = solver.random_initial_guess( data.geometry.pos_x, data )
-    print x_0
     solver.quasi_static_solver(x_0, data)
     solver.strain_center_bar( data )
     print "Strain = " 

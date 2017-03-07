@@ -25,7 +25,7 @@ import sys
 logger = logging.getLogger(__name__)
 
 class PD_problem():
-    @profile
+    
     def __init__(self, PD_deck):
         # Import initial data
         self.len_x = PD_deck.num_nodes_x
@@ -58,7 +58,7 @@ class PD_problem():
 
     #Creates a loading vector b which describes the force applied on each node
     #at any time step
-    @profile
+    
     def compute_b(self, PD_deck):       
         #Build  matrix b[row = node, column = time]
         b = np.zeros( ( self.len_x, PD_deck.time_steps) )
@@ -71,7 +71,7 @@ class PD_problem():
             self.b = b
         
     #Provides ramp force values to compute the load vector b
-    @profile
+    
     def ramp_loading(self, PD_deck, t_n, con):     
         Time_t = PD_deck.delta_t*(t_n)
         if PD_deck.shape_type == "Ramp":
@@ -102,7 +102,7 @@ class PD_problem():
         self.Horizon = PD_deck.horizon_factor*PD_deck.delta_x*safety_factor
 
     # Returns a list of addresses of the neighbors of a point x_i
-    @profile
+    
     def get_index_x_family(self, x_i):
         return (np.where(self.family[x_i] == 1))[0]
 
@@ -137,15 +137,13 @@ class PD_problem():
         return result
 
     #Computes the residual vector used in the quasi_static_solver function
-    @profile
+    
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( self.len_x ) )
         
         if PD_deck.solver_symmetry == True:
             # Middle node doesn't move        
             Mid_Node = int(self.len_x/2)
-            print  "Mid: " , Mid_Node
-            print PD_deck.geometry.pos_x[Mid_Node]
             y[Mid_Node] = PD_deck.geometry.pos_x[Mid_Node]
             
             # Choice of the material class
@@ -168,13 +166,13 @@ class PD_problem():
                 residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
             for x_i in range(Mid_Node+1, len(PD_deck.geometry.pos_x)):
                 residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
-        print residual
+        #print residual
         return residual
 
     #This functtion solves the problem at each time step, using the previous
     #time step solution as an initial guess
     #This function calls the compute_residual function
-    @profile
+    
     def quasi_static_solver(self, y, PD_deck):
         
         for t_n in range(1, PD_deck.time_steps):
@@ -352,7 +350,6 @@ class PD_problem():
 
     def random_initial_guess(self, z, PD_deck):
         y = np.zeros((self.len_x))
-        print 0.1 * random.uniform(-1, 1) * PD_deck.delta_x
         y = z + 0.1 * random.uniform(-1, 1) * PD_deck.delta_x
         return y
 
