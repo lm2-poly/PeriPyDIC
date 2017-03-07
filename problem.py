@@ -20,48 +20,49 @@ import pdb
 import math
 import datetime
 import util.condition as condition
+import sys
 
 logger = logging.getLogger(__name__)
 
 class PD_problem():
-    
+    @profile
     def __init__(self, PD_deck):
         # Import initial data
         self.len_x = PD_deck.num_nodes_x
-        self.b = np.zeros( ( self.len_x, int(PD_deck.time_steps)) )
+        self.b = np.zeros( ( self.len_x, PD_deck.time_steps) )
         self.compute_b(PD_deck)
         self.compute_horizon(PD_deck)
-        self.len_x = PD_deck.num_nodes_x
         #PD_deck.geometry.pos_x = np.zeros(PD_deck.num_nodes_x)
         self.generate_neighborhood_matrix(PD_deck, PD_deck.geometry.pos_x)
-        self.y = np.zeros( ( self.len_x, int(PD_deck.time_steps)) )
+        self.y = np.zeros( ( self.len_x, PD_deck.time_steps) )
         self.y[:,0] = PD_deck.geometry.pos_x
-        self.u = np.zeros( (self.len_x, int(PD_deck.time_steps) ) )
-        self.strain = np.zeros( ( int(PD_deck.time_steps) ) )
-        self.forces = np.zeros( ( self.len_x, int(PD_deck.time_steps) ) )
-        self.ext = np.zeros( ( self.len_x, self.len_x, int(PD_deck.time_steps) ) )
+        self.u = np.zeros( (self.len_x, PD_deck.time_steps ) )
+        self.strain = np.zeros( ( PD_deck.time_steps ) )
+        self.forces = np.zeros( ( self.len_x, PD_deck.time_steps ) )
+        self.ext = np.zeros( ( self.len_x, self.len_x, PD_deck.time_steps ) )
         
         if PD_deck.material_type == "Elastic":
             self.Modulus = PD_deck.e_modulus
         elif PD_deck.material_type == "Viscoelastic":
             self.Relax_Modulus = PD_deck.relax_modulus
             self.Relax_Time = PD_deck.relax_time
-            self.ext_visco = np.zeros( ( self.len_x, self.len_x, len(self.Relax_Time), int(PD_deck.time_steps)) ) 
+            self.ext_visco = np.zeros( ( self.len_x, self.len_x, len(self.Relax_Time), PD_deck.time_steps) ) 
         else:
             logger.error("Error in problem.py: Material type unknown, please use Elastic or Viscoelastic.")      
         
         #self.experimental_nodes = 3
-        #self.exp_displacement = np.zeros((int(PD_deck.time_steps) - 1, self.experimental_nodes))
-        #self.exp_times = np.zeros((int(PD_deck.time_steps) - 1))
+        #self.exp_displacement = np.zeros((PD_deck.time_steps - 1, self.experimental_nodes))
+        #self.exp_times = np.zeros((PD_deck.time_steps - 1))
         #self.exp_init_positions = np.zeros(self.experimental_nodes)
-        #self.energy = np.zeros( (self.len_x, int(PD_deck.time_steps) ) )
+        #self.energy = np.zeros( (self.len_x, PD_deck.time_steps ) )
 
     #Creates a loading vector b which describes the force applied on each node
     #at any time step
+    @profile
     def compute_b(self, PD_deck):       
         #Build  matrix b[row = node, column = time]
-        b = np.zeros( ( self.len_x, int(PD_deck.time_steps)) )
-        for t_n in range(1, int(PD_deck.time_steps)): 
+        b = np.zeros( ( self.len_x, PD_deck.time_steps) )
+        for t_n in range(1, PD_deck.time_steps): 
             for con in PD_deck.conditions:
                 #Madenci approach
                 for x_i in con.id:
@@ -70,9 +71,9 @@ class PD_problem():
             self.b = b
         
     #Provides ramp force values to compute the load vector b
+    @profile
     def ramp_loading(self, PD_deck, t_n, con):     
         Time_t = PD_deck.delta_t*(t_n)
-        #print Time_t , t_n , PD_deck.delta_t
         if PD_deck.shape_type == "Ramp":
             if con.type == "Force":                                      
                 if Time_t <= PD_deck.shape_values[0]:
@@ -97,10 +98,11 @@ class PD_problem():
     # Computes the horizon        
     def compute_horizon(self, PD_deck):
         #Be sure that points are IN the horizon
-        safety_small_fraction = 1.01
-        self.Horizon = PD_deck.horizon_factor*PD_deck.delta_x*safety_small_fraction
+        safety_factor = 1.01
+        self.Horizon = PD_deck.horizon_factor*PD_deck.delta_x*safety_factor
 
     # Returns a list of addresses of the neighbors of a point x_i
+    @profile
     def get_index_x_family(self, x_i):
         return (np.where(self.family[x_i] == 1))[0]
 
@@ -135,12 +137,15 @@ class PD_problem():
         return result
 
     #Computes the residual vector used in the quasi_static_solver function
+    @profile
     def compute_residual(self, y, PD_deck, t_n):
         residual = np.zeros( ( self.len_x ) )
         
         if PD_deck.solver_symmetry == True:
             # Middle node doesn't move        
-            Mid_Node = int(PD_deck.num_nodes_x/2)
+            Mid_Node = int(self.len_x/2)
+            print  "Mid: " , Mid_Node
+            print PD_deck.geometry.pos_x[Mid_Node]
             y[Mid_Node] = PD_deck.geometry.pos_x[Mid_Node]
             
             # Choice of the material class
@@ -163,13 +168,15 @@ class PD_problem():
                 residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
             for x_i in range(Mid_Node+1, len(PD_deck.geometry.pos_x)):
                 residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
-        #print residual
+        print residual
         return residual
 
     #This functtion solves the problem at each time step, using the previous
     #time step solution as an initial guess
     #This function calls the compute_residual function
+    @profile
     def quasi_static_solver(self, y, PD_deck):
+        
         for t_n in range(1, PD_deck.time_steps):
             solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov',jac=None,tol=1.0e-12,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
             self.y[:, t_n] = solver.x
@@ -187,12 +194,12 @@ class PD_problem():
 #    # at any time step
 #    def compute_b(self, PD_deck):
 #        # Build  matrix b[row = node, column = time]
-#        b = np.zeros((self.len_x, int(PD_deck.time_steps)))
+#        b = np.zeros((self.len_x, PD_deck.time_steps))
 #        PD_deck.get_parameters_loading_ramp()
 #        if PD_deck.Loading_Flag == "RAMP":
 #            for x_i in range(len(PD_deck.geometry.pos_x) -
 #                             PD_deck.horizon_factor, len(PD_deck.geometry.pos_x)):
-#                for t_n in range(1, int(PD_deck.time_steps)):
+#                for t_n in range(1, PD_deck.time_steps):
 #                    b[x_i, t_n] = self.ramp_loading(PD_deck, t_n)
 #        else:
 #            logger.error(
@@ -211,7 +218,7 @@ class PD_problem():
 #                PD_deck.time_steps)))
 #        PD_deck.get_parameters_linear_displacement()
 #        for x_i in range(0, PD_deck.horizon_factor):
-#            for t_n in range(0, int(PD_deck.time_steps)):
+#            for t_n in range(0, PD_deck.time_steps):
 #                
 #                displ_load[
 #                    x_i, t_n] = self.linear_displacement_loading(
@@ -345,12 +352,13 @@ class PD_problem():
 
     def random_initial_guess(self, z, PD_deck):
         y = np.zeros((self.len_x))
+        print 0.1 * random.uniform(-1, 1) * PD_deck.delta_x
         y = z + 0.1 * random.uniform(-1, 1) * PD_deck.delta_x
         return y
 
     # Computes the strain energy density from Ts x u
     def strain_energy_from_force(self, PD_deck):
-        energy = np.zeros( (int(PD_deck.time_steps), self.len_x) )
+        energy = np.zeros( (PD_deck.time_steps, self.len_x) )
         for t_n in range(0, PD_deck.time_steps ):   
             for x_i in range(0, PD_deck.num_nodes_x):               
                 energy[t_n , x_i] = abs(self.forces[x_i, t_n]) * abs(self.u[x_i, t_n]) * PD_deck.Volume
@@ -361,7 +369,7 @@ class PD_problem():
     
     #Computes the strian energy using the formula iven in the PMB
     def strain_energy_bond_based(self, PD_deck):
-        energy = np.zeros((self.len_x, int(PD_deck.time_steps)))
+        energy = np.zeros((self.len_x, PD_deck.time_steps))
         for t_n in range(0, PD_deck.time_steps):
             for x_i in range(0, PD_deck.num_nodes_x):
                 index_x_family = self.get_index_x_family(x_i)

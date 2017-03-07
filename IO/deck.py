@@ -21,7 +21,7 @@ class PD_deck():
     relax_modulus = []
     relax_time = []
     num_nodes_x = 0.0
-    delta_x = 0.0
+    delta_x = 1.0
     horizon_factor = 0.0
     time_steps = 0
     e_modulus = 0.0
