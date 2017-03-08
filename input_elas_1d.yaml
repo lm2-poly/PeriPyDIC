@@ -2,7 +2,7 @@ Discretization:
     Dim: 1
     Final_Time: 2.0
     Time_Steps: 4
-    Horizon_Factor: 1.0
+    Horizon_Factor: 3.0
     Influence_Function: 1.0
     File: 
         Name: geometry.csv
@@ -13,15 +13,12 @@ Boundary:
     Condition:
         Type: 
             - Force
-            - Force
             - Displacement
         Value: 
             - 40.0
-            - -40.0
             - 0.0
         File: 
             - force_condition_1.csv
-            - force_condition_2.csv
             - displ_condition_1.csv
     Shape:
         Type: Ramp
