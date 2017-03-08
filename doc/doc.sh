@@ -1,2 +1,2 @@
 export PYTHONPATH=..
-find .. -maxdepth 1 -name "*.py" -exec pdoc --html --overwrite "{}" ";"
+find .. -maxdepth 2 -name "*.py" -exec pdoc --html --overwrite "{}" ";"
