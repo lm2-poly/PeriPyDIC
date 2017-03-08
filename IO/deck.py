@@ -36,36 +36,39 @@ class PD_deck():
             else:
                 with open(inputFile,'r') as f:
                     self.doc = yaml.load(f)
+                    
                     if not "Material" in self.doc:
-                        print "Error: Specific a material tag in your yaml"
-                        sys.exit(1)
-                    if not "Type" in self.doc["Material"]:
-                        print "Error: No type tag found"
+                        print "Error: Specify a material tag in your yaml"
                         sys.exit(1)
                     else:
-                        self.material_type = self.doc["Material"]["Type"]
-                        if self.material_type == "Elastic":
-                            if not "E_Modulus" in self.doc["Material"]:
-                                print "Error: No E_Modulus tag found"
-                                sys.exit(1)
-                            else:
-                                self.e_modulus = float(self.doc["Material"]["E_Modulus"])
-                        elif self.material_type == "Viscoelastic":
-                            if not "Relax_Modulus" in self.doc["Material"]:
-                                print "Error: No Relax_Modulus tag found"
-                                sys.exit(1)
-                            else:
-                                self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
-                                print self.relax_modulus
-                            if not "Relax_Time" in self.doc["Material"]:
-                                print "Error: No Relax_Time tag found"
-                                sys.exit(1)
-                            else:
-                                self.relax_time = self.doc["Material"]["Relax_Time"]
-                                print self.relax_time
-                        else:
-                            print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
+                        if not "Type" in self.doc["Material"]:
+                            print "Error: No type tag found"
                             sys.exit(1)
+                        else:
+                            self.material_type = self.doc["Material"]["Type"]
+                            if self.material_type == "Elastic":
+                                if not "E_Modulus" in self.doc["Material"]:
+                                    print "Error: No E_Modulus tag found"
+                                    sys.exit(1)
+                                else:
+                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                            elif self.material_type == "Viscoelastic":
+                                if not "Relax_Modulus" in self.doc["Material"]:
+                                    print "Error: No Relax_Modulus tag found"
+                                    sys.exit(1)
+                                else:
+                                    self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                    print self.relax_modulus
+                                if not "Relax_Time" in self.doc["Material"]:
+                                    print "Error: No Relax_Time tag found"
+                                    sys.exit(1)
+                                else:
+                                    self.relax_time = self.doc["Material"]["Relax_Time"]
+                                    print self.relax_time
+                            else:
+                                print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
+                                sys.exit(1)
+                    
                     if not "Discretization" in self.doc:
                         print "Error: Specific a discretization tag in your yaml"
                         sys.exit(1)
@@ -96,20 +99,49 @@ class PD_deck():
                             sys.exit(1)
                         else:
                             self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
-                        if not( "File") in self.doc["Discretization"]:
+                        if not ("File") in self.doc["Discretization"]:
                             print "Error: No File tag found"
                             sys.exit(1)
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
                         self.delta_x = self.geometry.getMinDist(1)
                         print "delta_x =" , self.delta_x
-                        for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
-                            self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
                         self.num_nodes_x = len(self.geometry.pos_x)
-                        if "Shape" in self.doc["Boundary"]:
-                            self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
-                            self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
                         
+                        if not "Boundary" in self.doc:
+                            print "Error: No Boundary tag found"
+                            sys.exit(1)
+                        else:
+                            if not "Condition" in self.doc["Boundary"]:
+                                print "Error: No Condition tag found"
+                                sys.exit(1)
+                            else: 
+                                for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
+                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
+                            if not "Shape" in self.doc["Boundary"]:
+                                print "Error: No Shape tag found"
+                                sys.exit(1)                       
+                            else:
+                                self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
+                                self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
+                                
+                        if "Output" in self.doc:
+                            if not "CSV" in self.doc["Output"]:
+                                print "Error: No CSV tag found"
+                                sys.exit(1) 
+                            else:
+                                if not "Type" in self.doc["Output"]["CSV"]:
+                                    print "Error: No Type tag found"
+                                    sys.exit(1)
+                                else:
+                                    self.csv_type = self.doc["Output"]["CSV"]["Type"]
+                                if not "File" in self.doc["Output"]["CSV"]:
+                                    print "Error: No File tag found"
+                                    sys.exit(1)
+                                else:
+                                    self.csv_file = self.doc["Output"]["CSV"]["File"]
+                                
+                            
                             
                                 
                                 

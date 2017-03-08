@@ -11,8 +11,10 @@ import logging
 import numpy as np
 import scipy.optimize
 import random
-import csv
-import math
+#import csv
+#import os
+#import sys
+#import math
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +26,10 @@ class PD_problem():
         self.b = np.zeros( ( self.len_x, PD_deck.time_steps) )
         self.compute_b(PD_deck)
         self.compute_horizon(PD_deck)
-        #PD_deck.geometry.pos_x = np.zeros(PD_deck.num_nodes_x)
         self.generate_neighborhood_matrix(PD_deck, PD_deck.geometry.pos_x)
         self.y = np.zeros( ( self.len_x, PD_deck.time_steps) )
         self.y[:,0] = PD_deck.geometry.pos_x
-        self.u = np.zeros( (self.len_x, PD_deck.time_steps ) )
+        #self.u = np.zeros( (self.len_x, PD_deck.time_steps ) )
         self.strain = np.zeros( ( PD_deck.time_steps ) )
         self.forces = np.zeros( ( self.len_x, PD_deck.time_steps ) )
         self.ext = np.zeros( ( self.len_x, self.len_x, PD_deck.time_steps ) )
@@ -60,7 +61,7 @@ class PD_problem():
                     for x_i in con.id:
                         b[x_i, t_n] = self.ramp_loading( PD_deck, t_n , con )
             self.b = b
-            print "b =" , self.b
+            #print "b =" , self.b
         
     # Provide the loading shape to use to compute the loading vector b
     def ramp_loading(self, PD_deck, t_n, con):     
@@ -89,9 +90,9 @@ class PD_problem():
     # Computes the horizon        
     def compute_horizon(self, PD_deck):
         #Be sure that points are IN the horizon
-        safety_factor = 1.01
+        safety_factor = 1.001
         self.Horizon = PD_deck.horizon_factor*PD_deck.delta_x*safety_factor
-        print "Horizon =" , self.Horizon
+        #print "Horizon =" , self.Horizon
 
     # Returns a list of addresses of the neighbors of a point x_i
     def get_index_x_family(self, x_i):
@@ -108,6 +109,7 @@ class PD_problem():
                     self.family[x_i][x_p] = 1
                 else:
                     pass
+        #print self.family
                                                               
     # Computes the shape tensor (here a scalar) for each node
     def compute_m(self, y):
@@ -186,14 +188,6 @@ class PD_problem():
     def update_ext_state_visco_data(self, variables, t_n):    
         self.ext_visco[:, :, :, t_n] = variables.e_visco  
 
-    # Records the force vector at each time step
-    def update_energy_data(self, variables, t_n):
-        self.energy = self.strain_energy_from_force
-
-    # Records the ext_state vector at each time step
-    def update_displacements(self, t_n):
-        self.u[:, t_n] = self.y[:, t_n] - self.y[:, 0]
-
     # Initial guess
     def random_initial_guess(self, z, PD_deck):
         #Do not forget to do this for each direction, not only x
@@ -203,12 +197,38 @@ class PD_problem():
 
     def strain_center_bar(self, PD_deck):
         Mid_Node_1 = int(PD_deck.num_nodes_x/2)-1
-        print "Mid_Node_1 =" , Mid_Node_1
+        #print "Mid_Node_1 =" , Mid_Node_1
         Mid_Node_2 = int(PD_deck.num_nodes_x/2)+1
-        print "Mid_Node_2 =" , Mid_Node_2
+        #print "Mid_Node_2 =" , Mid_Node_2
         for t_n in range(1, PD_deck.time_steps):
             self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(PD_deck.geometry.pos_x[Mid_Node_2] - PD_deck.geometry.pos_x[Mid_Node_1])) / np.absolute(PD_deck.geometry.pos_x[Mid_Node_2] - PD_deck.geometry.pos_x[Mid_Node_1])
 
+    def write_position_to_csv(self, PD_deck):
+        #dim = PD_deck.dim   
+        #outFile = PD_deck.csv_file
+        
+        #if not os.path.exists(self.outFile):
+            #print "Error: Could not find " + outFile
+            #sys.exit(1)
+        f = open('nodes_positions.csv', 'w')
+        f.write("Time")
+        for x_i in range(0,self.len_x):
+            f.write(",#"+str(x_i))
+        f.write("\n")
+        for t_n in range(0, PD_deck.time_steps):
+            f.write(str(t_n*PD_deck.delta_t))
+            for loc in self.y[:,t_n]:
+                f.write(","+str(loc))
+            f.write("\n")
+
+#    # Records the force vector at each time step
+#    def update_energy_data(self, variables, t_n):
+#        self.energy = self.strain_energy_from_force
+#
+#    # Records the ext_state vector at each time step
+#    def update_displacements(self, t_n):
+#        self.u[:, t_n] = self.y[:, t_n] - self.y[:, 0]
+#
 #    # Computes the strain energy density from Ts x u
 #    def strain_energy_from_force(self, PD_deck):
 #        energy = np.zeros( (PD_deck.time_steps, self.len_x) )
