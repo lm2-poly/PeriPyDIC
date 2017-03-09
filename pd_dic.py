@@ -57,11 +57,18 @@ def simulation(data):
     x_0 = solver.random_initial_guess( data.geometry.pos_x, data )
     solver.quasi_static_solver(x_0, data)
     solver.strain_center_bar( data )
-    print "Strain = " 
-    print np.around(solver.strain,decimals=6)
-    print "Nodes positions = "
-    print solver.y
-    print time.time()- t0, "seconds"
+    writeCSV(data,solver)
+    print "delta_x =" , data.delta_x
+    print "Horizon =" , solver.Horizon
+    print "Strain = " , np.around(solver.strain,decimals=6)
+    #print "Nodes positions = "
+    #print solver.y
+    #print "Total time =" , time.time()- t0, "seconds"
+
+def writeCSV(data,problem):
+    for out in data.outputs:
+        if out.outType == "CSV":
+            out.write(data,problem)
         
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":

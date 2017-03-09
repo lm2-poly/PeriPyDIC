@@ -3,12 +3,16 @@
 This class reads the geometries files and handles the specified
 boundary conditions. In addition it could be use to discretize 
 regular structures.
+
+@author: ilyass.tabiai@polymtl.ca
+@author: rolland.delorme@polymtl.ca
 @author: patrick.diehl@polymtl.ca
 """ 
 
 import numpy as np
 import csv
 import os
+import sys
 
 class Geometry():
     
@@ -38,7 +42,7 @@ class Geometry():
     
     def readNodes(self,dim,inFile):
         if not os.path.exists(inFile):
-                print "Error: Could not find " + inputFile
+                print "Error: Could not find " + inFile
                 sys.exit(1)
         
         with open(inFile, 'r') as csvfile:
