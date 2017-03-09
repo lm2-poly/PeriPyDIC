@@ -12,6 +12,7 @@ import os.path
 import geometry
 import sys
 import util.condition
+import IO.output
 
 class PD_deck():
     
@@ -28,6 +29,7 @@ class PD_deck():
     delta_t = 0.0
     shape_type = "None"
     shape_values = []
+    outputs = []
     
     def __init__(self,inputFile):
             if not os.path.exists(inputFile):
@@ -126,27 +128,15 @@ class PD_deck():
                                 self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
                                 
                         if "Output" in self.doc:
-                            if not "CSV" in self.doc["Output"]:
-                                print "Error: No CSV tag found"
-                                sys.exit(1) 
-                            else:
+                            if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
                                     print "Error: No Type tag found"
                                     sys.exit(1)
-                                else:
-                                    self.csv_type = self.doc["Output"]["CSV"]["Type"]
-                                if not "File" in self.doc["Output"]["CSV"]:
+                                elif not "File" in self.doc["Output"]["CSV"]:
                                     print "Error: No File tag found"
                                     sys.exit(1)
                                 else:
-                                    self.csv_file = self.doc["Output"]["CSV"]["File"]
-                                
-                            
-                            
-                                
-                                
-                                
-
-    
-
-                    
+                                    print "Inside"
+                                    for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
+                                        self.outputs.append(IO.output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
+                                      

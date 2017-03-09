@@ -203,23 +203,6 @@ class PD_problem():
         for t_n in range(1, PD_deck.time_steps):
             self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(PD_deck.geometry.pos_x[Mid_Node_2] - PD_deck.geometry.pos_x[Mid_Node_1])) / np.absolute(PD_deck.geometry.pos_x[Mid_Node_2] - PD_deck.geometry.pos_x[Mid_Node_1])
 
-    def write_position_to_csv(self, PD_deck):
-        #dim = PD_deck.dim   
-        #outFile = PD_deck.csv_file
-        
-        #if not os.path.exists(self.outFile):
-            #print "Error: Could not find " + outFile
-            #sys.exit(1)
-        f = open('nodes_positions.csv', 'w')
-        f.write("Time")
-        for x_i in range(0,self.len_x):
-            f.write(",#"+str(x_i))
-        f.write("\n")
-        for t_n in range(0, PD_deck.time_steps):
-            f.write(str(t_n*PD_deck.delta_t))
-            for loc in self.y[:,t_n]:
-                f.write(","+str(loc))
-            f.write("\n")
 
 #    # Records the force vector at each time step
 #    def update_energy_data(self, variables, t_n):

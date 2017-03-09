@@ -31,5 +31,5 @@ Output:
         Type:
             - Position
         File:
-            - node_position
+            - nodes_positions.csv
     
