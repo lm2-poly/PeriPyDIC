@@ -5,7 +5,7 @@ Discretization:
     Horizon_Factor: 4.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_m4_dx0_25.csv
+        Name: geometry_m4_dx0_50.csv
 Material:
     Type: Elastic
     E_Modulus: 4000.0
@@ -18,7 +18,7 @@ Boundary:
             - 40.0
             - 0.0
         File: 
-            - force_condition_dx0_25.csv
+            - force_condition_dx0_50.csv
             - displ_condition_1.csv
     Shape:
         Type: Ramp
@@ -31,5 +31,4 @@ Output:
         Type:
             - Position
         File:
-            - nodes_positions_m4_dx0_25.csv
-    
+            - nodes_positions_m4_dx0_50.csv

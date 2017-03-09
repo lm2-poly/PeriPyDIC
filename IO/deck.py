@@ -60,13 +60,13 @@ class PD_deck():
                                     sys.exit(1)
                                 else:
                                     self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
-                                    print self.relax_modulus
+                                    #print self.relax_modulus
                                 if not "Relax_Time" in self.doc["Material"]:
                                     print "Error: No Relax_Time tag found"
                                     sys.exit(1)
                                 else:
                                     self.relax_time = self.doc["Material"]["Relax_Time"]
-                                    print self.relax_time
+                                    #print self.relax_time
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
