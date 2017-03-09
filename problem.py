@@ -61,7 +61,7 @@ class PD_problem():
                     for x_i in con.id:
                         b[int(x_i), t_n] = self.ramp_loading( PD_deck, t_n , con )
             self.b = b
-            #print "b =" , self.b
+            print "b =" , self.b
         
     # Provide the loading shape to use to compute the loading vector b
     def ramp_loading(self, PD_deck, t_n, con):     

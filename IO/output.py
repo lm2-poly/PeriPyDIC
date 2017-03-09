@@ -28,5 +28,5 @@ class OutputCSV():
                 spamwriter.writerow(header)
             
                 for t_n in range(0, PD_deck.time_steps):
-                    spamwriter.writerow( np.insert(problem.y , 0,  t_n*PD_deck.delta_t   ))
+                    spamwriter.writerow( np.insert(problem.y[:,t_n] , 0,  t_n*PD_deck.delta_t   ))
         

@@ -62,7 +62,7 @@ def simulation(data):
     print "Horizon =" , solver.Horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
     #print "Nodes positions = "
-    #print solver.y
+    print solver.y
     #print "Total time =" , time.time()- t0, "seconds"
 
 def writeCSV(data,problem):

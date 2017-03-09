@@ -107,7 +107,6 @@ class PD_deck():
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
                         self.delta_x = self.geometry.getMinDist(1)
-                        print "delta_x =" , self.delta_x
                         self.num_nodes_x = len(self.geometry.pos_x)
                         
                         if not "Boundary" in self.doc:
