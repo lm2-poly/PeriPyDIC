@@ -30,7 +30,7 @@ class ConditionFromFile():
             i = 0
             for row in spamreader:
                 id[i] = int(row[0])
-                self.boundary_volume += volume[id[i]]
+                self.boundary_volume += volume[int(id[i])]
                 i += 1
                 
             return id

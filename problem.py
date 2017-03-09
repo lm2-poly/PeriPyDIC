@@ -59,7 +59,7 @@ class PD_problem():
                 if con.type == "Force":
                     #Madenci approach
                     for x_i in con.id:
-                        b[x_i, t_n] = self.ramp_loading( PD_deck, t_n , con )
+                        b[int(x_i), t_n] = self.ramp_loading( PD_deck, t_n , con )
             self.b = b
             #print "b =" , self.b
         
@@ -134,7 +134,7 @@ class PD_problem():
         for con in PD_deck.conditions:
             if con.type == "Displacement": 
                 for id in con.id:
-                    y[id] = PD_deck.geometry.pos_x[id] + con.value
+                    y[int(id)] = PD_deck.geometry.pos_x[int(id)] + con.value
         # Choice of the material class
         if PD_deck.material_type == "Elastic":
             from materials.elastic import elastic_material

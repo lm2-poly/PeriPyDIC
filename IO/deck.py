@@ -136,7 +136,6 @@ class PD_deck():
                                     print "Error: No File tag found"
                                     sys.exit(1)
                                 else:
-                                    print "Inside"
                                     for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
                                         self.outputs.append(IO.output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
                                       
