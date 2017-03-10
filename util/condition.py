@@ -15,6 +15,17 @@ class ConditionFromFile():
         self.force_density = self.value / self.boundary_volume
                         
     def readCondition(self, inFile,volume):
+        """ Reads the ids from the inFile where this condition should be 
+            applied.
+            
+            Args:
+                inFile: File name of the CSV file with the ids of the nodes
+                    for this boundary condition
+            volume: Volume of the nodes
+            
+            Returns:
+                id: The ids read from the inFile
+        """
         if not os.path.exists(inFile):
             print "Error: Could not find " + inFile
             sys.exit(1)
