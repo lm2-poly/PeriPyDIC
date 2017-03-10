@@ -1,6 +1,4 @@
 #-*- coding: utf-8 -*-
-##@package geometry
-# Documention the geometry package
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
