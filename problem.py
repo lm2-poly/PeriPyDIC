@@ -91,7 +91,7 @@ class PD_problem():
     def compute_horizon(self, PD_deck):
         #Be sure that points are IN the horizon
         safety_factor = 1.001
-        self.Horizon = PD_deck.horizon_factor*PD_deck.delta_x*safety_factor
+        self.Horizon = PD_deck.horizon_factor_m_value*PD_deck.delta_x*safety_factor
         #print "Horizon =" , self.Horizon
 
     # Returns a list of addresses of the neighbors of a point x_i
@@ -105,7 +105,7 @@ class PD_problem():
             for x_p in range(0, len(x)):
                 if x_p == x_i:
                     pass
-                elif np.absolute(x_i - x_p) <= PD_deck.horizon_factor:
+                elif np.absolute(x_i - x_p) <= PD_deck.horizon_factor_m_value:
                     self.family[x_i][x_p] = 1
                 else:
                     pass

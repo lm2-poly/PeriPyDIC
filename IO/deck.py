@@ -23,7 +23,7 @@ class PD_deck():
     relax_time = []
     num_nodes_x = 0.0
     delta_x = 0.0
-    horizon_factor = 0.0
+    horizon_factor_m_value = 0.0
     time_steps = 0
     e_modulus = 0.0
     delta_t = 0.0
@@ -91,11 +91,11 @@ class PD_deck():
                         else:
                             self.time_steps = int(self.doc["Discretization"]["Time_Steps"]) + 1
                             self.delta_t = float(self.final_time  / (self.time_steps-1)) 
-                        if not "Horizon_Factor" in self.doc["Discretization"]:
+                        if not "Horizon_Factor_m_value" in self.doc["Discretization"]:
                             print "Error: No Horizon_Factor tag found"
                             sys.exit(1)
                         else:
-                            self.horizon_factor = float(self.doc["Discretization"]["Horizon_Factor"])
+                            self.horizon_factor_m_value = float(self.doc["Discretization"]["Horizon_Factor_m_value"])
                         if not "Influence_Function" in self.doc["Discretization"]:
                             print "Error: Influence_Function tag found"
                             sys.exit(1)

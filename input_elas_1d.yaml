@@ -2,7 +2,7 @@ Discretization:
     Dim: 1
     Final_Time: 2.0
     Time_Steps: 8
-    Horizon_Factor: 4.0
+    Horizon_Factor_m_value: 4.0
     Influence_Function: 1.0
     File: 
         Name: geometry_m4_dx0_50.csv
