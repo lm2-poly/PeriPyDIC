@@ -19,6 +19,7 @@
 
    Optional packages:
    * `matplotlib.pyplot`
+   * `doxygen`
 
 ###Basic script
 Solve a default problem provided in the `deck.xml` by either executing the following python script in the folder where you cloned the repo, or opening a python console in the same folder and executing the following lines one by one.
@@ -150,56 +151,30 @@ It is possible to check the data currently loaded in the class using, for exampl
    
    
 
-## XML deck description
+## Input description
 
-```XML
-<?xml version="1.0"?>
-<data>
-	<Discretization>
-			<N_Delta_x>4</N_Delta_x>
-			<N_Delta_t>2</N_Delta_t>
-			<Final_Time>1.0</Final_Time>
-			<Horizon_Factor>1</Horizon_Factor>
-			<Influence_Function>1</Influence_Function>
-	</Discretization>
-	<Boundary_Conditions>
-	        <Type>RAMP</Type>
-			<Force>54.0</Force>
-			<Ramp_Time>1.0</Ramp_Time>
-	</Boundary_Conditions>
-	<Geometry>
-			<Length>4.0</Length>
-			<Surface>1</Surface>
-	</Geometry>
-	<Material>
-	        <Type>ELASTIC</Type>
-			<E_Modulus>4000.0</E_Modulus>
-	</Material>
-</data>
+### Geometry
+
+### Boundary Conditions
+Boundary conditions can be described with
+```yaml
+Boundary:
+    Condition:
+        Type: 
+            - Force or Displacement
+        Value: 
+            - Float
+        File: 
+            - file.csv
 ```
-
-`<Discretization>` must contain:
-
-* `<N_Delta_x>` The number of spatial steps.
-* `<N_Delta_t>` The number of time steps.
-* `<Final_Time>` Duration of the simulation.
-* `<Influence_Function>` The value of the influence function as defined in Silling, Lehoucq 2010.
-
-`<Boundary_Conditions>` must contain:
-
-* `<Type>` Currently, only the `RAMP` loading type is available.
-    * `<Force>` Force applied on the bar on its extremeties.
-    * `<Ramp_Time>` Time during which the force grows linearly before reaching the force value.
-
-`<Geometry>` must contain:
-
-* `<Length>` Lenth of the 1D bar.
-* `<Surface>` Surface occupied by the 1D bar (perpendicular to the bar's direction).
-
-`<Material>` must contain:
-
-* `<Type>` Currently, only the `ELASTIC` material is avilable.
-    * `<E_Modulus>` Value of the 1D elastic modulus.
+where the `Type` either can be `Force` or `Displacement`, `Value` describes the value in Newton or Millimeter whis is applied at the nodes
+described in `File`. The file has to be provided in the CSV format with spaces as delimiter with the id ofthe nodes where the condition 
+should be applied. Here, is an example for a `file.csv`
+```yaml
+#id
+0
+1
+```
 
 # License
 The code is licensed under the MIT License developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/about).
