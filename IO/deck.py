@@ -51,7 +51,7 @@ class PD_deck():
                                     print "Error: No Relax_Time tag found"
                                     sys.exit(1)
                                 else:
-                                    ## Relaxiation times
+                                    ## Relaxation times
                                     self.relax_time = self.doc["Material"]["Relax_Time"]
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
@@ -96,10 +96,10 @@ class PD_deck():
                         if not ("File") in self.doc["Discretization"]:
                             print "Error: No File tag found"
                             sys.exit(1)
-                        ## Object for handling the disctre nodes
+                        ## Object for handling the discrete nodes
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
-                        ## The ninimal nodal spacing in x direction
+                        ## The minimal nodal spacing in x direction
                         self.delta_x = self.geometry.getMinDist(1)
                         ## Amount of nodes in x direction
                         self.num_nodes_x = len(self.geometry.pos_x)
@@ -122,7 +122,7 @@ class PD_deck():
                             else:
                                 ## Type of the shape, e.g. Ramp
                                 self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
-                                ## List of the values for speciying the shape
+                                ## List of the values for specifying the shape
                                 self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
                                 
                         if "Output" in self.doc:

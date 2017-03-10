@@ -137,13 +137,13 @@ class PD_problem():
                     y[int(id)] = PD_deck.geometry.pos_x[int(id)] + con.value
         # Choice of the material class
         if PD_deck.material_type == "Elastic":
-            from materials.elastic import elastic_material
-            variables = elastic_material( PD_deck, self, y )
+            from materials.elastic import Elastic_material
+            variables = Elastic_material( PD_deck, self, y )
             self.update_force_data(variables, t_n)
             self.update_ext_state_data(variables, t_n)
         elif PD_deck.material_type == "Viscoelastic":
-            from materials.viscoelastic import viscoelastic_material
-            variables = viscoelastic_material( PD_deck, self, y, t_n)
+            from materials.viscoelastic import Viscoelastic_material
+            variables = Viscoelastic_material( PD_deck, self, y, t_n)
             self.update_force_data(variables, t_n)
             self.update_ext_state_data(variables, t_n)
             self.update_ext_state_visco_data(variables, t_n)
