@@ -2,10 +2,10 @@ Discretization:
     Dim: 1
     Final_Time: 2.0
     Time_Steps: 8
-    Horizon_Factor: 4.0
+    Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_m4_dx0_50.csv
+        Name: geometry_dx0_50.csv
 Material:
     Type: Elastic
     E_Modulus: 4000.0
@@ -31,4 +31,4 @@ Output:
         Type:
             - Position
         File:
-            - nodes_positions_m4_dx0_50.csv
+            - nodes_positions_delta2_dx0_50.csv
