@@ -1,0 +1,8 @@
+title: Peridynamics 1d
+description: Simple classes to solve a 1D problem in peridynamics. The code is easy to modify.
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-tactile
+
+gems:
+  - jekyll-mentions
