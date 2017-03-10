@@ -106,6 +106,6 @@ Where `Type` specifies the attribute and `File` the file name of the output file
 An example for an elastic material and an viscoelastic material is provided in the example folder
 
 # License
-The code is licensed under the MIT License developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/about).
+The code is licensed under the MIT License developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/cv).
 
 Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="http://dx.doi.org/10.1016/S0022-5096(99)00029-0" rel="dct:source">http://dx.doi.org/10.1016/S0022-5096(99)00029-0</a>.
