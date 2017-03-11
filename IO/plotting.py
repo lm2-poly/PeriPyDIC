@@ -1,15 +1,23 @@
 #-*- coding: utf-8 -*-
 """
 Created on Wed Feb 28 2017
-
 @author: patrick.diehl@polymtl.ca
+@author: ilyass.tabiai@polymtl.ca
+@author: rolland.delorme@polymtl.ca
 """
+
+
 
 import matplotlib.pyplot as plt
 
-
+## Class handles plotting of results using Matplorlib, exports plots as PDFs
 class Plotting():
-
+     ## Plots energy at a certain time step for each nodes, currentyl only for 1D results
+     # @param energy Array containing energy values for each node at each time step
+     # @param time Moment at which results should be plotted
+     # @param initial 
+     # @param outpath Desired path for the output PDF
+     
      def plot_energy(self, energy, time, initial, outpath):
         # print len(energy) , len(time), len(initial)
         maxvalues = []

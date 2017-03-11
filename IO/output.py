@@ -5,7 +5,7 @@
 import csv
 import numpy as np
 
-## Class handels the output for CSV files
+## Class handles the output for CSV files
 class OutputCSV():
      ## Constructor 
      # @param outType Type of the output 
