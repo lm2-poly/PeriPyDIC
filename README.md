@@ -1,4 +1,4 @@
-# The problem
+# The problem {#mainpage}
 
    Consider a 1D bar. The length of the bar and the number of sections in which the bar will be divided (the Peridynamic (PD) nodes are at the edges of each section) are provided by the user.
    
@@ -106,6 +106,6 @@ Where `Type` specifies the attribute and `File` the file name of the output file
 An example for an elastic material and an viscoelastic material is provided in the example folder
 
 # License
-The code is licensed under the MIT License developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/cv).
+The code is licensed under the MIT License developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/).
 
 Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="http://dx.doi.org/10.1016/S0022-5096(99)00029-0" rel="dct:source">http://dx.doi.org/10.1016/S0022-5096(99)00029-0</a>.
