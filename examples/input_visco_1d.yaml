@@ -39,3 +39,6 @@ Output:
             - Position
         File:
             - nodes_positions_m4_dx0_50.csv
+Solver:
+    Type: krylov
+    Tolerance: 1.0e-12

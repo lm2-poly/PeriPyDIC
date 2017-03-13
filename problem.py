@@ -166,7 +166,7 @@ class PD_problem():
     def quasi_static_solver(self, y, PD_deck):
         
         for t_n in range(1, PD_deck.time_steps):
-            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method='krylov',jac=None,tol=1.0e-12,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
+            solver = scipy.optimize.root(self.compute_residual, y, args=(PD_deck, t_n), method=PD_deck.solver_type,jac=None,tol=PD_deck.solver_tolerance,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
             self.y[:, t_n] = solver.x
             y = self.random_initial_guess(solver.x, PD_deck)
             if solver.success == "False":

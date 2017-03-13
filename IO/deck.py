@@ -138,4 +138,20 @@ class PD_deck():
                                     self.outputs = []
                                     for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
                                         self.outputs.append(IO.output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
+                        if not "Solver" in  self.doc:
+                            print "Error: No Solver tag found"
+                            sys.exit(1)
+                        else:
+                            if not "Type" in self.doc["Solver"]:
+                                print "Error: No Type tag in Solver found"
+                                sys.exit(1)
+                            else:
+                                #Type of the solver
+                                self.solver_type = self.doc["Solver"]["Type"]
+                            if not "Tolerance" in self.doc["Solver"]:
+                                print "Error: No Tolerance tag in Solver found"
+                                sys.exit(1)
+                            else:
+                                #Tolerance of the solver
+                                self.solver_tolerance = float(self.doc["Solver"]["Tolerance"])
                                       

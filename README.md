@@ -101,6 +101,14 @@ Output:
 ```
 Where `Type` specifies the attribute and `File` the file name of the output file.
 
+### Solver
+Here, the `Type` and the `Tolerance` can be specified.
+```yaml
+Solver:
+    Type: krylov
+    Tolerance: 1.0e-12
+```
+
 ## Examples
 
 An example for an elastic material and an viscoelastic material is provided in the example folder
