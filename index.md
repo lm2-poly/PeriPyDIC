@@ -13,5 +13,9 @@ The code is developed by Ilyass Tabiai (@ilyasst), Rolland Delorme (@rollanddelo
 
 * Martin Lévesque, Rolland Delorme, Ilyass Tabiai, Daniel Therriault and Louis Laberge Lebel, **Generalization of the ordinary state-based peridynamic model for isotropic linear viscoelasticity**, _Mechanics of Time-Dependent Materials, (), 1-27_, 10.1007/s11043-017-9342-3, 
 
+### Documentation
+
+The documentation of the code can be found [here](http://lm2-poly.github.io/PeriPyDIC/doc/html/index.html).
+
 ### Support or Contact
 Please report any comments or remark to our code as an [issue](https://github.com/lm2-poly/PeriPyDIC/issues) on the [project page](https://github.com/lm2-poly/PeriPyDIC) on github.
