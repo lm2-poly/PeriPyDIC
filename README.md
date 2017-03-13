@@ -1,4 +1,4 @@
-# The problem {#mainpage}
+# The problem 
 
    Consider a 1D bar. The length of the bar and the number of sections in which the bar will be divided (the Peridynamic (PD) nodes are at the edges of each section) are provided by the user.
    
