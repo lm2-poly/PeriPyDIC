@@ -51,24 +51,24 @@ def main(argv):
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
             
 
-def simulation(data):
+def simulation(deck):
     t0 = time.time()
-    solver = problem.PD_problem(data)
-    x_0 = solver.random_initial_guess( data.geometry.pos_x, data )
-    solver.quasi_static_solver(x_0, data)
-    solver.strain_center_bar( data )
-    writeCSV(data,solver)
-    print "delta_x =" , data.delta_x
+    solver = problem.PD_problem(deck)
+    x_0 = solver.random_initial_guess( deck.geometry.pos_x, deck )
+    solver.quasi_static_solver(x_0, deck)
+    solver.strain_center_bar( deck )
+    writeCSV(deck,solver)
+    print "delta_x =" , deck.delta_x
     print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
     #print "Nodes positions = "
     print solver.y
     #print "Total time =" , time.time()- t0, "seconds"
 
-def writeCSV(data,problem):
-    for out in data.outputs:
+def writeCSV(deck,problem):
+    for out in deck.outputs:
         if out.outType == "CSV":
-            out.write(data,problem)
+            out.write(deck,problem)
         
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":

@@ -20,9 +20,9 @@ class OutputCSV():
          self.dataType = dataType
          
      ## Writes the data to the CSV file 
-     # @param PD_deck The object containing the configuration of the yaml file
+     # @param deck The object containing the configuration of the yaml file
      # @param problem The object containing the computational vlaues
-     def write(self, PD_deck,problem):
+     def write(self, deck,problem):
         with open(self.inputFile, 'wb') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=' ')
             header = []
@@ -30,10 +30,10 @@ class OutputCSV():
             if self.dataType == "Position":
                 
                 header.append("#Time")
-                for x_i in range(0,PD_deck.num_nodes_x):
+                for x_i in range(0,deck.num_nodes_x):
                     header.append("Id"+str(x_i))        
                 spamwriter.writerow(header)
             
-                for t_n in range(0, PD_deck.time_steps):
-                    spamwriter.writerow( np.insert(problem.y[:,t_n] , 0,  t_n*PD_deck.delta_t   ))
+                for t_n in range(0, deck.time_steps):
+                    spamwriter.writerow( np.insert(problem.y[:,t_n] , 0,  t_n*deck.delta_t   ))
         
