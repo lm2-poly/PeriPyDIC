@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 11 19:24:33 2015
-
-@author: ilyass.tabiai@polymtl.ca
-@author: rolland.delorme@polymtl.ca
-@author: patrick.diehl@polymtl.ca
-"""
-
+#-*- coding: utf-8 -*-
+#@author: ilyass.tabiai@polymtl.ca
+#@author: rolland.delorme@polymtl.ca
+#@author: patrick.diehl@polymtl.ca
 import sys
 import getopt
 import IO.deck

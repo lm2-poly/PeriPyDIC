@@ -7,6 +7,10 @@ import numpy as np
 ## Class to compute, as a vector state, the global internal volumic force of an elastic material using its material properties
 class Elastic_material():
   
+    ## Constructor
+    # @param deck The input deck
+    # @param problem The related peridynamic problem
+    # @param y The actual postions
     def __init__(self, deck, problem, y):
         ## Amount of nodes in x direction
         self.len_x = deck.num_nodes_x
@@ -25,7 +29,9 @@ class Elastic_material():
     # Reminder: y[xi, t] = x[xi] + u[xi, t]
   
     ## Function to compute the scalar extension state
-    # @param deck blabla...
+    # @param deck The input deck
+    # @param problem The related peridynamic problem
+    # @param y The actual postions
     def compute_ext_state(self, deck, problem, y):
         # Initialization for e
         e = np.zeros((self.len_x, self.len_x))
@@ -37,6 +43,9 @@ class Elastic_material():
         self.e = e
     
     ## Function to compute the vector force state
+    # @param deck The input deck
+    # @param problem The related peridynamic problem
+    # @param y The actual postions
     def compute_T(self, deck, problem, y):
         tscal = np.zeros((self.len_x, self.len_x))
         for x_i in range(0, self.len_x):
@@ -55,6 +64,8 @@ class Elastic_material():
         self.T = T
     
     ## Function to compute, as a vector state, the global internal volumic force within the equation of motion
+    # @param deck The input deck
+    # @param problem The related peridynamic problem
     def compute_Ts(self, deck, problem):
         Ts = np.zeros((self.len_x))
         for x_i in range(0, self.len_x):
