@@ -59,7 +59,7 @@ def simulation(data):
     solver.strain_center_bar( data )
     writeCSV(data,solver)
     print "delta_x =" , data.delta_x
-    print "Horizon =" , solver.Horizon
+    print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
     #print "Nodes positions = "
     print solver.y

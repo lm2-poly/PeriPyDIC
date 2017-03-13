@@ -1,20 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Dec 13 12:50:28 2015
-
-@author: ilyass.tabiai@polymtl.ca
-@author: rolland.delorme@polymtl.ca
-@author: patrick.diehl@polymtl.ca
-"""
+#-*- coding: utf-8 -*-
+#@author: ilyass.tabiai@polymtl.ca
+#@author: rolland.delorme@polymtl.ca
+#@author: patrick.diehl@polymtl.ca
 
 import logging
 import numpy as np
 import scipy.optimize
 import random
-#import csv
-#import os
-#import sys
-#import math
+import util.neighbor
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +18,7 @@ class PD_problem():
         self.len_x = PD_deck.num_nodes_x
         self.b = np.zeros( ( self.len_x, PD_deck.time_steps) )
         self.compute_b(PD_deck)
-        self.compute_horizon(PD_deck)
-        self.generate_neighborhood_matrix(PD_deck, PD_deck.geometry.pos_x)
+        self.neighbors = util.neighbor.NeighborSearch(PD_deck)
         self.y = np.zeros( ( self.len_x, PD_deck.time_steps) )
         self.y[:,0] = PD_deck.geometry.pos_x
         #self.u = np.zeros( (self.len_x, PD_deck.time_steps ) )
@@ -87,42 +79,18 @@ class PD_problem():
         else:
             logger.error("Error in problem.py: Shape of BC unknown, please use Ramp.")
                    
-    # Computes the horizon        
-    def compute_horizon(self, PD_deck):
-        #Be sure that points are IN the horizon
-        safety_factor = 1.001
-        self.Horizon = PD_deck.horizon_factor_m_value*PD_deck.delta_x*safety_factor
-        #print "Horizon =" , self.Horizon
-
-    # Returns a list of addresses of the neighbors of a point x_i
-    def get_index_x_family(self, x_i):
-        return (np.where(self.family[x_i] == 1))[0]
-
-    # Generates matrix neighborhood
-    def generate_neighborhood_matrix(self, PD_deck, x):
-        self.family = np.zeros((self.len_x, self.len_x))
-        for x_i in range(0, len(x)):
-            for x_p in range(0, len(x)):
-                if x_p == x_i:
-                    pass
-                elif np.absolute(x_i - x_p) <= PD_deck.horizon_factor_m_value:
-                    self.family[x_i][x_p] = 1
-                else:
-                    pass
-        #print self.family
-                                                              
     # Computes the shape tensor (here a scalar) for each node
     def compute_m(self, y):
         M = np.zeros((self.len_x, self.len_x))
         for x_i in range(0, self.len_x):
-            index_x_family = self.get_index_x_family(x_i)
+            index_x_family = self.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 M[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
         return M
 
     # Computes the weights for each PD node
     def weighted_function(self, PD_deck, x, x_i):
-        index_x_family = self.get_index_x_family(x_i)
+        index_x_family = self.neighbors.get_index_x_family(x_i)
         result = 0
         for x_p in index_x_family:
             result = result + PD_deck.influence_function * (x[x_p] - x[x_i])**2 * PD_deck.geometry.volumes[x_p]

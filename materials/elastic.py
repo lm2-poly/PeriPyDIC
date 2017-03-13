@@ -30,7 +30,7 @@ class Elastic_material():
         # Initialization for e
         e = np.zeros((self.len_x, self.len_x))
         for x_i in range(0, self.len_x):
-            index_x_family = PD_problem.get_index_x_family(x_i)
+            index_x_family = PD_problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(PD_deck.geometry.pos_x[x_p] - PD_deck.geometry.pos_x[x_i])
         ## Scalar extension state
@@ -40,7 +40,7 @@ class Elastic_material():
     def compute_T(self, PD_deck, PD_problem, y):
         tscal = np.zeros((self.len_x, self.len_x))
         for x_i in range(0, self.len_x):
-            index_x_family = PD_problem.get_index_x_family(x_i)
+            index_x_family = PD_problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 tscal[x_i, x_p] = (self.w / PD_problem.weighted_function(PD_deck,PD_deck.geometry.pos_x,x_i)) * self.E_Modulus * self.e[x_i,x_p]
         ## Scalar force state
@@ -48,7 +48,7 @@ class Elastic_material():
 
         T = np.zeros((self.len_x, self.len_x))
         for x_i in range(0, self.len_x):
-            index_x_family = PD_problem.get_index_x_family(x_i)
+            index_x_family = PD_problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 T[x_i, x_p] = tscal[x_i, x_p] * self.M[x_i, x_p]
         ##  Vector force state
@@ -58,7 +58,7 @@ class Elastic_material():
     def compute_Ts(self, PD_deck, PD_problem):
         Ts = np.zeros((self.len_x))
         for x_i in range(0, self.len_x):
-            index_x_family = PD_problem.get_index_x_family(x_i)
+            index_x_family = PD_problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 Ts[x_i] = Ts[x_i] + self.T[x_i, x_p] - self.T[x_p, x_i]
             Ts[x_i] = Ts[x_i] * PD_deck.geometry.volumes[x_i]
