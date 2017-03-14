@@ -13,7 +13,7 @@ class Elastic_material():
     # @param y The actual postions
     def __init__(self, deck, problem, y):
         ## Amount of nodes in x direction
-        self.len_x = deck.num_nodes_x
+        self.len_x = deck.num_nodes
         ## Young's modulus of the material
         self.E_Modulus = deck.e_modulus
         ## Scalar influence function
@@ -38,7 +38,7 @@ class Elastic_material():
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
-                e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(deck.geometry.pos_x[x_p] - deck.geometry.pos_x[x_i])
+                e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])
         ## Scalar extension state
         self.e = e
     
@@ -51,7 +51,7 @@ class Elastic_material():
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
-                tscal[x_i, x_p] = (self.w / problem.weighted_function(deck,deck.geometry.pos_x,x_i)) * self.E_Modulus * self.e[x_i,x_p]
+                tscal[x_i, x_p] = (self.w / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * self.E_Modulus * self.e[x_i,x_p]
         ## Scalar force state
         self.tscal = tscal
 

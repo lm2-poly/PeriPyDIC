@@ -15,12 +15,12 @@ class PD_problem():
     
     def __init__(self, deck):
         # Import initial data
-        self.len_x = deck.num_nodes_x
+        self.len_x = deck.num_nodes
         self.b = np.zeros( ( self.len_x, deck.time_steps) )
         self.compute_b(deck)
         self.neighbors = util.neighbor.NeighborSearch(deck)
         self.y = np.zeros( ( self.len_x, deck.time_steps) )
-        self.y[:,0] = deck.geometry.pos_x
+        self.y[:,0] = deck.geometry.nodes
         #self.u = np.zeros( (self.len_x, deck.time_steps ) )
         self.strain = np.zeros( ( deck.time_steps ) )
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
@@ -102,7 +102,7 @@ class PD_problem():
         for con in deck.conditions:
             if con.type == "Displacement": 
                 for id in con.id:
-                    y[int(id)] = deck.geometry.pos_x[int(id)] + con.value
+                    y[int(id)] = deck.geometry.nodes[int(id)] + con.value
         # Choice of the material class
         if deck.material_type == "Elastic":
             from materials.elastic import Elastic_material
@@ -164,12 +164,12 @@ class PD_problem():
         return y
 
     def strain_center_bar(self, deck):
-        Mid_Node_1 = int(deck.num_nodes_x/2)-1
+        Mid_Node_1 = int(deck.num_nodes/2)-1
         #print "Mid_Node_1 =" , Mid_Node_1
-        Mid_Node_2 = int(deck.num_nodes_x/2)+1
+        Mid_Node_2 = int(deck.num_nodes/2)+1
         #print "Mid_Node_2 =" , Mid_Node_2
         for t_n in range(1, deck.time_steps):
-            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.pos_x[Mid_Node_2] - deck.geometry.pos_x[Mid_Node_1])) / np.absolute(deck.geometry.pos_x[Mid_Node_2] - deck.geometry.pos_x[Mid_Node_1])
+            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.nodes[Mid_Node_2] - deck.geometry.nodes[Mid_Node_1])) / np.absolute(deck.geometry.nodes[Mid_Node_2] - deck.geometry.nodes[Mid_Node_1])
 
 
 #    # Records the force vector at each time step
@@ -184,7 +184,7 @@ class PD_problem():
 #    def strain_energy_from_force(self, deck):
 #        energy = np.zeros( (deck.time_steps, self.len_x) )
 #        for t_n in range(0, deck.time_steps ):   
-#            for x_i in range(0, deck.num_nodes_x):               
+#            for x_i in range(0, deck.num_nodes):               
 #                energy[t_n , x_i] = abs(self.forces[x_i, t_n]) * abs(self.u[x_i, t_n]) * deck.Volume
 #                #abs(self.forces[x_i, t_n]), abs(self.u[x_i, t_n]), energy[t_n , x_i]
 #        #print "ENERGY:",
@@ -195,13 +195,13 @@ class PD_problem():
 #    def strain_energy_bond_based(self, deck):
 #        energy = np.zeros((self.len_x, deck.time_steps))
 #        for t_n in range(0, deck.time_steps):
-#            for x_i in range(0, deck.num_nodes_x):
+#            for x_i in range(0, deck.num_nodes):
 #                index_x_family = self.get_index_x_family(x_i)
 #                modulus = deck.get_elastic_material_properties()
 #                for x_p in index_x_family:
 #                    #Silling-Askari2005, Eq17
 #                    stretch = (abs(self.u[x_p, t_n] - self.u[x_i, t_n]) - abs(
-#                        deck.geometry.pos_x[x_p] - deck.geometry.pos_x[x_i])) / abs(deck.geometry.pos_x[x_p] - deck.geometry.pos_x[x_i])
+#                        deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])) / abs(deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])
 #                    #Silling-Askari2005, Eq22
 #                    energy[x_i, t_n] = (
 #                        math.pi * modulus * math.pow(stretch, 2) * math.pow(self.Horizon, 4)) / 4.

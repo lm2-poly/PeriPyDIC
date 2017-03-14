@@ -30,7 +30,7 @@ class OutputCSV():
             if self.dataType == "Position":
                 
                 header.append("#Time")
-                for x_i in range(0,deck.num_nodes_x):
+                for x_i in range(0,deck.num_nodes):
                     header.append("Id"+str(x_i))        
                 spamwriter.writerow(header)
             

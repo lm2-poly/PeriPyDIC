@@ -99,10 +99,17 @@ class PD_deck():
                         ## Object for handling the discrete nodes
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
-                        ## The minimal nodal spacing in x direction
-                        self.delta_x = self.geometry.getMinDist(1)
-                        ## Amount of nodes in x direction
-                        self.num_nodes_x = len(self.geometry.pos_x)
+                        if self.dim >= 1:
+                            ## The minimal nodal spacing in x direction
+                            self.delta_x = self.geometry.getMinDist(1)
+                        if self.dim >= 2:
+                            ## The minimal nodal spacing in y direction
+                            self.delta_y = self.geometry.getMinDist(2)
+                        if self.dim >= 3:
+                            ## The minimal nodal spacing in z direction
+                            self.delta_y = self.geometry.getMinDist(3)
+                        ## Amount of nodes 
+                        self.num_nodes = self.geometry.amount
                         
                         if not "Boundary" in self.doc:
                             print "Error: No Boundary tag found"

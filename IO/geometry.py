@@ -21,7 +21,9 @@ class Geometry():
         self.volumes = np.array(0)
         ## Density per node
         self.density = np.array(0)
-       
+        ## Amount of nodes
+        self.amount = 0
+        
         self.volume_boundary = 0.
     
     ## Read the positions, volume, and density of the nodes from the inFile.
@@ -31,7 +33,8 @@ class Geometry():
         if not os.path.exists(inFile):
                 print "Error: Could not find " + inFile
                 sys.exit(1)
-        
+        #Dimension of the problem
+        self.dim = dim
         with open(inFile, 'r') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=' ')
             #Skip the first line, because is the header
@@ -59,33 +62,50 @@ class Geometry():
                 
                 self.volumes[i] = float(row[dim+1])
                 i +=1
-    
+        self.generateNodes()
     ## Computes the min distance between all nodes
     # @param direction
     # @return Minimal direction    
     def getMinDist(self,direction):
         tmp = float('inf')
         if direction == 1:
-            for i in range(0,len(self.pos_x)):
-                for j in range(0,len(self.pos_x)):
+            for i in range(0,len(self.nodes)):
+                for j in range(0,len(self.nodes)):
                     if i != j:
-                        val = abs(self.pos_x[j]-self.pos_x[i])
+                        val = abs(self.nodes[j]-self.nodes[i])
                         if val < tmp:
                             tmp = val
         if direction == 2:
-            for i in range(0,len(self.pos_y)):
-                for j in range(0,len(self.pos_y)):
+            for i in range(0,len(self.nodes[1])):
+                for j in range(0,len(self.nodes[1])):
                     if i != j:
-                        val = abs(self.pos_y[j]-self.pos_y[i])
+                        val = abs(self.nodes[1][j]-self.nodes[1][i])
                         if val < tmp:
                             tmp = val
         if direction == 3:
-            for i in range(0,len(self.pos_z)):
-                for j in range(0,len(self.pos_z)):
+            for i in range(0,len(self.nodes[1])):
+                for j in range(0,len(self.nodes[1])):
                     if i != j:
-                        val = abs(self.pos_z[j]-self.pos_z[i])
+                        val = abs(self.nodes[2][j]-self.nodes[2][i])
                         if val < tmp:
                             tmp = val
         return tmp
                     
-        
+    def generateNodes(self):
+           
+        if self.dim == 1:
+            self.nodes = np.array((self.pos_x),dtype=np.double)
+            del self.pos_x
+            self.amount = len(self.nodes)
+        if self.dim == 2:
+            self.nodes = np.array((self.pos_x,self.pos_y),dtype=np.double)
+            del self.pos_x
+            del self.pos_y
+            self.amount = len(self.nodes[0])
+        if self.dim == 3:
+            self.nodes = np.array((self.pos_x,self.pos_y,self.pos_z),dtype=np.double)
+            del self.pos_x
+            del self.pos_y
+            del self.pos_z
+            self.amount = len(self.nodes[0])
+            

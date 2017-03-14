@@ -14,7 +14,7 @@ class Viscoelastic_material():
     # @param t_n The time step
     def __init__(self, deck, problem, y, t_n):
         ## Amount of nodes in x direction
-        self.len_x = deck.num_nodes_x
+        self.len_x = deck.num_nodes
         ## Relaxation modulus of the material
         self.Relax_Modulus = deck.relax_modulus
         ## Relaxation time of the material
@@ -42,7 +42,7 @@ class Viscoelastic_material():
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family: 
-                e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(deck.geometry.pos_x[x_p] - deck.geometry.pos_x[x_i])       
+                e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])       
         ## Scalar extension state
         self.e = e
 
@@ -75,7 +75,7 @@ class Viscoelastic_material():
             index_x_family = problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family: 
                 for k in range(1, len(self.Relax_Time)):
-                    t_visco[x_i, x_p] = t_visco[x_i, x_p] + (self.w / problem.weighted_function(deck, deck.geometry.pos_x, x_i))*self.Relax_Modulus[k]*(self.e[x_i, x_p] - self.e_visco[x_i, x_p, k])
+                    t_visco[x_i, x_p] = t_visco[x_i, x_p] + (self.w / problem.weighted_function(deck, deck.geometry.nodes, x_i))*self.Relax_Modulus[k]*(self.e[x_i, x_p] - self.e_visco[x_i, x_p, k])
         ## Viscous part of the scalar state
         self.t_visco = t_visco
     
@@ -88,7 +88,7 @@ class Viscoelastic_material():
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
-                tscal[x_i, x_p] = (self.w / problem.weighted_function(deck, deck.geometry.pos_x, x_i))*self.Relax_Modulus[0]*self.e[x_i, x_p] + self.t_visco[x_i, x_p]
+                tscal[x_i, x_p] = (self.w / problem.weighted_function(deck, deck.geometry.nodes, x_i))*self.Relax_Modulus[0]*self.e[x_i, x_p] + self.t_visco[x_i, x_p]
         ## Scalar force state
         self.tscal = tscal
         

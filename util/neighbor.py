@@ -27,13 +27,17 @@ class NeighborSearch():
     #@param The input deck
     def generate_neighborhood_matrix(self, deck):
         ## Adjacency matrix 
-        self.family = np.zeros((deck.num_nodes_x, deck.num_nodes_x))
-        for x_i in range(0, deck.num_nodes_x):
-            for x_p in range(0, deck.num_nodes_x):
+        self.family = np.zeros((deck.num_nodes, deck.num_nodes))
+        for x_i in range(0, deck.num_nodes):
+            for x_p in range(0, deck.num_nodes):
                 if x_p == x_i:
                     pass
-                elif np.absolute(deck.geometry.pos_x[x_i] - deck.geometry.pos_x[x_p]) <= self.horizon:
+                elif np.absolute(deck.geometry.nodes[x_i] - deck.geometry.nodes[x_p]) <= self.horizon:
                     self.family[x_i][x_p] = 1
                 else:
                     pass
         #print self.family
+        
+    #def findNeighbors():
+        
+        

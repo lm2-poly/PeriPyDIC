@@ -49,7 +49,7 @@ def main(argv):
 def simulation(deck):
     t0 = time.time()
     solver = problem.PD_problem(deck)
-    x_0 = solver.random_initial_guess( deck.geometry.pos_x, deck )
+    x_0 = solver.random_initial_guess( deck.geometry.nodes, deck )
     solver.quasi_static_solver(x_0, deck)
     solver.strain_center_bar( deck )
     writeCSV(deck,solver)
