@@ -8,19 +8,28 @@ import numpy as np
 import scipy.optimize
 import random
 import util.neighbor
-
+import sys
 logger = logging.getLogger(__name__)
 
 class PD_problem():
     
     def __init__(self, deck):
         # Import initial data
-        self.len_x = deck.num_nodes
+        self.len_x = deck.dim *  deck.num_nodes
         self.b = np.zeros( ( self.len_x, deck.time_steps) )
         self.compute_b(deck)
         self.neighbors = util.neighbor.NeighborSearch(deck)
         self.y = np.zeros( ( self.len_x, deck.time_steps) )
-        self.y[:,0] = deck.geometry.nodes[:,0]
+        if deck.dim == 1:
+            self.y[:,0] = deck.geometry.nodes[:,0]
+            print self.y
+            sys.exit(1)
+        if deck.dim == 2:
+            coordinates = [row[0] for row in deck.geometry.nodes ] + [row[1] for row in deck.geometry.nodes ]
+            self.y[:,0] = coordinates
+        if deck.dim == 3:
+            coordinates = [row[0] for row in deck.geometry.nodes ] + [row[1] for row in deck.geometry.nodes ] + [row[2] for row in deck.geometry.nodes ]
+            self.y[:,0] = coordinates
         #self.u = np.zeros( (self.len_x, deck.time_steps ) )
         self.strain = np.zeros( ( deck.time_steps ) )
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
@@ -51,7 +60,15 @@ class PD_problem():
                 if con.type == "Force":
                     #Madenci approach
                     for x_i in con.id:
-                        b[int(x_i), t_n] = self.ramp_loading( deck, t_n , con )
+                        # x direction
+                        if con.direction == 1:
+                            b[int(x_i), t_n] = self.ramp_loading( deck, t_n , con )
+                        # y direction
+                        if con.direction == 2:
+                            b[int(x_i)+ deck.num_nodes , t_n] = self.ramp_loading( deck, t_n , con )
+                        # z direction
+                        if con.direction == 3:
+                            b[int(x_i) + 2 * deck.num_nodes, t_n] = self.ramp_loading( deck, t_n , con )
             self.b = b
             #print "b =" , self.b
         
@@ -102,7 +119,19 @@ class PD_problem():
         for con in deck.conditions:
             if con.type == "Displacement": 
                 for id in con.id:
-                    y[int(id)] = deck.geometry.nodes[int(id)] + con.value
+                    # x direction
+                    if con.direction == 1:
+                        if deck.dim == 1:
+                            y[int(id)] = deck.geometry.nodes[int(id)] + con.value
+                        else:
+                            y[int(id)] = deck.geometry.nodes[int(id)][0] + con.value
+                    # y direction
+                    if con.direction == 2:
+                        y[int(id)+ deck.num_nodes] = deck.geometry.nodes[int(id)][1] + con.value    
+                    # z direction
+                    if con.direction == 3:
+                        y[int(id)+ 2 * deck.num_nodes] = deck.geometry.nodes[int(id)][2] + con.value
+                            
         # Choice of the material class
         if deck.material_type == "Elastic":
             from materials.elastic import Elastic_material

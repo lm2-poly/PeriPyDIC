@@ -25,7 +25,7 @@ class NeighborSearch():
     def get_index_x_family(self, x_i):
         return self.family[x_i]
 
-    ## Generates adjacency matrix
+    ## Generates adjacency lists
     #@param The input deck
     def findNeighbors(self,deck):
         tree = scipy.spatial.KDTree(deck.geometry.nodes)    
@@ -34,4 +34,3 @@ class NeighborSearch():
         for i in range(0,len(ids)):
            self.family.append(np.array(filter(lambda x: x != i, np.array(filter(lambda x: x < deck.num_nodes, ids[i])))))
         del d , ids
-        

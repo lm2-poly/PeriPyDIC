@@ -17,6 +17,9 @@ Boundary:
         Value: 
             - 40.0
             - 0.0
+        Direction:
+            - 1
+            - 1
         File: 
             - force_condition_dx0_50.csv
             - displ_condition_1.csv

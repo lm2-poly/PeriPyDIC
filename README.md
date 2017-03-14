@@ -76,11 +76,13 @@ Boundary:
             - Force or Displacement
         Value: 
             - Float
+        Direction:
+            - Int
         File: 
             - file.csv
 ```
 where the `Type` either can be `Force` or `Displacement`, `Value` describes the value in Newton or Millimeter whis is applied at the nodes
-described in `File`. The file has to be provided in the CSV format with spaces as delimiter with the id ofthe nodes where the condition 
+described in `File`, and `Direction` describes the direction (X=1,Y=2,Z=3) where the condition is applied. The file has to be provided in the CSV format with spaces as delimiter with the id ofthe nodes where the condition 
 should be applied. Here, is an example for a `file.csv`
 ```yaml
 #id
