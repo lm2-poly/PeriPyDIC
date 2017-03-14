@@ -20,7 +20,7 @@ class PD_problem():
         self.compute_b(deck)
         self.neighbors = util.neighbor.NeighborSearch(deck)
         self.y = np.zeros( ( self.len_x, deck.time_steps) )
-        self.y[:,0] = deck.geometry.nodes
+        self.y[:,0] = deck.geometry.nodes[:,0]
         #self.u = np.zeros( (self.len_x, deck.time_steps ) )
         self.strain = np.zeros( ( deck.time_steps ) )
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
@@ -135,7 +135,7 @@ class PD_problem():
         
         for t_n in range(1, deck.time_steps):
             solver = scipy.optimize.root(self.compute_residual, y, args=(deck, t_n), method=deck.solver_type,jac=None,tol=deck.solver_tolerance,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
-            self.y[:, t_n] = solver.x
+            self.y[:, t_n] = solver.x[:,0]
             y = self.random_initial_guess(solver.x, deck)
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
@@ -161,6 +161,7 @@ class PD_problem():
         #Do not forget to do this for each direction, not only x
         y = np.zeros((self.len_x))
         y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
+        #print y
         return y
 
     def strain_center_bar(self, deck):

@@ -3,6 +3,8 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
+import scipy.spatial
+import sys
 
 ## Class for handling the neighborhood
 class NeighborSearch():
@@ -15,7 +17,10 @@ class NeighborSearch():
         self.safety_factor = 1.001
         ## Horizon of the neighborhood
         self.horizon = deck.horizon_factor_m_value*deck.delta_x*self.safety_factor
-        self.generate_neighborhood_matrix(deck)
+        if deck.geometry.dim == 1:
+            self.generate_neighborhood_matrix(deck)
+        else:
+            self.findNeighbors(deck)
         
     ## Returns the family of node x_i
     # @param x_i Id of the node
@@ -38,6 +43,11 @@ class NeighborSearch():
                     pass
         #print self.family
         
-    #def findNeighbors():
+    def findNeighbors(self,deck):
+        tree = scipy.spatial.cKDTree(deck.geometry.nodes)    
+        print deck.geometry.nodes
+        deq, ieq = tree.query(deck.geometry.nodes, k=10, eps=0.0, p=2, distance_upper_bound=self.horizon) 
+        print deq
+        sys.exit()
         
         
