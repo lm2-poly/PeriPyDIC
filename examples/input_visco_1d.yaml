@@ -2,10 +2,10 @@ Discretization:
     Dim: 1
     Final_Time: 20.0
     Time_Steps: 40
-    Horizon_Factor: 4.0
+    Horizon_Factor_m_value: 4.0
     Influence_Function: 1.0
     File:
-        Name: geometry_m4_dx0_50.csv
+        Name: geometry_dx0_50.csv
 Material:
     Type: Viscoelastic
     Relax_Modulus: 
@@ -25,8 +25,8 @@ Boundary:
             - 40.0
             - 0.0
         File: 
-            - force_condition_dx1.csv
-            - displ_condition_0_50.csv
+            - force_condition_dx0_50.csv
+            - displ_condition_1.csv
     Shape:
         Type: Ramp
         Values:
@@ -39,3 +39,6 @@ Output:
             - Position
         File:
             - nodes_positions_m4_dx0_50.csv
+Solver:
+    Type: krylov
+    Tolerance: 1.0e-12

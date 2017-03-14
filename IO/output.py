@@ -1,21 +1,28 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Mar 09 08:51:08 2017
-
-@author: Rolland
-"""
+#@author: ilyass.tabiai@polymtl.ca
+#@author: rolland.delorme@polymtl.ca
+#@author: patrick.diehl@polymtl.ca
 import csv
 import numpy as np
 
+## Class handles the output for CSV files
 class OutputCSV():
-     
+     ## Constructor 
+     # @param outType Type of the output 
+     # @param dataType The data, which is wriiten to the CSV file 
+     # @param inputFile The file where the output is written
      def __init__(self,outType,dataType,inputFile):
+         ## Type of the output
          self.outType = outType
+         ## Filename for the output file
          self.inputFile = inputFile
+         ## Type of the written data
          self.dataType = dataType
          
-
-     def write(self, PD_deck,problem):
+     ## Writes the data to the CSV file 
+     # @param deck The object containing the configuration of the yaml file
+     # @param problem The object containing the computational vlaues
+     def write(self, deck,problem):
         with open(self.inputFile, 'wb') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=' ')
             header = []
@@ -23,10 +30,10 @@ class OutputCSV():
             if self.dataType == "Position":
                 
                 header.append("#Time")
-                for x_i in range(0,PD_deck.num_nodes_x):
+                for x_i in range(0,deck.num_nodes_x):
                     header.append("Id"+str(x_i))        
                 spamwriter.writerow(header)
             
-                for t_n in range(0, PD_deck.time_steps):
-                    spamwriter.writerow( np.insert(problem.y[:,t_n] , 0,  t_n*PD_deck.delta_t   ))
+                for t_n in range(0, deck.time_steps):
+                    spamwriter.writerow( np.insert(problem.y[:,t_n] , 0,  t_n*deck.delta_t   ))
         

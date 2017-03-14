@@ -1,2 +1,3 @@
-export PYTHONPATH=..
-find .. -maxdepth 2 -name "*.py" -exec pdoc --html --overwrite "{}" ";"
+sed ' 1 s/.*/&{#mainpage}/' ../README.md > README.md
+
+doxygen configuration.doxy
