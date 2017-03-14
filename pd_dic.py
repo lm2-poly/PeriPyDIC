@@ -58,7 +58,6 @@ def simulation(deck):
     print "Strain = " , np.around(solver.strain,decimals=6)
     #print "Nodes positions = "
     print solver.y
-    #print "Total time =" , time.time()- t0, "seconds"
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

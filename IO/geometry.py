@@ -59,10 +59,13 @@ class Geometry():
                 
             if dim == 1:
                 ## Nodes of the discretization
-                self.nodes = np.array(zip(pos_x))
+                self.nodes = np.empty((len(pos_x),self.dim))
+                self.nodes[:,0] = pos_x
                 del pos_x
             if dim == 2:
-                self.nodes = np.array(zip(pos_x,pos_y))
+                self.nodes = np.empty((len(pos_x),self.dim))
+                self.nodes[:,0] = pos_x
+                self.nodes[:,1] = pos_y
                 del pos_x
                 del pos_y
             if dim >= 3:
@@ -70,7 +73,7 @@ class Geometry():
                 del pos_x
                 del pos_y
                 del pos_z
-                
+    
     ## Computes the min distance between all nodes
     # @param dim The dimension of nodes
     # @return Minimal dim    
