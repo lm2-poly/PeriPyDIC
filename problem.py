@@ -91,6 +91,7 @@ class PD_problem():
     # Computes the weights for each PD node
     def weighted_function(self, deck, x, x_i):
         index_x_family = self.neighbors.get_index_x_family(x_i)
+        #print "inside", x_i, index_x_family
         result = 0
         for x_p in index_x_family:
             result = result + deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
