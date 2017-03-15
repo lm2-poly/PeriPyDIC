@@ -31,7 +31,7 @@ class PD_problem():
         #self.u = np.zeros( (self.len_x, deck.time_steps ) )
         self.strain = np.zeros( ( deck.time_steps ) )
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
-        self.ext = np.zeros( ( self.len_x, self.len_x, deck.time_steps ) )
+        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ) )
         
         if deck.material_type == "Elastic":
             self.Modulus = deck.e_modulus
@@ -192,7 +192,10 @@ class PD_problem():
         
         for t_n in range(1, deck.time_steps):
             solver = scipy.optimize.root(self.compute_residual, y, args=(deck, t_n), method=deck.solver_type,jac=None,tol=deck.solver_tolerance,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
-            self.y[:, t_n] = solver.x[:,0]
+            if deck.dim == 1:
+                self.y[:, t_n] = solver.x[:,0]
+            else:
+                self.y[:, t_n] = solver.x
             y = self.random_initial_guess(solver.x, deck)
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
@@ -220,10 +223,10 @@ class PD_problem():
         if deck.dim == 1:
             y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
         if deck.dim >= 2:
-            y[:deck.num_nodes] = z[0:,0] + 0.25 * random.uniform(-1, 1) * deck.delta_x
-            y[deck.num_nodes:2*deck.num_nodes] = z[0:,1] + 0.25 * random.uniform(-1, 1) * deck.delta_y
+            y[:deck.num_nodes] = z[:deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_x
+            y[deck.num_nodes:2*deck.num_nodes] = z[deck.num_nodes:2*deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_y
         if deck.dim >= 3:
-            y[2*deck.num_nodes:3*deck.num_nodes] = z[0:,2] + 0.25 * random.uniform(-1, 1) * deck.delta_z
+            y[2*deck.num_nodes:3*deck.num_nodes] = z[2*deck.num_nodes:3*deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_z
         #print y
         return y
 
@@ -233,7 +236,7 @@ class PD_problem():
         Mid_Node_2 = int(deck.num_nodes/2)+1
         #print "Mid_Node_2 =" , Mid_Node_2
         for t_n in range(1, deck.time_steps):
-            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.nodes[Mid_Node_2] - deck.geometry.nodes[Mid_Node_1])) / np.absolute(deck.geometry.nodes[Mid_Node_2] - deck.geometry.nodes[Mid_Node_1])
+            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])) / np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])
 
 
 #    # Records the force vector at each time step

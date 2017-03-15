@@ -23,7 +23,6 @@ class ConditionFromFile():
         self.type = cType
         self.value = float(value)
         self.force_density = self.value / self.boundary_volume
-        print self.force_density
         self.direction = direction
                         
     ##Reads the ids from the inFile where this condition should be applied.
