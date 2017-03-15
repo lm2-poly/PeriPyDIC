@@ -54,7 +54,9 @@ def simulation(deck):
         initialVector = deck.geometry.nodes
     if deck.dim == 2:
         initialVector = np.concatenate((deck.geometry.nodes[:,0], deck.geometry.nodes[:,1]), axis=0)
-    
+    if deck.dim == 3:
+        initialVector = np.concatenate((deck.geometry.nodes[:,0] ,np.concatenate((deck.geometry.nodes[:,1], deck.geometry.nodes[:,2]), axis=0)),axis=0)
+  
     x_0 = solver.random_initial_guess( initialVector, deck )
     solver.quasi_static_solver(x_0, deck)
     solver.strain_center_bar( deck )
