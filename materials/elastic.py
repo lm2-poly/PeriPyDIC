@@ -3,7 +3,7 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
-import sys
+#import sys
 np.set_printoptions(threshold='nan')
 
 ## Class to compute, as a vector state, the global internal volumic force of an elastic material using its material properties
@@ -83,8 +83,7 @@ class Elastic_material():
                     T[2*self.len_x + x_i, 2*self.len_x + x_p] = tscal[x_i, x_p] * self.M_z[x_i, x_p]
         ##  Vector force state
         self.T = T
-        #print self.T
-        #sys.exit(1)
+    
     
     ## Function to compute, as a vector state, the global internal volumic force within the equation of motion
     # @param deck The input deck

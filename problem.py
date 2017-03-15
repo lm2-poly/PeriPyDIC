@@ -131,13 +131,13 @@ class PD_problem():
         result = 0
         for x_p in index_x_family:
             if deck.dim == 1:
-                result =+ deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
+                result += deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
             if deck.dim == 2:
                 actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)
-                result =+ deck.influence_function * actual * deck.geometry.volumes[x_p]
+                result += deck.influence_function * actual * deck.geometry.volumes[x_p]
             if deck.dim == 3:
                 actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)+np.power(x[x_p][2] - x[x_i][2],2)
-                result =+ deck.influence_function * actual * deck.geometry.volumes[x_p]
+                result += deck.influence_function * actual * deck.geometry.volumes[x_p]
                 
         return result
 
