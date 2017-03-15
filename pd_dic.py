@@ -49,7 +49,15 @@ def main(argv):
 def simulation(deck):
     t0 = time.time()
     solver = problem.PD_problem(deck)
-    x_0 = solver.random_initial_guess( deck.geometry.pos_x, deck )
+    
+    if deck.dim == 1:
+        initialVector = deck.geometry.nodes
+    if deck.dim == 2:
+        initialVector = np.concatenate((deck.geometry.nodes[:,0], deck.geometry.nodes[:,1]), axis=0)
+    if deck.dim == 3:
+        initialVector = np.concatenate((deck.geometry.nodes[:,0] ,np.concatenate((deck.geometry.nodes[:,1], deck.geometry.nodes[:,2]), axis=0)),axis=0)
+  
+    x_0 = solver.random_initial_guess( initialVector, deck )
     solver.quasi_static_solver(x_0, deck)
     solver.strain_center_bar( deck )
     writeCSV(deck,solver)
@@ -57,8 +65,7 @@ def simulation(deck):
     print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
     #print "Nodes positions = "
-    print solver.y
-    #print "Total time =" , time.time()- t0, "seconds"
+    #print solver.y
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

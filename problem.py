@@ -8,23 +8,30 @@ import numpy as np
 import scipy.optimize
 import random
 import util.neighbor
-
+import sys
 logger = logging.getLogger(__name__)
 
 class PD_problem():
     
     def __init__(self, deck):
         # Import initial data
-        self.len_x = deck.num_nodes_x
+        self.len_x = deck.dim *  deck.num_nodes
         self.b = np.zeros( ( self.len_x, deck.time_steps) )
         self.compute_b(deck)
         self.neighbors = util.neighbor.NeighborSearch(deck)
         self.y = np.zeros( ( self.len_x, deck.time_steps) )
-        self.y[:,0] = deck.geometry.pos_x
+        if deck.dim == 1:
+            self.y[:,0] = deck.geometry.nodes[:,0]
+        if deck.dim == 2:
+            coordinates = [row[0] for row in deck.geometry.nodes ] + [row[1] for row in deck.geometry.nodes ]
+            self.y[:,0] = coordinates
+        if deck.dim == 3:
+            coordinates = [row[0] for row in deck.geometry.nodes ] + [row[1] for row in deck.geometry.nodes ] + [row[2] for row in deck.geometry.nodes ]
+            self.y[:,0] = coordinates
         #self.u = np.zeros( (self.len_x, deck.time_steps ) )
         self.strain = np.zeros( ( deck.time_steps ) )
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
-        self.ext = np.zeros( ( self.len_x, self.len_x, deck.time_steps ) )
+        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ) )
         
         if deck.material_type == "Elastic":
             self.Modulus = deck.e_modulus
@@ -51,7 +58,15 @@ class PD_problem():
                 if con.type == "Force":
                     #Madenci approach
                     for x_i in con.id:
-                        b[int(x_i), t_n] = self.ramp_loading( deck, t_n , con )
+                        # x direction
+                        if con.direction == 1:
+                            b[int(x_i), t_n] = self.ramp_loading( deck, t_n , con )
+                        # y direction
+                        if con.direction == 2:
+                            b[int(x_i)+ deck.num_nodes , t_n] = self.ramp_loading( deck, t_n , con )
+                        # z direction
+                        if con.direction == 3:
+                            b[int(x_i) + 2 * deck.num_nodes, t_n] = self.ramp_loading( deck, t_n , con )
             self.b = b
             #print "b =" , self.b
         
@@ -80,21 +95,51 @@ class PD_problem():
             logger.error("Error in problem.py: Shape of BC unknown, please use Ramp.")
                    
     # Computes the shape tensor (here a scalar) for each node
-    def compute_m(self, y):
-        M = np.zeros((self.len_x, self.len_x))
-        for x_i in range(0, self.len_x):
-            index_x_family = self.neighbors.get_index_x_family(x_i)
-            for x_p in index_x_family:
-                M[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
-        return M
-
+    def compute_m(self, y,dim,length):
+        if dim == 1:
+            M = np.zeros((length, length))
+            for x_i in range(0, length):
+                index_x_family = self.neighbors.get_index_x_family(x_i)
+                for x_p in index_x_family:
+                    M[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
+            return M
+        if dim == 2:
+            M_x = np.zeros((length, length))
+            M_y = np.zeros((length, length))
+            for x_i in range(0, length):
+                index_x_family = self.neighbors.get_index_x_family(x_i)
+                for x_p in index_x_family:
+                    distance = np.sqrt(np.power(y[x_p] - y[x_i],2)+np.power(y[length +x_p] - y[length + x_i],2))
+                    M_x[x_i, x_p] = (y[x_p] - y[x_i]) / distance
+                    M_y[x_i, x_p] = (y[length + x_p] - y[ length + x_i]) / distance
+            return M_x , M_y
+        if dim == 3:
+            M_x = np.zeros((length, length))
+            M_y = np.zeros((length, length))
+            M_z = np.zeros((length, length))
+            for x_i in range(0, length):
+                index_x_family = self.neighbors.get_index_x_family(x_i)
+                for x_p in index_x_family:
+                    M_x[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
+                    M_y[x_i, x_p] = (y[length + x_p] - y[ length + x_i]) / np.absolute(y[length + x_p] - y[ length + x_i])
+                    M_z[x_i, x_p] = (y[2*length + x_p] - y[ 2*length + x_i]) / np.absolute(y[2*length + x_p] - y[ 2* length + x_i])
+            return M_x , M_y , M_z
+        
     # Computes the weights for each PD node
     def weighted_function(self, deck, x, x_i):
         index_x_family = self.neighbors.get_index_x_family(x_i)
         #print "inside", x_i, index_x_family
         result = 0
         for x_p in index_x_family:
-            result = result + deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
+            if deck.dim == 1:
+                result += deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
+            if deck.dim == 2:
+                actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)
+                result += deck.influence_function * actual * deck.geometry.volumes[x_p]
+            if deck.dim == 3:
+                actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)+np.power(x[x_p][2] - x[x_i][2],2)
+                result += deck.influence_function * actual * deck.geometry.volumes[x_p]
+                
         return result
 
     # Computes the residual vector used in the quasi_static_solver function
@@ -102,8 +147,20 @@ class PD_problem():
         residual = np.zeros( ( self.len_x ) )
         for con in deck.conditions:
             if con.type == "Displacement": 
-                for id in con.id:
-                    y[int(id)] = deck.geometry.pos_x[int(id)] + con.value
+                for id_node in con.id:
+                    # x direction
+                    if con.direction == 1:
+                        if deck.dim == 1:
+                            y[int(id_node)] = deck.geometry.nodes[int(id_node)] + con.value
+                        else:
+                            y[int(id_node)] = deck.geometry.nodes[int(id_node)][0] + con.value
+                    # y direction
+                    if con.direction == 2:
+                        y[int(id_node)+ deck.num_nodes] = deck.geometry.nodes[int(id_node)][1] + con.value    
+                    # z direction
+                    if con.direction == 3:
+                        y[int(id_node)+ 2 * deck.num_nodes] = deck.geometry.nodes[int(id_node)][2] + con.value
+                            
         # Choice of the material class
         if deck.material_type == "Elastic":
             from materials.elastic import Elastic_material
@@ -129,14 +186,17 @@ class PD_problem():
         #print residual
         return residual
 
-    # This functtion solves the problem at each time step, using the previous
+    # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
     # This function calls the compute_residual function
     def quasi_static_solver(self, y, deck):
         
         for t_n in range(1, deck.time_steps):
             solver = scipy.optimize.root(self.compute_residual, y, args=(deck, t_n), method=deck.solver_type,jac=None,tol=deck.solver_tolerance,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
-            self.y[:, t_n] = solver.x
+            if deck.dim == 1:
+                self.y[:, t_n] = solver.x[:,0]
+            else:
+                self.y[:, t_n] = solver.x
             y = self.random_initial_guess(solver.x, deck)
             if solver.success == "False":
                 logger.warning("Convergence could not be reached.")
@@ -161,16 +221,23 @@ class PD_problem():
     def random_initial_guess(self, z, deck):
         #Do not forget to do this for each direction, not only x
         y = np.zeros((self.len_x))
-        y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
+        if deck.dim == 1:
+            y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
+        if deck.dim >= 2:
+            y[:deck.num_nodes] = z[:deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_x
+            y[deck.num_nodes:2*deck.num_nodes] = z[deck.num_nodes:2*deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_y
+        if deck.dim >= 3:
+            y[2*deck.num_nodes:3*deck.num_nodes] = z[2*deck.num_nodes:3*deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_z
+        #print y
         return y
 
     def strain_center_bar(self, deck):
-        Mid_Node_1 = int(deck.num_nodes_x/2)-1
+        Mid_Node_1 = int(deck.num_nodes/2)-1
         #print "Mid_Node_1 =" , Mid_Node_1
-        Mid_Node_2 = int(deck.num_nodes_x/2)+1
+        Mid_Node_2 = int(deck.num_nodes/2)+1
         #print "Mid_Node_2 =" , Mid_Node_2
         for t_n in range(1, deck.time_steps):
-            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.pos_x[Mid_Node_2] - deck.geometry.pos_x[Mid_Node_1])) / np.absolute(deck.geometry.pos_x[Mid_Node_2] - deck.geometry.pos_x[Mid_Node_1])
+            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])) / np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])
 
 
 #    # Records the force vector at each time step
@@ -185,7 +252,7 @@ class PD_problem():
 #    def strain_energy_from_force(self, deck):
 #        energy = np.zeros( (deck.time_steps, self.len_x) )
 #        for t_n in range(0, deck.time_steps ):   
-#            for x_i in range(0, deck.num_nodes_x):               
+#            for x_i in range(0, deck.num_nodes):               
 #                energy[t_n , x_i] = abs(self.forces[x_i, t_n]) * abs(self.u[x_i, t_n]) * deck.Volume
 #                #abs(self.forces[x_i, t_n]), abs(self.u[x_i, t_n]), energy[t_n , x_i]
 #        #print "ENERGY:",
@@ -196,13 +263,13 @@ class PD_problem():
 #    def strain_energy_bond_based(self, deck):
 #        energy = np.zeros((self.len_x, deck.time_steps))
 #        for t_n in range(0, deck.time_steps):
-#            for x_i in range(0, deck.num_nodes_x):
+#            for x_i in range(0, deck.num_nodes):
 #                index_x_family = self.get_index_x_family(x_i)
 #                modulus = deck.get_elastic_material_properties()
 #                for x_p in index_x_family:
 #                    #Silling-Askari2005, Eq17
 #                    stretch = (abs(self.u[x_p, t_n] - self.u[x_i, t_n]) - abs(
-#                        deck.geometry.pos_x[x_p] - deck.geometry.pos_x[x_i])) / abs(deck.geometry.pos_x[x_p] - deck.geometry.pos_x[x_i])
+#                        deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])) / abs(deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])
 #                    #Silling-Askari2005, Eq22
 #                    energy[x_i, t_n] = (
 #                        math.pi * modulus * math.pow(stretch, 2) * math.pow(self.Horizon, 4)) / 4.

@@ -100,9 +100,15 @@ class PD_deck():
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
                         ## The minimal nodal spacing in x direction
-                        self.delta_x = self.geometry.getMinDist(1)
-                        ## Amount of nodes in x direction
-                        self.num_nodes_x = len(self.geometry.pos_x)
+                        self.delta_x = self.geometry.getMinDist(self.dim,1)
+                        if self.dim >= 2:
+                            ## The minimal nodal spacing in y-direction
+                            self.delta_y = self.geometry.getMinDist(self.dim,2)
+                        if self.dim >= 3:
+                            ## The minimal nodal spacing in z-direction
+                            self.delta_z = self.geometry.getMinDist(self.dim,3)
+                        ## Amount of nodes 
+                        self.num_nodes = self.geometry.amount
                         
                         if not "Boundary" in self.doc:
                             print "Error: No Boundary tag found"
@@ -115,7 +121,7 @@ class PD_deck():
                                 ## List of all conditions specified in the configuration file
                                 self.conditions = []
                                 for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
-                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes))
+                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i]))
                             if not "Shape" in self.doc["Boundary"]:
                                 print "Error: No Shape tag found"
                                 sys.exit(1)                       
