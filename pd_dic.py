@@ -57,7 +57,7 @@ def simulation(deck):
     print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
     #print "Nodes positions = "
-    print solver.y
+    #print solver.y
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

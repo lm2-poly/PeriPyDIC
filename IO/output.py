@@ -9,7 +9,7 @@ import numpy as np
 class OutputCSV():
      ## Constructor 
      # @param outType Type of the output 
-     # @param dataType The data, which is wriiten to the CSV file 
+     # @param dataType The data, which is written to the CSV file 
      # @param inputFile The file where the output is written
      def __init__(self,outType,dataType,inputFile):
          ## Type of the output
@@ -21,7 +21,7 @@ class OutputCSV():
          
      ## Writes the data to the CSV file 
      # @param deck The object containing the configuration of the yaml file
-     # @param problem The object containing the computational vlaues
+     # @param problem The object containing the computational values
      def write(self, deck,problem):
         with open(self.inputFile, 'wb') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=' ')

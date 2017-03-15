@@ -3,6 +3,8 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
+import sys
+np.set_printoptions(threshold='nan')
 
 ## Class to compute, as a vector state, the global internal volumic force of an elastic material using its material properties
 class Elastic_material():
@@ -19,7 +21,12 @@ class Elastic_material():
         ## Scalar influence function
         self.w = deck.influence_function
         ##  Deformed direction vector state
-        self.M = problem.compute_m(y)
+        if deck.dim == 1:
+            self.M_x = problem.compute_m(y,deck.dim,deck.num_nodes)
+        if deck.dim == 2:
+            self.M_x , self.M_y = problem.compute_m(y,deck.dim,deck.num_nodes)
+        if deck.dim == 3:
+            self.M_x , self.M_y , self.M_z = problem.compute_m(y,deck.dim,deck.num_nodes)
         self.compute_ext_state(deck, problem, y)
         self.compute_T(deck, problem, y)
         self.compute_Ts(deck, problem)
@@ -38,7 +45,16 @@ class Elastic_material():
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
-                e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])
+                if deck.dim == 1:
+                    e[x_i, x_p] = np.absolute(y[x_p] - y[x_i]) - np.absolute(deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])
+                if deck.dim == 2:
+                    initial = np.sqrt(np.power(y[x_p] - y[x_i],2) + np.power(y[self.len_x + x_p] - y[self.len_x + x_i],2))
+                    actual = np.sqrt(np.power(deck.geometry.nodes[x_p][0] - deck.geometry.nodes[x_i][0],2)+np.power(deck.geometry.nodes[x_p][1] - deck.geometry.nodes[x_i][1],2))
+                    e[x_i, x_p] = actual  - initial 
+                if deck.dim == 3:
+                    initial = np.sqrt(np.power(y[x_p] - y[x_i],2) + np.power(y[self.len_x + x_p] - y[self.len_x + x_i],2)+ np.power(y[2*self.len_x + x_p] - y[2*self.len_x + x_i],2))
+                    actual = np.sqrt(np.power(deck.geometry.nodes[x_p][0] - deck.geometry.nodes[x_i][0],2)+np.power(deck.geometry.nodes[x_p][1] - deck.geometry.nodes[x_i][1],2)+np.power(deck.geometry.nodes[x_p][2] - deck.geometry.nodes[x_i][2],2))
+                    e[x_i, x_p] = actual  - initial 
         ## Scalar extension state
         self.e = e
     
@@ -55,13 +71,20 @@ class Elastic_material():
         ## Scalar force state
         self.tscal = tscal
 
-        T = np.zeros((self.len_x, self.len_x))
+        T = np.zeros((deck.dim * self.len_x, deck.dim * self.len_x))
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
-                T[x_i, x_p] = tscal[x_i, x_p] * self.M[x_i, x_p]
+                if deck.dim >= 1:
+                    T[x_i, x_p] = tscal[x_i, x_p] * self.M_x[x_i, x_p]
+                if deck.dim >=2:
+                    T[self.len_x + x_i, self.len_x + x_p] = tscal[x_i, x_p] * self.M_y[x_i, x_p]
+                if deck.dim == 3:
+                    T[2*self.len_x + x_i, 2*self.len_x + x_p] = tscal[x_i, x_p] * self.M_z[x_i, x_p]
         ##  Vector force state
         self.T = T
+        #print self.T
+        #sys.exit(1)
     
     ## Function to compute, as a vector state, the global internal volumic force within the equation of motion
     # @param deck The input deck

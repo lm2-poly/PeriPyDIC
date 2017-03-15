@@ -18,11 +18,12 @@ class ConditionFromFile():
     # @param value The value, which is applied
     # @param volume The volume of the nodes
     # @param direction The direction where the conditions is applied
-    def __init__(self,type,inFile,value,volume,direction):
+    def __init__(self,cType,inFile,value,volume,direction):
         self.id = self.readCondition(inFile,volume)
-        self.type = type
+        self.type = cType
         self.value = float(value)
         self.force_density = self.value / self.boundary_volume
+        print self.force_density
         self.direction = direction
                         
     ##Reads the ids from the inFile where this condition should be applied.
@@ -39,14 +40,14 @@ class ConditionFromFile():
             # Skip the first line, because is the header
             next(spamreader)
             length = len(list(spamreader))
-            id = np.empty(length)
+            ids = np.empty(length)
             csvfile.seek(0)
             next(spamreader)
             i = 0
             for row in spamreader:
-                id[i] = int(row[0])
-                self.boundary_volume += volume[int(id[i])]
+                ids[i] = int(row[0])
+                self.boundary_volume += volume[int(ids[i])]
                 i += 1
                 
-            return id
+            return ids
       

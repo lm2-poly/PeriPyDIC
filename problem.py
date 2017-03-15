@@ -22,8 +22,6 @@ class PD_problem():
         self.y = np.zeros( ( self.len_x, deck.time_steps) )
         if deck.dim == 1:
             self.y[:,0] = deck.geometry.nodes[:,0]
-            print self.y
-            sys.exit(1)
         if deck.dim == 2:
             coordinates = [row[0] for row in deck.geometry.nodes ] + [row[1] for row in deck.geometry.nodes ]
             self.y[:,0] = coordinates
@@ -97,20 +95,50 @@ class PD_problem():
             logger.error("Error in problem.py: Shape of BC unknown, please use Ramp.")
                    
     # Computes the shape tensor (here a scalar) for each node
-    def compute_m(self, y):
-        M = np.zeros((self.len_x, self.len_x))
-        for x_i in range(0, self.len_x):
-            index_x_family = self.neighbors.get_index_x_family(x_i)
-            for x_p in index_x_family:
-                M[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
-        return M
-
+    def compute_m(self, y,dim,length):
+        if dim == 1:
+            M = np.zeros((length, length))
+            for x_i in range(0, length):
+                index_x_family = self.neighbors.get_index_x_family(x_i)
+                for x_p in index_x_family:
+                    M[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
+            return M
+        if dim == 2:
+            M_x = np.zeros((length, length))
+            M_y = np.zeros((length, length))
+            for x_i in range(0, length):
+                index_x_family = self.neighbors.get_index_x_family(x_i)
+                for x_p in index_x_family:
+                    distance = np.sqrt(np.power(y[x_p] - y[x_i],2)+np.power(y[length +x_p] - y[length + x_i],2))
+                    M_x[x_i, x_p] = (y[x_p] - y[x_i]) / distance
+                    M_y[x_i, x_p] = (y[length + x_p] - y[ length + x_i]) / distance
+            return M_x , M_y
+        if dim == 3:
+            M_x = np.zeros((length, length))
+            M_y = np.zeros((length, length))
+            M_z = np.zeros((length, length))
+            for x_i in range(0, length):
+                index_x_family = self.neighbors.get_index_x_family(x_i)
+                for x_p in index_x_family:
+                    M_x[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
+                    M_y[x_i, x_p] = (y[length + x_p] - y[ length + x_i]) / np.absolute(y[length + x_p] - y[ length + x_i])
+                    M_z[x_i, x_p] = (y[2*length + x_p] - y[ 2*length + x_i]) / np.absolute(y[2*length + x_p] - y[ 2* length + x_i])
+            return M_x , M_y , M_z
+        
     # Computes the weights for each PD node
     def weighted_function(self, deck, x, x_i):
         index_x_family = self.neighbors.get_index_x_family(x_i)
         result = 0
         for x_p in index_x_family:
-            result = result + deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
+            if deck.dim == 1:
+                result =+ deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
+            if deck.dim == 2:
+                actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)
+                result =+ deck.influence_function * actual * deck.geometry.volumes[x_p]
+            if deck.dim == 3:
+                actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)+np.power(x[x_p][2] - x[x_i][2],2)
+                result =+ deck.influence_function * actual * deck.geometry.volumes[x_p]
+                
         return result
 
     # Computes the residual vector used in the quasi_static_solver function
@@ -118,19 +146,19 @@ class PD_problem():
         residual = np.zeros( ( self.len_x ) )
         for con in deck.conditions:
             if con.type == "Displacement": 
-                for id in con.id:
+                for id_node in con.id:
                     # x direction
                     if con.direction == 1:
                         if deck.dim == 1:
-                            y[int(id)] = deck.geometry.nodes[int(id)] + con.value
+                            y[int(id_node)] = deck.geometry.nodes[int(id_node)] + con.value
                         else:
-                            y[int(id)] = deck.geometry.nodes[int(id)][0] + con.value
+                            y[int(id_node)] = deck.geometry.nodes[int(id_node)][0] + con.value
                     # y direction
                     if con.direction == 2:
-                        y[int(id)+ deck.num_nodes] = deck.geometry.nodes[int(id)][1] + con.value    
+                        y[int(id_node)+ deck.num_nodes] = deck.geometry.nodes[int(id_node)][1] + con.value    
                     # z direction
                     if con.direction == 3:
-                        y[int(id)+ 2 * deck.num_nodes] = deck.geometry.nodes[int(id)][2] + con.value
+                        y[int(id_node)+ 2 * deck.num_nodes] = deck.geometry.nodes[int(id_node)][2] + con.value
                             
         # Choice of the material class
         if deck.material_type == "Elastic":
@@ -157,7 +185,7 @@ class PD_problem():
         #print residual
         return residual
 
-    # This functtion solves the problem at each time step, using the previous
+    # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
     # This function calls the compute_residual function
     def quasi_static_solver(self, y, deck):
@@ -189,7 +217,13 @@ class PD_problem():
     def random_initial_guess(self, z, deck):
         #Do not forget to do this for each direction, not only x
         y = np.zeros((self.len_x))
-        y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
+        if deck.dim == 1:
+            y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
+        if deck.dim >= 2:
+            y[:deck.num_nodes] = z[0:,0] + 0.25 * random.uniform(-1, 1) * deck.delta_x
+            y[deck.num_nodes:2*deck.num_nodes] = z[0:,1] + 0.25 * random.uniform(-1, 1) * deck.delta_y
+        if deck.dim >= 3:
+            y[2*deck.num_nodes:3*deck.num_nodes] = z[0:,2] + 0.25 * random.uniform(-1, 1) * deck.delta_z
         #print y
         return y
 
