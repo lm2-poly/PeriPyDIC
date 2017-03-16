@@ -14,15 +14,21 @@ class ConditionFromFile():
     boundary_volume = 0.0
     
     ## Constructor
-    # @param type Type of the condition, e.g. Force or Displacement
+    # @param cType Type of the condition, e.g. Force or Displacement
+    # @param inFile Path to the CSV file with the respective node ids
     # @param value The value, which is applied
     # @param volume The volume of the nodes
     # @param direction The direction where the conditions is applied
     def __init__(self,cType,inFile,value,volume,direction):
+        ## Ids of the node where this condition is applied
         self.id = self.readCondition(inFile,volume)
+        ## Type of the condition (Force or Displacement)
         self.type = cType
+        ## Value in Newton or Meter
         self.value = float(value)
+        ## Force density 
         self.force_density = self.value / self.boundary_volume
+        ## Direction of the condition
         self.direction = direction
                         
     ##Reads the ids from the inFile where this condition should be applied.

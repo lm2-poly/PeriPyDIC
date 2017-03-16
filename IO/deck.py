@@ -21,8 +21,8 @@ class PD_deck():
                 sys.exit(1)
             else:
                 with open(inputFile,'r') as f:
+                    ## Container of the tags parsed from the yaml file
                     self.doc = yaml.load(f)
-                    
                     if not "Material" in self.doc:
                         print "Error: Specify a material tag in your yaml"
                         sys.exit(1)

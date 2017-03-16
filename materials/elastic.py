@@ -20,12 +20,14 @@ class Elastic_material():
         self.E_Modulus = deck.e_modulus
         ## Scalar influence function
         self.w = deck.influence_function
-        ##  Deformed direction vector state
         if deck.dim == 1:
+            ##  Deformed direction vector state in x direction
             self.M_x = problem.compute_m(y,deck.dim,deck.num_nodes)
         if deck.dim == 2:
+            ##  Deformed direction vector state in y direction
             self.M_x , self.M_y = problem.compute_m(y,deck.dim,deck.num_nodes)
         if deck.dim == 3:
+            ##  Deformed direction vector state in z direction
             self.M_x , self.M_y , self.M_z = problem.compute_m(y,deck.dim,deck.num_nodes)
         self.compute_ext_state(deck, problem, y)
         self.compute_T(deck, problem, y)
@@ -70,7 +72,7 @@ class Elastic_material():
                 tscal[x_i, x_p] = (self.w / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * self.E_Modulus * self.e[x_i,x_p]
         ## Scalar force state
         self.tscal = tscal
-
+        ## Vector state in x direction
         self.T_x = np.zeros((deck.dim * self.len_x, deck.dim * self.len_x))
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
@@ -78,9 +80,11 @@ class Elastic_material():
                 if deck.dim >= 1:
                     self.T_x[x_i, x_p] = tscal[x_i, x_p] * self.M_x[x_i, x_p]
                 if deck.dim >=2:
+                    ## Vector state in y direction
                     self.T_y = np.zeros((deck.dim * self.len_x, deck.dim * self.len_x))
                     self.T_y[x_i, x_p] = tscal[x_i, x_p] * self.M_y[x_i, x_p]
                 if deck.dim >= 3:
+                    ## Vector state in z direction
                     self.T_z = np.zeros((deck.dim * self.len_x, deck.dim * self.len_x))
                     self.T_z[x_i, x_p] = tscal[x_i, x_p] * self.M_z[x_i, x_p]
         ##  Vector force state

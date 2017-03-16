@@ -23,7 +23,7 @@ class Geometry():
         if not os.path.exists(inFile):
                 print "Error: Could not find " + inFile
                 sys.exit(1)
-        #Dimension of the problem
+        ##Dimension of the problem
         self.dim = dim
         with open(inFile, 'r') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=' ')
