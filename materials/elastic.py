@@ -29,6 +29,7 @@ class Elastic_material():
         if deck.dim == 3:
             ##  Deformed direction vector state in z direction
             self.M_x , self.M_y , self.M_z = problem.compute_m(y,deck.dim,deck.num_nodes)
+            
         self.compute_ext_state(deck, problem, y)
         self.compute_T(deck, problem, y)
         self.compute_Ts(deck, problem)
