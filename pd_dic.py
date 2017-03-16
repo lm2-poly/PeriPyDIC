@@ -7,8 +7,15 @@ import getopt
 import IO.deck
 import problem
 import numpy as np
-import time
+import pkgutil
 
+vtk_loader = pkgutil.find_loader('vtk')
+found_vtk = vtk_loader is not None 
+if found_vtk == True:
+    import IO.vis
+else:
+    print "VTK output not supported. Please install PyVTK for that"
+    
 def main(argv):
     """
     Main
@@ -47,7 +54,6 @@ def main(argv):
             
 
 def simulation(deck):
-    t0 = time.time()
     solver = problem.PD_problem(deck)
     
     if deck.dim == 1:
@@ -61,6 +67,8 @@ def simulation(deck):
     solver.quasi_static_solver(x_0, deck)
     solver.strain_center_bar( deck )
     writeCSV(deck,solver)
+    if found_vtk == True:
+        write_vtk(deck,solver)
     print "delta_x =" , deck.delta_x
     print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
@@ -71,7 +79,10 @@ def writeCSV(deck,problem):
     for out in deck.outputs:
         if out.outType == "CSV":
             out.write(deck,problem)
-        
+
+def write_vtk(deck,problem):
+    writer = IO.vis.VTK_writer("test.vtu")
+    
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
     main(sys.argv[1:])
