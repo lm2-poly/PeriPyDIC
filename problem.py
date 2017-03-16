@@ -8,7 +8,7 @@ import numpy as np
 import scipy.optimize
 import random
 import util.neighbor
-import sys
+
 logger = logging.getLogger(__name__)
 
 class PD_problem():
@@ -120,9 +120,10 @@ class PD_problem():
             for x_i in range(0, length):
                 index_x_family = self.neighbors.get_index_x_family(x_i)
                 for x_p in index_x_family:
-                    M_x[x_i, x_p] = (y[x_p] - y[x_i]) / np.absolute(y[x_p] - y[x_i])
-                    M_y[x_i, x_p] = (y[length + x_p] - y[ length + x_i]) / np.absolute(y[length + x_p] - y[ length + x_i])
-                    M_z[x_i, x_p] = (y[2*length + x_p] - y[ 2*length + x_i]) / np.absolute(y[2*length + x_p] - y[ 2* length + x_i])
+                    distance = np.sqrt(np.power(y[x_p] - y[x_i],2) + np.power(y[length +x_p] - y[length + x_i],2) + np.power(y[2*length +x_p] - y[2*length + x_i],2))
+                    M_x[x_i, x_p] = (y[x_p] - y[x_i]) / distance
+                    M_y[x_i, x_p] = (y[length + x_p] - y[ length + x_i]) / distance
+                    M_z[x_i, x_p] = (y[2*length + x_p] - y[ 2*length + x_i]) / distance
             return M_x , M_y , M_z
         
     # Computes the weights for each PD node
