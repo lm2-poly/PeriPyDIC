@@ -21,8 +21,8 @@ Boundary:
             - 1
             - 1
         File: 
-            - force_condition_dx0_50.csv
-            - displ_condition_1.csv
+            - force_condition.csv
+            - displ_condition.csv
     Shape:
         Type: Ramp
         Values:
