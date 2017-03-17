@@ -76,6 +76,7 @@ class Elastic_material():
         e = np.zeros((self.len_x, self.len_x))
         for x_i in range(0, self.len_x):
             index_x_family = problem.neighbors.get_index_x_family(x_i)
+            print index_x_family
             for x_p in index_x_family:
                 
                 if deck.dim == 1:
@@ -83,8 +84,9 @@ class Elastic_material():
                     initial = np.absolute(deck.geometry.nodes[x_p] - deck.geometry.nodes[x_i])
                     e[x_i, x_p] = actual - initial
                     self.e = e
-                
+                    
                 if deck.dim == 2:
+                    print "inside"
                     e_s = np.zeros((self.len_x, self.len_x))
                     e_d = np.zeros((self.len_x, self.len_x))
                     actual = np.sqrt(np.power(y[x_p] - y[x_i],2) + np.power(y[self.len_x + x_p] - y[self.len_x + x_i],2))
@@ -94,6 +96,7 @@ class Elastic_material():
                     e_d[x_i, x_p] = e[x_i, x_p] - e_d[x_i, x_p]
                     ## Scalar extension state
                     self.e = e 
+                    print self.e
                     self.e_s = e_s
                     self.e_d = e_d
                     

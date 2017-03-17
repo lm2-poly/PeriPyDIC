@@ -2,7 +2,7 @@ Discretization:
     Dim: 2
     Final_Time: 2.0
     Time_Steps: 8
-    Horizon_Factor_m_value: 2.0
+    Horizon_Factor_m_value: 10.0
     Influence_Function: 1.0
     File: 
         Name: geometry_2D.csv
@@ -40,11 +40,7 @@ Output:
             - Position
         File:
             - nodes_positions_m4_dx0_50.csv
-<<<<<<< HEAD:examples/input_elas_2D.yaml
     VTK:
-=======
-        VTK:
->>>>>>> b98b13dc27520c075a50d886e10f112a43e9d37f:examples/input_elas_2d.yaml
         Path: ./out/
         Type:
             - Displacement

@@ -33,6 +33,8 @@ class PD_problem():
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ) )
 
+        print deck.geometry.nodes
+
     # Creates a loading vector b which describes the force or displacement applied on each node
     # at any time step
     def compute_b(self, deck):       
