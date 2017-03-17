@@ -8,6 +8,7 @@ import geometry
 import sys
 import util.condition
 import IO.output
+import vis
 
 ## Class handeling the input of the yaml file and storing the values
 class PD_deck():
@@ -28,7 +29,7 @@ class PD_deck():
                         sys.exit(1)
                     else:
                         if not "Type" in self.doc["Material"]:
-                            print "Error: No type tag found"
+                            print "Error: No Type tag found"
                             sys.exit(1)
                         else:
                             ## Type of the material 
@@ -58,7 +59,7 @@ class PD_deck():
                                 sys.exit(1)
                     
                     if not "Discretization" in self.doc:
-                        print "Error: Specific a discretization tag in your yaml"
+                        print "Error: Specific a Discretization tag in your yaml"
                         sys.exit(1)
                     else:
                         if not "Dim" in self.doc["Discretization"]:
@@ -109,7 +110,6 @@ class PD_deck():
                             self.delta_z = self.geometry.getMinDist(self.dim,3)
                         ## Amount of nodes 
                         self.num_nodes = self.geometry.amount
-                        
                         if not "Boundary" in self.doc:
                             print "Error: No Boundary tag found"
                             sys.exit(1)
@@ -130,7 +130,6 @@ class PD_deck():
                                 self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
                                 ## List of the values for specifying the shape
                                 self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
-                                
                         if "Output" in self.doc:
                             if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
@@ -144,6 +143,18 @@ class PD_deck():
                                     self.outputs = []
                                     for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
                                         self.outputs.append(IO.output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
+                            if "VTK" in self.doc["Output"]:
+                                if not "Path" in self.doc["Output"]["VTK"]:
+                                    print "Error: No Path tag found in VTK"
+                                    sys.exit(1)
+                                elif not "Type" in self.doc["Output"]["VTK"]:
+                                    print "Error: No Type tag found in VTK"
+                                    sys.exit(1)
+                                elif not "Slice" in self.doc["Output"]["VTK"]:
+                                    print "Error: No Slice tag found in VTK"
+                                    sys.exit(1)
+                                else:
+                                    self.vtk_writer = IO.vis.VTK_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)

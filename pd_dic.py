@@ -81,7 +81,7 @@ def writeCSV(deck,problem):
             out.write(deck,problem)
 
 def write_vtk(deck,problem):
-    writer = IO.vis.VTK_writer("test.vtu")
+    print ""
     
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
