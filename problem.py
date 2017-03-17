@@ -207,7 +207,7 @@ class PD_problem():
     def random_initial_guess(self, z, deck):
         #Do not forget to do this for each direction, not only x
         y = np.zeros((self.len_x))
-        y = z + 0.00025 * random.uniform(-10, 10) * deck.delta_x
+        y = z + 0.00025 * random.uniform(-1, 1) * deck.delta_x
         return y
 
     def strain_center_bar(self, deck):

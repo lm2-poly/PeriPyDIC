@@ -29,7 +29,7 @@ class Elastic_material():
             ## Shear modulus of the material
             self.Mu = deck.shear_modulus
             ## Poisson ratio of the material
-            self.Nu = (3 * self.K - 2 * self.Mu) / (2 * (3 * self.K + self.Mu))
+            self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
             ##  Deformed direction vector state in y direction
             self.M_x , self.M_y = problem.compute_m(y,deck.dim,deck.num_nodes)
         if deck.dim == 3:
@@ -47,24 +47,24 @@ class Elastic_material():
     # Computes the dilatation
     def pd_dilatation(self, deck, problem, x, e, x_i):
         index_x_family = problem.neighbors.get_index_x_family(x_i)
-        result = 0
-        dilatation = 0
+        result = 0.
+        dilatation = 0.
         for x_p in index_x_family:
             
             if deck.dim == 1:
                 actual = np.absolute(x[x_p] - x[x_i]) * e[x_i,x_p]
                 result += deck.influence_function * actual * deck.geometry.volumes[x_p]
-                dilatation = (1 / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * result 
+                dilatation = (1. / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * result 
             
             if deck.dim == 2:
                 actual = np.sqrt(np.power(x[x_p][0] - x[x_i][0],2) + np.power(x[x_p][1] - x[x_i][1],2)) * e[x_i, x_p]
                 result += deck.influence_function * actual * deck.geometry.volumes[x_p]
-                dilatation = (2 / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * ((2 * self.Nu - 1) / (self.Nu - 1)) * result
+                dilatation = (2. / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * ((2. * self.Nu - 1.) / (self.Nu - 1.)) * result
             
             if deck.dim == 3:
                 actual = np.sqrt(np.power(x[x_p][0] - x[x_i][0],2) + np.power(x[x_p][1] - x[x_i][1],2) + np.power(x[x_p][2] - x[x_i][2],2)) * e[x_i,x_p]
                 result += deck.influence_function * actual * deck.geometry.volumes[x_p]
-                dilatation = (3 / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * result 
+                dilatation = (3. / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * result 
         return dilatation
   
     ## Function to compute the scalar extension state
@@ -90,7 +90,7 @@ class Elastic_material():
                     actual = np.sqrt(np.power(y[x_p] - y[x_i],2) + np.power(y[self.len_x + x_p] - y[self.len_x + x_i],2))
                     initial = np.sqrt(np.power(deck.geometry.nodes[x_p][0] - deck.geometry.nodes[x_i][0],2)+np.power(deck.geometry.nodes[x_p][1] - deck.geometry.nodes[x_i][1],2))
                     e[x_i, x_p] = actual  - initial
-                    e_s[x_i, x_p] = self.pd_dilatation(deck, problem, deck.geometry.nodes, e, x_i) * initial / 3
+                    e_s[x_i, x_p] = self.pd_dilatation(deck, problem, deck.geometry.nodes, e, x_i) * initial / 3.
                     e_d[x_i, x_p] = e[x_i, x_p] - e_d[x_i, x_p]
                     ## Scalar extension state
                     self.e = e 

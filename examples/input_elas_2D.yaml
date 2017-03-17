@@ -47,5 +47,5 @@ Output:
             - Force
         Slice: 1
 Solver:
-    Type: krylov
-    Tolerance: 1.0e-12
+    Type: anderson
+    Tolerance: 1.0e-7
