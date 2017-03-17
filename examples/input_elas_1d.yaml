@@ -36,11 +36,11 @@ Output:
         File:
             - nodes_positions_m4_dx0_50.csv
     VTK:
-        Path: ./out/data
+        Path: ./out/
         Type:
             - Displacement
             - Force
-        Slice: 5
+        Slice: 1
 Solver:
     Type: krylov
     Tolerance: 1.0e-12

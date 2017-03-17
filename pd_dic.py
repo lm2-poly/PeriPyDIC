@@ -68,7 +68,7 @@ def simulation(deck):
     solver.strain_center_bar( deck )
     writeCSV(deck,solver)
     if found_vtk == True:
-        write_vtk(deck,solver)
+       deck.vtk_writer.write_data(deck,solver)
     print "delta_x =" , deck.delta_x
     print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
