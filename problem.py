@@ -33,8 +33,6 @@ class PD_problem():
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ) )
 
-        print deck.geometry.nodes
-
     # Creates a loading vector b which describes the force or displacement applied on each node
     # at any time step
     def compute_b(self, deck):       
@@ -179,7 +177,7 @@ class PD_problem():
     def quasi_static_solver(self, y, deck):
         
         for t_n in range(1, deck.time_steps):
-            solver = scipy.optimize.root(self.compute_residual, y, args=(deck, t_n), method=deck.solver_type,jac=None,tol=deck.solver_tolerance,callback=None,options={'maxiter':1000,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
+            solver = scipy.optimize.root(self.compute_residual, y, args=(deck, t_n), method=deck.solver_type,jac=None,tol=deck.solver_tolerance,callback=None,options={'maxiter':10,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
             if deck.dim == 1:
                 self.y[:, t_n] = solver.x[:,0]
             else:
@@ -190,6 +188,7 @@ class PD_problem():
             else:
                 logger.info( t_n, solver.success )
             #print y
+            print t_n
         return solver
 
     # Records the force vector at each time step
@@ -208,14 +207,7 @@ class PD_problem():
     def random_initial_guess(self, z, deck):
         #Do not forget to do this for each direction, not only x
         y = np.zeros((self.len_x))
-        if deck.dim == 1:
-            y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
-        if deck.dim >= 2:
-            y[:deck.num_nodes] = z[:deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_x
-            y[deck.num_nodes:2*deck.num_nodes] = z[deck.num_nodes:2*deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_y
-        if deck.dim >= 3:
-            y[2*deck.num_nodes:3*deck.num_nodes] = z[2*deck.num_nodes:3*deck.num_nodes] + 0.25 * random.uniform(-1, 1) * deck.delta_z
-        #print y
+        y = z + 0.00025 * random.uniform(-10, 10) * deck.delta_x
         return y
 
     def strain_center_bar(self, deck):

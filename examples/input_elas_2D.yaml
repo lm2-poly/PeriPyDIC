@@ -2,7 +2,7 @@ Discretization:
     Dim: 2
     Final_Time: 2.0
     Time_Steps: 8
-    Horizon_Factor_m_value: 10.0
+    Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
         Name: geometry_2D.csv
