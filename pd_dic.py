@@ -67,7 +67,7 @@ def simulation(deck):
     solver.quasi_static_solver(x_0, deck)
     solver.strain_center_bar( deck )
     writeCSV(deck,solver)
-    if found_vtk == True:
+    if found_vtk == True and deck.vtk_output == True:
        deck.vtk_writer.write_data(deck,solver)
     print "delta_x =" , deck.delta_x
     print "Horizon =" , solver.neighbors.horizon

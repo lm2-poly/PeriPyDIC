@@ -144,6 +144,8 @@ class PD_deck():
                                     for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
                                         self.outputs.append(IO.output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
                             if "VTK" in self.doc["Output"]:
+                                ## VTK output has to be done
+                                self.vtk_output = True
                                 if not "Path" in self.doc["Output"]["VTK"]:
                                     print "Error: No Path tag found in VTK"
                                     sys.exit(1)
@@ -154,7 +156,9 @@ class PD_deck():
                                     print "Error: No Slice tag found in VTK"
                                     sys.exit(1)
                                 else:
-                                    self.vtk_writer = IO.vis.VTK_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
+                                    self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
+                            else:
+                                self.vtk_output = False
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)
