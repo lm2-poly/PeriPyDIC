@@ -40,7 +40,11 @@ Output:
             - Position
         File:
             - nodes_positions_m4_dx0_50.csv
+<<<<<<< HEAD:examples/input_elas_2D.yaml
     VTK:
+=======
+        VTK:
+>>>>>>> b98b13dc27520c075a50d886e10f112a43e9d37f:examples/input_elas_2d.yaml
         Path: ./out/
         Type:
             - Displacement

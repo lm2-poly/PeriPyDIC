@@ -169,9 +169,9 @@ class PD_deck():
                                     print "Error: No Slice tag found in VTK"
                                     sys.exit(1)
                                 else:
-                                    self.vtk_writer = vis.VTK_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
+                                    self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
                                     if self.vtk_writer.vtk_enabled == False:
-                                        print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
+                                        print "Warning: VTK found, but no PyVTK is found, so there will be no output written."      
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)

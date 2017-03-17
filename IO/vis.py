@@ -1,11 +1,15 @@
-import numpy as np
+# -*- coding: utf-8 -*-
+#@author: ilyass.tabiai@polymtl.ca
+#@author: rolland.delorme@polymtl.ca
+#@author: patrick.diehl@polymtl.ca
+
 import pkgutil
 vtk_loader = pkgutil.find_loader('vtk')
 found_vtk = vtk_loader is not None 
 if found_vtk == True:
     import vtk
 
-class VTK_writer():
+class vtk_writer():
     
 
     if found_vtk == True:    
@@ -61,4 +65,3 @@ class VTK_writer():
     
         def __init__(self,path,types,slice_length):
             self.vtk_enabled = False
-         
