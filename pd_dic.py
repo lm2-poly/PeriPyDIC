@@ -7,15 +7,7 @@ import getopt
 import IO.deck
 import problem
 import numpy as np
-import pkgutil
 
-vtk_loader = pkgutil.find_loader('vtk')
-found_vtk = vtk_loader is not None 
-if found_vtk == True:
-    import IO.vis
-else:
-    print "VTK output not supported. Please install PyVTK for that"
-    
 def main(argv):
     """
     Main
@@ -67,7 +59,7 @@ def simulation(deck):
     solver.quasi_static_solver(x_0, deck)
     solver.strain_center_bar( deck )
     writeCSV(deck,solver)
-    if found_vtk == True:
+    if deck.vtk_writer.vtk_enabled == True:
        deck.vtk_writer.write_data(deck,solver)
     print "delta_x =" , deck.delta_x
     print "Horizon =" , solver.neighbors.horizon

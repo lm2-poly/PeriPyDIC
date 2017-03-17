@@ -24,40 +24,6 @@ class PD_deck():
                 with open(inputFile,'r') as f:
                     ## Container of the tags parsed from the yaml file
                     self.doc = yaml.load(f)
-                    if not "Material" in self.doc:
-                        print "Error: Specify a material tag in your yaml"
-                        sys.exit(1)
-                    else:
-                        if not "Type" in self.doc["Material"]:
-                            print "Error: No Type tag found"
-                            sys.exit(1)
-                        else:
-                            ## Type of the material 
-                            self.material_type = self.doc["Material"]["Type"]
-                            if self.material_type == "Elastic":
-                                if not "E_Modulus" in self.doc["Material"]:
-                                    print "Error: No E_Modulus tag found"
-                                    sys.exit(1)
-                                else:
-                                    ## Young's modulus of the material
-                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])
-                            elif self.material_type == "Viscoelastic":
-                                if not "Relax_Modulus" in self.doc["Material"]:
-                                    print "Error: No Relax_Modulus tag found"
-                                    sys.exit(1)
-                                else:
-                                    ## Relaxation modulus of the material
-                                    self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
-                                if not "Relax_Time" in self.doc["Material"]:
-                                    print "Error: No Relax_Time tag found"
-                                    sys.exit(1)
-                                else:
-                                    ## Relaxation times
-                                    self.relax_time = self.doc["Material"]["Relax_Time"]
-                            else:
-                                print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
-                                sys.exit(1)
-                    
                     if not "Discretization" in self.doc:
                         print "Error: Specific a Discretization tag in your yaml"
                         sys.exit(1)
@@ -130,6 +96,55 @@ class PD_deck():
                                 self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
                                 ## List of the values for specifying the shape
                                 self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
+                    
+                    if not "Material" in self.doc:
+                        print "Error: Specify a material tag in your yaml"
+                        sys.exit(1)
+                    else:
+                        if not "Type" in self.doc["Material"]:
+                            print "Error: No Type tag found"
+                            sys.exit(1)
+                        else:
+                            ## Type of the material 
+                            self.material_type = self.doc["Material"]["Type"]
+                            if self.material_type == "Elastic":
+                                if self.dim == 1:
+                                    if not "Young_Modulus" in self.doc["Material"]:
+                                        print "Error: No Young_Modulus tag found"
+                                        sys.exit(1)
+                                    else:
+                                        ## Young modulus of the material
+                                        self.young_modulus = float(self.doc["Material"]["Young_Modulus"])
+                                if self.dim >= 2:
+                                    if not "Bulk_Modulus" in self.doc["Material"]:
+                                        print "Error: No Bulk_Modulus tag found"
+                                        sys.exit(1)
+                                    else:
+                                        ## Bulk modulus of the material
+                                        self.bulk_modulus = float(self.doc["Material"]["Bulk_Modulus"])
+                                    if not "Shear_Modulus" in self.doc["Material"]:
+                                        print "Error: No Shear_Modulus tag found"
+                                        sys.exit(1)
+                                    else:
+                                        ## Shear modulus of the material
+                                        self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"]) 
+                            elif self.material_type == "Viscoelastic":
+                                if not "Relax_Modulus" in self.doc["Material"]:
+                                    print "Error: No Relax_Modulus tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Relaxation modulus of the material
+                                    self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                if not "Relax_Time" in self.doc["Material"]:
+                                    print "Error: No Relax_Time tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Relaxation times
+                                    self.relax_time = self.doc["Material"]["Relax_Time"]
+                            else:
+                                print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
+                                sys.exit(1)
+                    
                         if "Output" in self.doc:
                             if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
@@ -154,7 +169,9 @@ class PD_deck():
                                     print "Error: No Slice tag found in VTK"
                                     sys.exit(1)
                                 else:
-                                    self.vtk_writer = IO.vis.VTK_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
+                                    self.vtk_writer = vis.VTK_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
+                                    if self.vtk_writer.vtk_enabled == False:
+                                        print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)

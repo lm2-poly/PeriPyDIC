@@ -1,14 +1,14 @@
 Discretization:
-    Dim: 2
+    Dim: 1
     Final_Time: 2.0
     Time_Steps: 8
-    Horizon_Factor_m_value: 2.0
+    Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_2D.csv
+        Name: geometry_1D.csv
 Material:
     Type: Elastic
-    E_Modulus: 4000.0
+    Young_Modulus: 4000.0
 Boundary:
     Condition:
         Type: 
@@ -35,6 +35,12 @@ Output:
             - Position
         File:
             - nodes_positions_m4_dx0_50.csv
+    VTK:
+        Path: ./out/
+        Type:
+            - Displacement
+            - Force
+        Slice: 1
 Solver:
     Type: krylov
     Tolerance: 1.0e-12

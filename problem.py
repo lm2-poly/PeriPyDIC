@@ -32,21 +32,6 @@ class PD_problem():
         self.strain = np.zeros( ( deck.time_steps ) )
         self.forces = np.zeros( ( self.len_x, deck.time_steps ) )
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ) )
-        
-        if deck.material_type == "Elastic":
-            self.Modulus = deck.e_modulus
-        elif deck.material_type == "Viscoelastic":
-            self.Relax_Modulus = deck.relax_modulus
-            self.Relax_Time = deck.relax_time
-            self.ext_visco = np.zeros( ( self.len_x, self.len_x, len(self.Relax_Time), deck.time_steps) ) 
-        else:
-            logger.error("Error in problem.py: Material type unknown, please use Elastic or Viscoelastic.")      
-        
-        #self.experimental_nodes = 3
-        #self.exp_displacement = np.zeros((deck.time_steps - 1, self.experimental_nodes))
-        #self.exp_times = np.zeros((deck.time_steps - 1))
-        #self.exp_init_positions = np.zeros(self.experimental_nodes)
-        #self.energy = np.zeros( (self.len_x, deck.time_steps ) )
 
     # Creates a loading vector b which describes the force or displacement applied on each node
     # at any time step
@@ -140,7 +125,6 @@ class PD_problem():
             if deck.dim == 3:
                 actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)+np.power(x[x_p][2] - x[x_i][2],2)
                 result += deck.influence_function * actual * deck.geometry.volumes[x_p]
-                
         return result
 
     # Computes the residual vector used in the quasi_static_solver function
@@ -239,8 +223,7 @@ class PD_problem():
         #print "Mid_Node_2 =" , Mid_Node_2
         for t_n in range(1, deck.time_steps):
             self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])) / np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])
-
-
+    
 #    # Records the force vector at each time step
 #    def update_energy_data(self, variables, t_n):
 #        self.energy = self.strain_energy_from_force
