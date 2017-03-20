@@ -8,6 +8,7 @@ import numpy as np
 import scipy.optimize
 import random
 import util.neighbor
+np.set_printoptions(threshold='nan')
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ class PD_problem():
     
     def __init__(self, deck):
         # Import initial data
-        self.len_x = deck.dim *  deck.num_nodes
+        self.len_x = deck.dim * deck.num_nodes
         self.b = np.zeros( ( self.len_x, deck.time_steps) )
         self.compute_b(deck)
         self.neighbors = util.neighbor.NeighborSearch(deck)
@@ -53,7 +54,6 @@ class PD_problem():
                         if con.direction == 3:
                             b[int(x_i) + 2 * deck.num_nodes, t_n] = self.ramp_loading( deck, t_n , con )
             self.b = b
-            #print "b =" , self.b
         
     # Provide the loading shape to use to compute the loading vector b
     def ramp_loading(self, deck, t_n, con):     
@@ -120,7 +120,7 @@ class PD_problem():
             if deck.dim == 1:
                 result += deck.influence_function * (x[x_p] - x[x_i])**2 * deck.geometry.volumes[x_p]
             if deck.dim == 2:
-                actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)
+                actual = np.power(x[x_p][0] - x[x_i][0],2) + np.power(x[x_p][1] - x[x_i][1],2)
                 result += deck.influence_function * actual * deck.geometry.volumes[x_p]
             if deck.dim == 3:
                 actual = np.power(x[x_p][0] - x[x_i][0],2)+np.power(x[x_p][1] - x[x_i][1],2)+np.power(x[x_p][2] - x[x_i][2],2)
@@ -168,6 +168,7 @@ class PD_problem():
                         found = True
             if found == False:
                 residual[x_i] = variables.Ts[x_i] + self.b[x_i, t_n]
+        #print "dila", variables.pd_dilatation(deck, self, deck.geometry.nodes, variables.e, 16)
         #print residual
         return residual
 
@@ -177,18 +178,18 @@ class PD_problem():
     def quasi_static_solver(self, y, deck):
         
         for t_n in range(1, deck.time_steps):
-            solver = scipy.optimize.root(self.compute_residual, y, args=(deck, t_n), method=deck.solver_type,jac=None,tol=deck.solver_tolerance,callback=None,options={'maxiter':10,'xtol':1.0e-12,'xatol':1.0e-12,'ftol':1.0e-12})
+            solver = scipy.optimize.root(self.compute_residual, y, args=(deck, t_n), method=deck.solver_type,jac=None,tol=deck.solver_tolerance,callback=None,options={'maxiter':1000})
             if deck.dim == 1:
                 self.y[:, t_n] = solver.x[:,0]
             else:
                 self.y[:, t_n] = solver.x
             y = self.random_initial_guess(solver.x, deck)
             if solver.success == "False":
-                logger.warning("Convergence could not be reached.")
+                print "Convergence could not be reached."
             else:
-                logger.info( t_n, solver.success )
+                print "Time Step: ", t_n, "Convergence: ", solver.success
             #print y
-            print t_n
+            #print t_n
         return solver
 
     # Records the force vector at each time step
@@ -207,17 +208,26 @@ class PD_problem():
     def random_initial_guess(self, z, deck):
         #Do not forget to do this for each direction, not only x
         y = np.zeros((self.len_x))
-        y = z + 0.00025 * random.uniform(-1, 1) * deck.delta_x
+        y = z + 0.25 * random.uniform(-1, 1) * deck.delta_x
         return y
 
-    def strain_center_bar(self, deck):
-        Mid_Node_1 = int(deck.num_nodes/2)-1
-        #print "Mid_Node_1 =" , Mid_Node_1
-        Mid_Node_2 = int(deck.num_nodes/2)+1
-        #print "Mid_Node_2 =" , Mid_Node_2
+    def strain_calculation(self, id_Node_1, id_Node_2, deck):
+#        Mid_Node_1 = int(deck.num_nodes/2)-1
+#        print "Mid_Node_1 =" , Mid_Node_1
+#        Mid_Node_2 = int(deck.num_nodes/2)+1
+#        print "Mid_Node_2 =" , Mid_Node_2
         for t_n in range(1, deck.time_steps):
-            self.strain[t_n] = (np.absolute(self.y[Mid_Node_2,t_n] - self.y[Mid_Node_1,t_n]) - np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])) / np.absolute(deck.geometry.nodes[Mid_Node_2][0] - deck.geometry.nodes[Mid_Node_1][0])
-    
+            if deck.dim == 1:
+                actual = np.absolute(self.y[id_Node_2,t_n] - self.y[id_Node_1,t_n])
+                initial = np.absolute(deck.geometry.nodes[id_Node_2][0] - deck.geometry.nodes[id_Node_1][0])
+            if deck.dim == 2:
+                actual = np.sqrt(np.power(self.y[id_Node_2, t_n] - self.y[id_Node_1, t_n],2) + np.power(self.y[id_Node_2 + deck.num_nodes, t_n] - self.y[id_Node_1 + deck.num_nodes, t_n],2))
+                initial = np.sqrt(np.power(deck.geometry.nodes[id_Node_2][0] - deck.geometry.nodes[id_Node_1][0],2) + np.power(deck.geometry.nodes[id_Node_2][1] - deck.geometry.nodes[id_Node_1][1],2)) 
+            if deck.dim == 3:
+                actual = np.sqrt(np.power(self.y[id_Node_2, t_n] - self.y[id_Node_1, t_n],2) + np.power(self.y[id_Node_2 + deck.num_nodes, t_n] - self.y[id_Node_1 + deck.num_nodes, t_n],2) + np.power(self.y[id_Node_2 + 2*deck.num_nodes, t_n] - self.y[id_Node_1 + 2*deck.num_nodes, t_n],2))
+                initial = np.sqrt(np.power(deck.geometry.nodes[id_Node_2][0] - deck.geometry.nodes[id_Node_1][0],2) + np.power(deck.geometry.nodes[id_Node_2][1] - deck.geometry.nodes[id_Node_1][1],2)  + np.power(deck.geometry.nodes[id_Node_2][2] - deck.geometry.nodes[id_Node_1][2],2)) 
+            self.strain[t_n] = (actual - initial) / initial
+            
 #    # Records the force vector at each time step
 #    def update_energy_data(self, variables, t_n):
 #        self.energy = self.strain_energy_from_force

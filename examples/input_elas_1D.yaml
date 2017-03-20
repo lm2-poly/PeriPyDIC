@@ -1,7 +1,7 @@
 Discretization:
     Dim: 1
     Final_Time: 2.0
-    Time_Steps: 8
+    Time_Steps: 4
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
@@ -21,8 +21,8 @@ Boundary:
             - 1
             - 1
         File: 
-            - force_condition.csv
-            - displ_condition.csv
+            - force_condition_1D.csv
+            - displ_condition_1D.csv
     Shape:
         Type: Ramp
         Values:
@@ -39,8 +39,10 @@ Output:
         Path: ./out/
         Type:
             - Displacement
+            - Neighbors
             - Force
+            - Conditions
         Slice: 1
 Solver:
     Type: krylov
-    Tolerance: 1.0e-12
+    Tolerance: 1.0e-7

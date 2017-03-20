@@ -1,7 +1,7 @@
 Discretization:
     Dim: 2
     Final_Time: 2.0
-    Time_Steps: 8
+    Time_Steps: 4
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
@@ -9,7 +9,7 @@ Discretization:
 Material:
     Type: Elastic
     Bulk_Modulus: 3333.33
-    Shear_Modulus: 0.3
+    Shear_Modulus: 1538.0
 Boundary:
     Condition:
         Type: 
@@ -25,9 +25,9 @@ Boundary:
             - 1
             - 2
         File: 
-            - force_condition.csv
-            - displ_condition.csv
-            - displ_condition.csv
+            - force_condition_2D.csv
+            - displ_condition_2D.csv
+            - displ_condition_2D.csv
     Shape:
         Type: Ramp
         Values:
@@ -44,8 +44,10 @@ Output:
         Path: ./out/
         Type:
             - Displacement
+            - Neighbors
             - Force
+            - Conditions
         Slice: 1
 Solver:
-    Type: anderson
+    Type: krylov
     Tolerance: 1.0e-7

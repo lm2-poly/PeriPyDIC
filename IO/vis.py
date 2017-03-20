@@ -34,9 +34,9 @@ class vtk_writer():
                 points.SetNumberOfPoints(num_nodes)
                 points.SetDataTypeToDouble()
                 for i in range(0,num_nodes):
-                    print problem.y[:,t]
+                    act = problem.y[:, t]
                     if deck.dim == 1:
-                        points.InsertPoint(i,problem.y[t][i],0.,0.)
+                        points.InsertPoint(i,act[i],0.,0.)
                     if deck.dim == 2:
                         act = problem.y[:, t]
                         points.InsertPoint(i,act[i],act[num_nodes+i],0.)
@@ -52,16 +52,56 @@ class vtk_writer():
                             array.SetNumberOfComponents(deck.dim)
                             array.SetNumberOfTuples(num_nodes)
                             
-                            if deck.dim >= 2:
-                                  act = problem.y[:, t]
+                            #if deck.dim >= 2:
+                            act = problem.y[:, t]
                                   
                             for i in range(num_nodes):
                                 if deck.dim == 1:
-                                    array.SetTuple1(i,abs(problem.y[t][i] - deck.geometry.nodes[i][0]))
+                                    array.SetTuple1(i,abs(act[i] - deck.geometry.nodes[i][0]))
                                 if deck.dim == 2:
                                     array.SetTuple2(i,abs(act[i] - deck.geometry.nodes[i][0]),abs(act[num_nodes+i] - deck.geometry.nodes[i][1]))
-                        dataOut.AddArray(array)
-                
+                            dataOut.AddArray(array)
+                        
+                        if out_type == "Neighbors":
+                            array = vtk.vtkIntArray()
+                            array.SetName("Neighbors")
+                            array.SetNumberOfComponents(1)
+                            array.SetNumberOfTuples(num_nodes)
+                            
+                            for i in range(num_nodes):
+                                 array.SetTuple1(i,len(problem.neighbors.get_index_x_family(i)))
+                            dataOut.AddArray(array)
+            
+                        if out_type == "Force":
+                            array = vtk.vtkDoubleArray()
+                            array.SetName("Volume_Force")
+                            array.SetNumberOfComponents(deck.dim)
+                            array.SetNumberOfTuples(num_nodes)
+                            
+                            #if deck.dim >= 2:
+                            act = problem.b[:, t]
+                                  
+                            for i in range(num_nodes):
+                                if deck.dim == 1:
+                                    array.SetTuple1(i,act[i])
+                                if deck.dim == 2:
+                                    array.SetTuple2(i,act[i], act[num_nodes+i])
+                            dataOut.AddArray(array)
+                            
+                        if out_type == "Conditions":
+                            
+                            for con in deck.conditions:
+                                array = vtk.vtkIntArray()
+                                array.SetName("Condition_"+con.type+"_"+str(con.value)+"_"+str(con.direction))
+                                array.SetNumberOfComponents(1)
+                                array.SetNumberOfTuples(num_nodes)
+                                
+                                for i in range(num_nodes):
+                                    if i not in con.id:
+                                        array.SetTuple1(i,0)
+                                    else:
+                                         array.SetTuple1(i,1)
+                                dataOut.AddArray(array)
             
                 writer.SetInputData(grid)
             

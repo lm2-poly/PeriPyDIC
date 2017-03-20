@@ -54,7 +54,7 @@ class Elastic_material():
             if deck.dim == 1:
                 actual = np.absolute(x[x_p] - x[x_i]) * e[x_i,x_p]
                 result += deck.influence_function * actual * deck.geometry.volumes[x_p]
-                dilatation = (1. / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * result 
+                dilatation = (1. / problem.weighted_function(deck,deck.geometry.nodes,x_i)) * result
             
             if deck.dim == 2:
                 actual = np.sqrt(np.power(x[x_p][0] - x[x_i][0],2) + np.power(x[x_p][1] - x[x_i][1],2)) * e[x_i, x_p]
