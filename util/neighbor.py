@@ -28,7 +28,7 @@ class NeighborSearch():
     # @param deck The input deck
     def findNeighbors(self,deck):
         tree = scipy.spatial.KDTree(deck.geometry.nodes)    
-        d , ids =  tree.query(deck.geometry.nodes, k=20, eps=0.0, p=2, distance_upper_bound=self.horizon) 
+        d , ids =  tree.query(deck.geometry.nodes, k=100, eps=0.0, p=2, distance_upper_bound=self.horizon) 
         ## Adjaceny list 
         self.family = []
         for i in range(0,len(ids)):

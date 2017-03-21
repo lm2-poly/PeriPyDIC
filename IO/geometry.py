@@ -77,21 +77,17 @@ class Geometry():
     ## Computes the min distance between all nodes
     # @param dim The dimension of nodes
     # @return Minimal dim  
-    # @param direction The direction  
-    def getMinDist(self,dim,direction):
+    def getMinDist(self,dim):
         tmp = float('inf')
         for i in range(0,self.amount):
             for j in range(0,self.amount):
                 if i != j:
-                    if direction == 1:
-                        if dim == 1:
-                            val = abs(self.nodes[j]-self.nodes[i])
-                        else:
-                            val = abs(self.nodes[j][0]-self.nodes[i][0])
-                    if direction == 2:
-                        val = abs(self.nodes[j][1]-self.nodes[i][1])
-                    if direction == 3:
-                        val = abs(self.nodes[j][2]-self.nodes[i][2])
+                    if dim == 1:
+                        val = abs(self.nodes[j]-self.nodes[i])
+                    if dim == 2:
+                        val = np.sqrt(np.power(self.nodes[j][0] - self.nodes[i][0],2) + np.power(self.nodes[j][1] - self.nodes[i][1],2))
+                    if dim == 3:
+                        val = np.sqrt(np.power(self.nodes[j][0] - self.nodes[i][0],2) + np.power(self.nodes[j][1] - self.nodes[i][1],2) + np.power(self.nodes[j][2] - self.nodes[i][2],2))
                     if val < tmp:
                         tmp = val
       

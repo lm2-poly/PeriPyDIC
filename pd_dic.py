@@ -7,7 +7,7 @@ import getopt
 import IO.deck
 import problem
 import numpy as np
-import time
+np.set_printoptions(threshold='nan')
 
 def main(argv):
     """
@@ -47,7 +47,6 @@ def main(argv):
             
 
 def simulation(deck):
-    t0 = time.time()
     solver = problem.PD_problem(deck)
     
     if deck.dim == 1:
@@ -59,8 +58,13 @@ def simulation(deck):
   
     x_0 = solver.random_initial_guess( initialVector, deck )
     solver.quasi_static_solver(x_0, deck)
-    solver.strain_center_bar( deck )
+    
+    solver.strain_calculation( 15, 17, deck )
+    
     writeCSV(deck,solver)
+    if deck.vtk_writer.vtk_enabled == True:
+       deck.vtk_writer.write_data(deck,solver)
+    
     print "delta_x =" , deck.delta_x
     print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
@@ -71,7 +75,10 @@ def writeCSV(deck,problem):
     for out in deck.outputs:
         if out.outType == "CSV":
             out.write(deck,problem)
-        
+
+def write_vtk(deck,problem):
+    print ""
+    
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
     main(sys.argv[1:])
