@@ -3,6 +3,7 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
+from numpy import linalg
 import csv
 import os
 import sys
@@ -77,20 +78,16 @@ class Geometry():
     ## Computes the min distance between all nodes
     # @param dim The dimension of nodes
     # @return Minimal dim  
-    def getMinDist(self,dim):
+    def getMinDist(self):
         tmp = float('inf')
         for i in range(0,self.amount):
             for j in range(0,self.amount):
                 if i != j:
-                    if dim == 1:
-                        val = abs(self.nodes[j]-self.nodes[i])
-                    if dim == 2:
-                        val = np.sqrt(np.power(self.nodes[j][0] - self.nodes[i][0],2) + np.power(self.nodes[j][1] - self.nodes[i][1],2))
-                    if dim == 3:
-                        val = np.sqrt(np.power(self.nodes[j][0] - self.nodes[i][0],2) + np.power(self.nodes[j][1] - self.nodes[i][1],2) + np.power(self.nodes[j][2] - self.nodes[i][2],2))
+                    #if dim == 1:
+                    val = np.linalg.norm(self.nodes[i,:]-self.nodes[j,:])
                     if val < tmp:
+        
                         tmp = val
-      
         return tmp
             
             

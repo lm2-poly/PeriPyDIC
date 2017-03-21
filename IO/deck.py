@@ -67,7 +67,7 @@ class PD_deck():
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
                         ## The minimal nodal spacing in x direction
-                        self.delta_x = self.geometry.getMinDist(self.dim)
+                        self.delta_X = self.geometry.getMinDist()
                         ## Amount of nodes 
                         self.num_nodes = self.geometry.amount
                         if not "Boundary" in self.doc:
