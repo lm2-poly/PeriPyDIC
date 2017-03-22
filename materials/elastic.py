@@ -105,8 +105,8 @@ class Elastic_material():
                 
                 if deck.dim == 2:
                     # PD material parameter
-                    alpha_s = (9 / self.Weighted_Volume[i]) * self.K
-                    alpha_d = (8 / self.Weighted_Volume[i]) * self.Mu
+                    alpha_s = (9. / self.Weighted_Volume[i]) * self.K
+                    alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
                     self.tscal_s = np.zeros((deck.num_nodes, deck.num_nodes))
                     self.tscal_d = np.zeros((deck.num_nodes, deck.num_nodes))
@@ -116,8 +116,8 @@ class Elastic_material():
                 
                 if deck.dim == 3:
                     # PD material parameter
-                    alpha_s = (9 / self.Weighted_Volume[i]) * self.K
-                    alpha_d = (15 / self.Weighted_Volume[i]) * self.K
+                    alpha_s = (9. / self.Weighted_Volume[i]) * self.K
+                    alpha_d = (15. / self.Weighted_Volume[i]) * self.K
                     # Scalar force state
                     self.tscal_s = np.zeros((deck.num_nodes, deck.num_nodes))
                     self.tscal_d = np.zeros((deck.num_nodes, deck.num_nodes))
@@ -145,7 +145,7 @@ class Elastic_material():
         for i in range(0, deck.num_nodes):
             index_x_family = problem.neighbors.get_index_x_family(i)
             for p in index_x_family:
-                self.F[i:] += (self.T[i,:,p] - self.T[p,:,i]) * deck.geometry.volumes[p]
+                self.F[i,:] += (self.T[i,:,p] - self.T[p,:,i]) * deck.geometry.volumes[p]
         #print self.F
                 
 
