@@ -128,14 +128,13 @@ class Elastic_material():
     ## Compute the vector force state between between Node_p and Node_i for each node
     # @param deck The input deck
     # @param problem The related peridynamic problem
-    # @param y The actual postions
+    # @param y The actual positions
     def compute_T(self, deck, problem, y):
         self.T = np.zeros((deck.num_nodes, deck.dim, deck.num_nodes))
         for i in range(0, deck.num_nodes):
             index_x_family = problem.neighbors.get_index_x_family(i)
             for p in index_x_family:
                 self.T[i,:,p] = self.tscal[i,p] * self.compute_dir_vector( deck, y, i, p)
-        #print self.compute_dir_vector( deck, y, 0, 33), self.T[0,:,33]
     
     ## Compute the global vector force state for the equation of motion
     # @param deck The input deck
