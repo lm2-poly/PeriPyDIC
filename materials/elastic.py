@@ -44,7 +44,6 @@ class Elastic_material():
         self.compute_T(deck, problem, y)
         self.compute_F(deck, problem)
 
-
     # Computes the dilatation at Node_i
     def pd_dilatation(self, deck, problem, e, i):
         dilatation = 0.
@@ -146,5 +145,3 @@ class Elastic_material():
             for p in index_x_family:
                 self.F[i,:] += (self.T[i,:,p] - self.T[p,:,i]) * deck.geometry.volumes[p]
         #print self.F
-
-

@@ -11,7 +11,6 @@ if found_vtk == True:
 
 class vtk_writer():
 
-
     if found_vtk == True:
 
         def __init__(self,path,types,slice_length):

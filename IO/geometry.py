@@ -89,5 +89,3 @@ class Geometry():
 
                         tmp = val
         return tmp
-
-

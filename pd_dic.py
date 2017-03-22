@@ -45,7 +45,6 @@ def main(argv):
         else:
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
 
-
 def simulation(deck):
     solver = problem.PD_problem(deck)
     initialVector = deck.geometry.nodes

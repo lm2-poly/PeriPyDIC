@@ -16,7 +16,6 @@ import IO.PD_deck
 from problem import PD_problem
 import numpy as np
 
-
 class elastic_material_dic():
 
     def __init__(self, PD_deck, PD_problem, t):
@@ -54,7 +53,6 @@ class elastic_material_dic():
         #self.compute_T(PD_deck, PD_problem, y)
         #self.compute_Ts(PD_deck, PD_problem)
 
-
     # Computes the deformations using the current positions and initial
     # positions of each node
     # Reminder: y[xi, t] = x[xi] + u[xi, t]
@@ -66,7 +64,6 @@ class elastic_material_dic():
                 self.exp_e[x_i, x_p] = np.absolute(
                     PD_problem.exp_displacement[t][x_p] - PD_problem.exp_displacement[t][x_i]) - np.absolute(PD_problem.exp_init_positions[
                         x_i] - PD_problem.exp_init_positions[x_p])
-
 
     def compute_M(self, PD_problem, t):
         M = np.zeros((int(self.Exp_Num_Nodes), int(self.Exp_Num_Nodes)))
@@ -80,7 +77,6 @@ class elastic_material_dic():
                 y_p = (
                     PD_problem.exp_displacement[t][x_p] +
                     PD_problem.exp_init_positions[x_p])
-
 
                 self.exp_M[x_i, x_p] = (y_p-y_i)/np.absolute(y_p-y_i)
 

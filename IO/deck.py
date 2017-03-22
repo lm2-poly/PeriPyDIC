@@ -182,4 +182,3 @@ class PD_deck():
                             else:
                                 ## Tolerance of the solver
                                 self.solver_tolerance = float(self.doc["Solver"]["Tolerance"])
-

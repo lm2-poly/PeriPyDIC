@@ -55,4 +55,3 @@ class ConditionFromFile():
                 i += 1
 
             return ids
-
