@@ -135,6 +135,30 @@ class PD_problem():
         #print residual
         return residual
 
+    def compute_jacobian(self, deck, y_actual, var_actual ):
+        y_perturb = y_actual.copy()
+        epsilon = 1.0e-6 * deck.delta_X
+        y_perturb += epsilon
+        
+        if deck.material_type == "Elastic":
+            from materials.elastic import Elastic_material
+            var_perturb = Elastic_material( deck, self, y_perturb )
+            
+        self.jocabian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim))
+        for m in range(0, deck.num_nodes)
+            for k in self.neighbors.get_index_x_family(m):
+                for i in range(0, deck.dim):
+                    for j in range(0, deck.dim):
+                        self.jacobian[m*deck.dim+i,k*deck.dim+j] = (var_pertub.F[k,m] - var_actual.F[k,m]) / epsilon
+
+
+
+
+
+
+
+
+
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
     # This function calls the compute_residual function
@@ -177,3 +201,6 @@ class PD_problem():
             actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
             initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
             self.strain[t_n] = (actual - initial) / initial
+            
+            
+
