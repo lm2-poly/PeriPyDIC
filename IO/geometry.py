@@ -16,7 +16,7 @@ class Geometry():
         self.volumes = np.array(0)
         ## Density per node
         self.density = np.array(0)
-       
+
     ## Read the positions, volume, and density of the nodes from the inFile.
     # @param dim Dimension of the nodes
     # @param inFile CSV file with the geometry
@@ -33,20 +33,20 @@ class Geometry():
             length = len(list(spamreader))
             csvfile.seek(0)
             next(spamreader)
-           
+
             ## Amount of nodes
             self.amount = length
             self.volumes = np.empty(length)
-            
+
             if dim >= 1:
                 pos_x = np.empty(length)
             if dim >= 2:
                 pos_y = np.empty(length)
             if dim >= 3:
                 pos_z = np.empty(length)
-            
+
             i = 0
-            
+
             for row in spamreader:
                 if dim >= 1:
                     pos_x[i] = np.array(float(row[1]))
@@ -54,10 +54,10 @@ class Geometry():
                     pos_y[i] = np.array(float(row[2]))
                 if dim >= 3:
                     pos_z[i] = np.array(float(row[3]))
-                
+
                 self.volumes[i] = float(row[dim +1])
                 i +=1
-                
+
             if dim == 1:
                 ## Nodes of the discretization
                 self.nodes = np.empty((len(pos_x),self.dim))
@@ -74,10 +74,10 @@ class Geometry():
                 del pos_x
                 del pos_y
                 del pos_z
-    
+
     ## Computes the min distance between all nodes
     # @param dim The dimension of nodes
-    # @return Minimal dim  
+    # @return Minimal dim
     def getMinDist(self):
         tmp = float('inf')
         for i in range(0,self.amount):
@@ -86,8 +86,8 @@ class Geometry():
                     #if dim == 1:
                     val = np.linalg.norm(self.nodes[i,:]-self.nodes[j,:])
                     if val < tmp:
-        
+
                         tmp = val
         return tmp
-            
-            
+
+

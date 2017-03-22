@@ -12,7 +12,7 @@ import vis
 
 ## Class handeling the input of the yaml file and storing the values
 class PD_deck():
-    
+
     ## Constructor
     # Reads the configuration in the yaml file and stores the values
     # @param inputFile The path to the yaml file with the configuration
@@ -44,10 +44,10 @@ class PD_deck():
                             print "Error: No Time_Steps tag found"
                             sys.exit(1)
                         else:
-                            ## Amount of time steps 
+                            ## Amount of time steps
                             self.time_steps = int(self.doc["Discretization"]["Time_Steps"]) + 1
                             ## Time step size
-                            self.delta_t = float(self.final_time  / (self.time_steps-1)) 
+                            self.delta_t = float(self.final_time  / (self.time_steps-1))
                         if not "Horizon_Factor_m_value" in self.doc["Discretization"]:
                             print "Error: No Horizon_Factor tag found"
                             sys.exit(1)
@@ -68,7 +68,7 @@ class PD_deck():
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
                         ## The minimal nodal spacing in x direction
                         self.delta_X = self.geometry.getMinDist()
-                        ## Amount of nodes 
+                        ## Amount of nodes
                         self.num_nodes = self.geometry.amount
                         if not "Boundary" in self.doc:
                             print "Error: No Boundary tag found"
@@ -77,20 +77,20 @@ class PD_deck():
                             if not "Condition" in self.doc["Boundary"]:
                                 print "Error: No Condition tag found"
                                 sys.exit(1)
-                            else: 
+                            else:
                                 ## List of all conditions specified in the configuration file
                                 self.conditions = []
                                 for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
                                     self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i]))
                             if not "Shape" in self.doc["Boundary"]:
                                 print "Error: No Shape tag found"
-                                sys.exit(1)                       
+                                sys.exit(1)
                             else:
                                 ## Type of the shape, e.g. Ramp
                                 self.shape_type = self.doc["Boundary"]["Shape"]["Type"]
                                 ## List of the values for specifying the shape
                                 self.shape_values = self.doc["Boundary"]["Shape"]["Values"]
-                    
+
                     if not "Material" in self.doc:
                         print "Error: Specify a material tag in your yaml"
                         sys.exit(1)
@@ -99,7 +99,7 @@ class PD_deck():
                             print "Error: No Type tag found"
                             sys.exit(1)
                         else:
-                            ## Type of the material 
+                            ## Type of the material
                             self.material_type = self.doc["Material"]["Type"]
                             if self.material_type == "Elastic":
                                 if self.dim == 1:
@@ -121,7 +121,7 @@ class PD_deck():
                                         sys.exit(1)
                                     else:
                                         ## Shear modulus of the material
-                                        self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"]) 
+                                        self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"])
                             elif self.material_type == "Viscoelastic":
                                 if not "Relax_Modulus" in self.doc["Material"]:
                                     print "Error: No Relax_Modulus tag found"
@@ -138,7 +138,7 @@ class PD_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
-                    
+
                         if "Output" in self.doc:
                             if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
@@ -165,7 +165,7 @@ class PD_deck():
                                 else:
                                     self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
                                     if self.vtk_writer.vtk_enabled == False:
-                                        print "Warning: VTK found, but no PyVTK is found, so there will be no output written."      
+                                        print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)
@@ -182,4 +182,4 @@ class PD_deck():
                             else:
                                 ## Tolerance of the solver
                                 self.solver_tolerance = float(self.doc["Solver"]["Tolerance"])
-                                      
+

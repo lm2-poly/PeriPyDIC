@@ -15,18 +15,18 @@ def main(argv):
     """
     helptext = sys.argv[0] + " -i input.yaml -t type"
     types = ['pd', 'dic']
-    
+
     if len(sys.argv) != 5:
         print helptext
         sys.exit(1)
-        
+
     try:
         opts, args = getopt.getopt(
             argv, "hi:o:t:", ["ifile=","type="])
     except getopt.GetoptError:
         print helptext
         sys.exit(0)
-        
+
     for opt, arg in opts:
         if opt in ("-i", "--ifile"):
             inputFile = arg
@@ -34,7 +34,7 @@ def main(argv):
             typeIn = arg
     if typeIn not in types:
         print("Error: Only pd or dic types are supported")
-        sys.exit(1)    
+        sys.exit(1)
 
     if typeIn == types[0]:
         deck = IO.deck.PD_deck(inputFile)
@@ -44,20 +44,20 @@ def main(argv):
             simulation(deck)
         else:
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
-            
+
 
 def simulation(deck):
     solver = problem.PD_problem(deck)
     initialVector = deck.geometry.nodes
     x_0 = solver.random_initial_guess( initialVector, deck )
     solver.quasi_static_solver(x_0, deck)
-    
+
     solver.strain_calculation( 15, 17, deck )
-    
+
     #writeCSV(deck,solver)
     #if deck.vtk_writer.vtk_enabled == True:
     #   deck.vtk_writer.write_data(deck,solver)
-    
+
     print "delta_x =" , deck.delta_X
     print "Horizon =" , solver.neighbors.horizon
     print "Strain = " , np.around(solver.strain,decimals=6)
@@ -71,7 +71,7 @@ def writeCSV(deck,problem):
 
 def write_vtk(deck,problem):
     print ""
-    
+
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
     main(sys.argv[1:])

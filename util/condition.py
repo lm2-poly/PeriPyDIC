@@ -8,11 +8,11 @@ import csv
 import numpy as np
 
 ## Class for storing the conditions from the yaml file
-class ConditionFromFile():            
+class ConditionFromFile():
 
     ## Volume of the boundary elements
     boundary_volume = 0.0
-    
+
     ## Constructor
     # @param cType Type of the condition, e.g. Force or Displacement
     # @param inFile Path to the CSV file with the respective node ids
@@ -26,15 +26,15 @@ class ConditionFromFile():
         self.type = cType
         ## Value in Newton or Meter
         self.value = float(value)
-        ## Force density 
+        ## Force density
         self.force_density = self.value / self.boundary_volume
         ## Direction of the condition
         self.direction = direction
-                        
+
     ##Reads the ids from the inFile where this condition should be applied.
-    # @param inFile File name of the CSV file with the ids of the nodes         
-    # @param volume The volume of the nodes      
-    # @return The ids read from the inFile           
+    # @param inFile File name of the CSV file with the ids of the nodes
+    # @param volume The volume of the nodes
+    # @return The ids read from the inFile
     def readCondition(self, inFile,volume):
         if not os.path.exists(inFile):
             print "Error: Could not find " + inFile
@@ -53,6 +53,6 @@ class ConditionFromFile():
                 ids[i] = int(row[0])
                 self.boundary_volume += volume[int(ids[i])]
                 i += 1
-                
+
             return ids
-      
+

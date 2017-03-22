@@ -38,7 +38,7 @@ class elastic_material_dic():
             (int(
                 self.Exp_Num_Nodes), int(
                 self.Exp_Num_Nodes)))
-            
+
         self.generate_neighborhood_matrix( PD_deck, PD_problem.exp_init_positions )
         print "Family:"
         print self.family
@@ -74,14 +74,14 @@ class elastic_material_dic():
             y_i = (
                 PD_problem.exp_displacement[t][x_i] +
                 PD_problem.exp_init_positions[x_i])
-                
+
             index_x_family = self.get_index_x_family(x_i)
             for x_p in index_x_family:
                 y_p = (
                     PD_problem.exp_displacement[t][x_p] +
                     PD_problem.exp_init_positions[x_p])
-                
-                
+
+
                 self.exp_M[x_i, x_p] = (y_p-y_i)/np.absolute(y_p-y_i)
 
     # Computes the weights for each PD node
@@ -120,7 +120,7 @@ class elastic_material_dic():
         for x_i in range(0, self.Exp_Num_Nodes):
             self.exp_W[x_i] = self.exp_Ts[x_i] * \
                 PD_problem.exp_displacement[t][x_i]
-                
+
     def generate_neighborhood_matrix(self, PD_deck, x):
         self.family = np.zeros((int(
                 self.Exp_Num_Nodes), int(
@@ -133,7 +133,7 @@ class elastic_material_dic():
                     self.family[x_i][x_p] = 1
                 else:
                     pass
-        
+
     # Returns a list of addresses of the neighbors of a point x_i
     def get_index_x_family(self, x_i):
         #print (np.where( self.family[x_i] == 1 ))[0]
