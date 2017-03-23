@@ -14,12 +14,14 @@ class Elastic_material():
     # @param deck The input deck
     # @param problem The related peridynamic problem
     # @param y The actual postions
-    def __init__(self, deck, problem, y):
+    def __init__(self, deck, problem, y, pertub=0.0):
         ## Scalar influence function
         self.w = deck.influence_function
 
         ## Weighted volume
         self.Weighted_Volume = problem.weighted_volume
+        
+        self.pertub = pertub
 
         if deck.dim == 1:
             ## Young modulus of the material
@@ -39,7 +41,7 @@ class Elastic_material():
             self.Mu = deck.shear_modulus
 
         self.compute_ext_state(deck, problem, y)
-        self.compute_tscal(deck, problem, y)
+        self.compute_tscal(deck, problem)
         self.compute_T(deck, problem, y)
         self.compute_F(deck, problem)
 
@@ -63,7 +65,7 @@ class Elastic_material():
 
     # Computes the direction vector between Node_p and Node_i
     def compute_dir_vector(self, deck, y, i, p):
-        Y = y[p,:] - y[i,:]
+        Y = (y[p,:]+self.pertub) - y[i,:]
         M = Y / np.linalg.norm(Y)
         return M
 
@@ -75,7 +77,7 @@ class Elastic_material():
             index_x_family = problem.neighbors.get_index_x_family(i)
             for p in index_x_family:
                 if deck.dim >=1:
-                    Y = y[p,:] - y[i,:]
+                    Y = (y[p,:]+self.pertub) - y[i,:]
                     X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                     self.e[i,p] = np.linalg.norm(Y) - np.linalg.norm(X)
 
@@ -89,7 +91,7 @@ class Elastic_material():
     # @param deck The input deck
     # @param problem The related peridynamic problem
     # @param y The actual postions
-    def compute_tscal(self, deck, problem, y):
+    def compute_tscal(self, deck, problem):
         self.tscal = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = problem.neighbors.get_index_x_family(i)

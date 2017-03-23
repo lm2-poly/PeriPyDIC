@@ -48,7 +48,9 @@ def main(argv):
 def simulation(deck):
     solver = problem.PD_problem(deck)
     initialVector = deck.geometry.nodes
+    print initialVector
     x_0 = solver.random_initial_guess( initialVector, deck )
+    print x_0
     solver.quasi_static_solver(x_0, deck)
 
     solver.strain_calculation( 15, 17, deck )

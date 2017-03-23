@@ -18,7 +18,7 @@ class PD_problem():
 
     def __init__(self, deck):
         # Import initial data
-        self.deck = deck
+       
         # NeighborSearch
         self.neighbors = util.neighbor.NeighborSearch(deck)
 
@@ -133,12 +133,10 @@ class PD_problem():
         return residual
 
     def compute_jacobian(self, deck, y_actual, mat_class_actual ):
-        y_perturb = list(y_actual)
-        epsilon = 1.0e-6 * deck.delta_X
-        y_perturb += epsilon
+        epsilon = 1.0e-4 * deck.delta_X
         if deck.material_type == "Elastic":
             from materials.elastic import Elastic_material
-            mat_class_perturb = Elastic_material( deck, self, y_perturb )
+            mat_class_pertur = Elastic_material( deck, self, y_actual, epsilon  )
             
         ids = []   
         for con in deck.conditions:
@@ -150,48 +148,56 @@ class PD_problem():
         for m in range(0, deck.num_nodes):
             family = np.append([m],self.neighbors.get_index_x_family(m))
             for k in family :
+            #for k in range(0, deck.num_nodes):
                 for i in range(0, deck.dim):
                     for j in range(0, deck.dim):
                         if i == j:
-                            print "F_actual", mat_class_actual.F[m,i]
-                            print "F_pertur", mat_class_perturb.F[m,i]
-                            self.jacobian[m*deck.dim+i,k*deck.dim+j] = (mat_class_perturb.F[m,i] - mat_class_actual.F[m,i]) / epsilon   
-                            #self.jacobian[m*deck.dim+i,k*deck.dim+j] = 333                      
-        for i in ids:
-            self.jacobian[i,:] = 0.0
-            self.jacobian[:,i] = 0.0
-
-    def newton_step(self, y, f):
-        r = np.linalg.norm(f)
-        if r > self.deck.solver_tolerance:
-                y_new = np.array(zip(y))
-                f_new = np.array(zip(f))
-                print "y in newton step", y_new
-                print "residual in newton step", f_new
-                self.compute_jacobian(self.deck, y_new, self.variables)
-                print self.jacobian
-                print -f
-                #print np.linalg.det(self.jacobian)
-                delta_y = np.linalg.solve(self.jacobian, -f_new)
-                #print delta_y
-        sys.exit(1)    
+                            print "F_diff", mat_class_pertur.F[m,i] - mat_class_actual.F[m,i], m, i
+                            self.jacobian[m*deck.dim+i,k*deck.dim+j] = (mat_class_pertur.F[m,i] - mat_class_actual.F[m,i]) / epsilon   
+                            #self.jacobian[m*deck.dim+i,k*deck.dim+j] = 333  
+                            
+        #for i in ids:
+            #self.jacobian[i,:] = 0.0
+            #self.jacobian[:,i] = 0.0
+                            
+    def newton_step(self, deck, ysolver, residual, var):
         
+        self.compute_jacobian(deck, ysolver , var)
+        print self.jacobian
+        #print np.linalg.det(self.jacobian)
+        delta_y = np.linalg.solve(self.jacobian, -residual)
+        #print delta_y
+        # sys.exit(1)  
+        return delta_y
+
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
     # This function calls the compute_residual function
     def quasi_static_solver(self, ysolver, deck):
         for t_n in range(1, deck.time_steps):
-            print "initial y", ysolver
-            solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=self.newton_step,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
-            self.y[:,:,t_n] = solver.x[:,:]
-            ysolver = self.random_initial_guess(solver.x, deck)
-            if solver.success == "False":
-                print "Convergence could not be reached."
-            else:
-                print "Time Step: ", t_n, "Convergence: ", solver.success
+            
+            res = float('inf')
+            step = 0
+            while res > deck.solver_tolerance and step < 10 :
+                residual = self.compute_residual(ysolver, deck, t_n)
+                res = np.linalg.norm(residual)
+                if res > deck.solver_tolerance:
+                    delta_y = self.newton_step(deck,ysolver, residual, self.variables)
+                    ysolver += delta_y
+            
+            #print "initial y", ysolver
+            #solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=self.newton_step,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
+            self.y[:,:,t_n] = ysolver
+            ysolver = self.random_initial_guess(ysolver, deck)
+            step += 1
+            print step
+            #if solver.success == "False":
+            #    print "Convergence could not be reached."
+            #else:
+            #    print "Time Step: ", t_n, "Convergence: ", solver.success
             #print ysolver
             #print t_n
-        return solver
+        #return solver
 
     # Records the force vector at each time step
     def update_force_data(self, variables, t_n):
@@ -210,7 +216,7 @@ class PD_problem():
         y = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
         for i in range(0,deck.num_nodes):
             for j in range(0,deck.dim):
-                y[i,j] = z[i,j] + 0.25 * random.uniform(-1, 1) * deck.delta_X
+                y[i,j] = z[i,j] + 1.e-4 * random.uniform(-1, 1) * deck.delta_X
         return y
 
     def strain_calculation(self, id_Node_1, id_Node_2, deck):
