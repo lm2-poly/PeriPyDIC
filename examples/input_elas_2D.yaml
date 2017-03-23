@@ -5,7 +5,7 @@ Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_2D.csv
+        Name: geometry_2D_test.csv
 Material:
     Type: Elastic
     Bulk_Modulus: 3333.33

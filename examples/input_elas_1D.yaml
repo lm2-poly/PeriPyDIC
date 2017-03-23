@@ -5,7 +5,7 @@ Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_1D.csv
+        Name: geometry_1D_test.csv
 Material:
     Type: Elastic
     Young_Modulus: 4000.0

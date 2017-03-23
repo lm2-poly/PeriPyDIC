@@ -18,7 +18,7 @@ class PD_problem():
 
     def __init__(self, deck):
         # Import initial data
-
+        self.deck = deck
         # NeighborSearch
         self.neighbors = util.neighbor.NeighborSearch(deck)
 
@@ -112,15 +112,15 @@ class PD_problem():
         # Choice of the material class
         if deck.material_type == "Elastic":
             from materials.elastic import Elastic_material
-            variables = Elastic_material( deck, self, ysolver )
-            self.update_force_data(variables, t_n)
-            self.update_ext_state_data(variables, t_n)
+            self.variables = Elastic_material( deck, self, ysolver )
+            self.update_force_data(self.variables, t_n)
+            self.update_ext_state_data(self.variables, t_n)
         elif deck.material_type == "Viscoelastic":
             from materials.viscoelastic import Viscoelastic_material
-            variables = Viscoelastic_material( deck, self, ysolver, t_n)
-            self.update_force_data(variables, t_n)
-            self.update_ext_state_data(variables, t_n)
-            self.update_ext_state_visco_data(variables, t_n)
+            self.variables = Viscoelastic_material( deck, self, ysolver, t_n)
+            self.update_force_data(self.variables, t_n)
+            self.update_ext_state_data(self.variables, t_n)
+            self.update_ext_state_visco_data(self.variables, t_n)
         else:
             logger.error("Error in problem.py: Material type unknown, please use Elastic or Viscoelastic.")
         for i in range(0,deck.num_nodes):
@@ -130,42 +130,57 @@ class PD_problem():
                     if i in con.id:
                         found = True
             if found == False:
-                residual[i,:] = variables.F[i,:] + self.b[i,:, t_n]
-        #print "dila", variables.pd_dilatation(deck, self, deck.geometry.nodes, variables.e, 16)
+                residual[i,:] = self.variables.F[i,:] + self.b[i,:, t_n]
+                
+        #print "dila", self.variables.pd_dilatation(deck, self, deck.geometry.nodes, self.variables.e, 16)
         #print residual
         return residual
 
-    def compute_jacobian(self, deck, y_actual, var_actual ):
+    def compute_jacobian(self, deck, y_actual, mat_class_actual ):
         y_perturb = y_actual.copy()
         epsilon = 1.0e-6 * deck.delta_X
         y_perturb += epsilon
-        
         if deck.material_type == "Elastic":
             from materials.elastic import Elastic_material
-            var_perturb = Elastic_material( deck, self, y_perturb )
+            mat_class_perturb = Elastic_material( deck, self, y_perturb )
             
-        self.jocabian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim))
-        for m in range(0, deck.num_nodes)
-            for k in self.neighbors.get_index_x_family(m):
-                for i in range(0, deck.dim):
-                    for j in range(0, deck.dim):
-                        self.jacobian[m*deck.dim+i,k*deck.dim+j] = (var_pertub.F[k,m] - var_actual.F[k,m]) / epsilon
+        ids = []   
+        for con in deck.conditions:
+            if con.type == "Displacement":
+                for i in con.id:
+                    ids.append(i)
+        print ids         
+        self.jacobian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim))
+        for m in range(0, deck.num_nodes):
+            if not m in ids:
+                family = np.append([m],self.neighbors.get_index_x_family(m))
+                for k in family :
+                    for i in range(0, deck.dim):
+                        for j in range(0, deck.dim):
+                            if i == j:
+                                self.jacobian[m*deck.dim+i,k*deck.dim+j] = (mat_class_perturb.F[m,i] - mat_class_actual.F[m,i]) / epsilon       
 
 
-
-
-
-
-
-
-
+    def newton_step(self, y, f):
+        r = np.linalg.norm(f)
+        if r > self.deck.solver_tolerance:
+                y_new = np.array(zip(y))
+                self.compute_jacobian(self.deck, y_new, self.variables)
+                print self.jacobian
+                print np.linalg.det(self.jacobian)
+                delta_y = np.linalg.solve(self.jacobian, -f)
+                print delta_y
+        sys.exit(1)
+        
+        
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
     # This function calls the compute_residual function
     def quasi_static_solver(self, ysolver, deck):
 
         for t_n in range(1, deck.time_steps):
-            solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=None,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
+            print ysolver
+            solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=self.newton_step,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
             self.y[:,:,t_n] = solver.x[:,:]
             ysolver = self.random_initial_guess(solver.x, deck)
             if solver.success == "False":
@@ -178,15 +193,15 @@ class PD_problem():
 
     # Records the force vector at each time step
     def update_force_data(self, variables, t_n):
-        self.forces[:,:, t_n] = variables.F
+        self.forces[:,:, t_n] = self.variables.F
 
     # Records the ext_state vector at each time step
     def update_ext_state_data(self, variables, t_n):
-        self.ext[:, :, t_n] = variables.e
+        self.ext[:, :, t_n] = self.variables.e
 
     # Records the ext_state_visco vector at each time step
     def update_ext_state_visco_data(self, variables, t_n):
-        self.ext_visco[:, :, :, t_n] = variables.e_visco
+        self.ext_visco[:, :, :, t_n] = self.variables.e_visco
 
     # Initial guess
     def random_initial_guess(self, z, deck):
