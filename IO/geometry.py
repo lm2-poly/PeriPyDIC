@@ -10,17 +10,12 @@ import sys
 
 ## Class handeling the discrete nodes
 class Geometry():
-    ## Constructor
-    def __init__(self):
-        ## Volume per node
-        self.volumes = np.array(0)
-        ## Density per node
-        self.density = np.array(0)
-
+  
     ## Read the positions, volume, and density of the nodes from the inFile.
     # @param dim Dimension of the nodes
     # @param inFile CSV file with the geometry
     def readNodes(self,dim,inFile):
+        
         if not os.path.exists(inFile):
                 print "Error: Could not find " + inFile
                 sys.exit(1)
@@ -36,41 +31,41 @@ class Geometry():
 
             ## Amount of nodes
             self.amount = length
-            self.volumes = np.empty(length)
+            self.volumes = np.empty(length,dtype=np.float64)
 
             if dim >= 1:
-                pos_x = np.empty(length)
+                pos_x = np.empty(length,dtype=np.float64)
             if dim >= 2:
-                pos_y = np.empty(length)
+                pos_y = np.empty(length,dtype=np.float64)
             if dim >= 3:
-                pos_z = np.empty(length)
+                pos_z = np.empty(length,dtype=np.float64)
 
             i = 0
 
             for row in spamreader:
                 if dim >= 1:
-                    pos_x[i] = np.array(float(row[1]))
+                    pos_x[i] = np.array(float(row[1]),dtype=np.float64)
                 if dim >= 2:
-                    pos_y[i] = np.array(float(row[2]))
+                    pos_y[i] = np.array(float(row[2]),dtype=np.float64)
                 if dim >= 3:
-                    pos_z[i] = np.array(float(row[3]))
+                    pos_z[i] = np.array(float(row[3]),dtype=np.float64)
 
                 self.volumes[i] = float(row[dim +1])
                 i +=1
 
             if dim == 1:
                 ## Nodes of the discretization
-                self.nodes = np.empty((len(pos_x),self.dim))
+                self.nodes = np.empty((len(pos_x),self.dim),dtype=np.float64)
                 self.nodes[:,0] = pos_x
                 del pos_x
             if dim == 2:
-                self.nodes = np.empty((len(pos_x),self.dim))
+                self.nodes = np.empty((len(pos_x),self.dim),dtype=np.float64)
                 self.nodes[:,0] = pos_x
                 self.nodes[:,1] = pos_y
                 del pos_x
                 del pos_y
             if dim >= 3:
-                self.nodes = np.array(zip(pos_x,pos_y,pos_z))
+                self.nodes = np.array(zip(pos_x,pos_y,pos_z),dtype=np.float64)
                 del pos_x
                 del pos_y
                 del pos_z

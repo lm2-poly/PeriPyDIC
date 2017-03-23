@@ -22,27 +22,23 @@ class PD_problem():
         # NeighborSearch
         self.neighbors = util.neighbor.NeighborSearch(deck)
 
-        #self.b = np.zeros( ( deck.dim * deck.num_nodes, deck.time_steps) )
-        #Compute the force density as a 3D array with the last dimension for the time steps
         self.compute_b(deck)
 
         #Compute the weighted volume for each node in a vector.
         self.weighted_function(deck)
 
-        #self.y = np.zeros( ( deck.dim * deck.num_nodes, deck.time_steps) )
-        #Actual position as a 3D array with the last dimension for the time steps
-        self.y = np.zeros((deck.num_nodes, deck.dim, deck.time_steps))
+        self.y = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         self.y[:,:,0] = deck.geometry.nodes[:,:]
 
-        self.strain = np.zeros( ( deck.time_steps ) )
-        self.forces = np.zeros((deck.num_nodes, deck.dim, deck.time_steps))
-        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ) )
+        self.strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
+        self.forces = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
+        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
 
     # Creates a loading vector b which describes the force or displacement applied on each node
     # at any time step
     def compute_b(self, deck):
         #Force density as a 3D array with the last dimension for the time steps
-        self.b = np.zeros((deck.num_nodes, deck.dim, deck.time_steps))
+        self.b = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         for t_n in range(1, deck.time_steps):
             for con in deck.conditions:
                 if con.type == "Force":
@@ -85,7 +81,7 @@ class PD_problem():
 
     # Computes the weights for each PD node
     def weighted_function(self, deck):
-        self.weighted_volume = np.zeros((deck.num_nodes))
+        self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
             for p in index_x_family:
@@ -94,7 +90,7 @@ class PD_problem():
 
     # Computes the residual vector used in the quasi_static_solver function
     def compute_residual(self, ysolver, deck, t_n):
-        residual = np.zeros((deck.num_nodes, deck.dim))
+        residual = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
         for con in deck.conditions:
             if con.type == "Displacement":
                 for id_node in con.id:
@@ -137,7 +133,7 @@ class PD_problem():
         return residual
 
     def compute_jacobian(self, deck, y_actual, mat_class_actual ):
-        y_perturb = y_actual.copy()
+        y_perturb = list(y_actual)
         epsilon = 1.0e-6 * deck.delta_X
         y_perturb += epsilon
         if deck.material_type == "Elastic":
@@ -149,37 +145,43 @@ class PD_problem():
             if con.type == "Displacement":
                 for i in con.id:
                     ids.append(i)
-        print ids         
-        self.jacobian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim))
+        
+        self.jacobian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim),dtype=np.float64)
         for m in range(0, deck.num_nodes):
-            if not m in ids:
-                family = np.append([m],self.neighbors.get_index_x_family(m))
-                for k in family :
-                    for i in range(0, deck.dim):
-                        for j in range(0, deck.dim):
-                            if i == j:
-                                self.jacobian[m*deck.dim+i,k*deck.dim+j] = (mat_class_perturb.F[m,i] - mat_class_actual.F[m,i]) / epsilon       
-
+            family = np.append([m],self.neighbors.get_index_x_family(m))
+            for k in family :
+                for i in range(0, deck.dim):
+                    for j in range(0, deck.dim):
+                        if i == j:
+                            print "F_actual", mat_class_actual.F[m,i]
+                            print "F_pertur", mat_class_perturb.F[m,i]
+                            self.jacobian[m*deck.dim+i,k*deck.dim+j] = (mat_class_perturb.F[m,i] - mat_class_actual.F[m,i]) / epsilon   
+                            #self.jacobian[m*deck.dim+i,k*deck.dim+j] = 333                      
+        for i in ids:
+            self.jacobian[i,:] = 0.0
+            self.jacobian[:,i] = 0.0
 
     def newton_step(self, y, f):
         r = np.linalg.norm(f)
         if r > self.deck.solver_tolerance:
                 y_new = np.array(zip(y))
+                f_new = np.array(zip(f))
+                print "y in newton step", y_new
+                print "residual in newton step", f_new
                 self.compute_jacobian(self.deck, y_new, self.variables)
                 print self.jacobian
-                print np.linalg.det(self.jacobian)
-                delta_y = np.linalg.solve(self.jacobian, -f)
-                print delta_y
-        sys.exit(1)
-        
+                print -f
+                #print np.linalg.det(self.jacobian)
+                delta_y = np.linalg.solve(self.jacobian, -f_new)
+                #print delta_y
+        sys.exit(1)    
         
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
     # This function calls the compute_residual function
     def quasi_static_solver(self, ysolver, deck):
-
         for t_n in range(1, deck.time_steps):
-            print ysolver
+            print "initial y", ysolver
             solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=self.newton_step,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
             self.y[:,:,t_n] = solver.x[:,:]
             ysolver = self.random_initial_guess(solver.x, deck)
@@ -205,7 +207,7 @@ class PD_problem():
 
     # Initial guess
     def random_initial_guess(self, z, deck):
-        y = np.zeros((deck.num_nodes, deck.dim))
+        y = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
         for i in range(0,deck.num_nodes):
             for j in range(0,deck.dim):
                 y[i,j] = z[i,j] + 0.25 * random.uniform(-1, 1) * deck.delta_X

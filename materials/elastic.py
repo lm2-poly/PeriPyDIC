@@ -15,7 +15,6 @@ class Elastic_material():
     # @param problem The related peridynamic problem
     # @param y The actual postions
     def __init__(self, deck, problem, y):
-
         ## Scalar influence function
         self.w = deck.influence_function
 
@@ -71,7 +70,7 @@ class Elastic_material():
     ## Compute the scalar extension state between Node_p and Node_i for each node
     def compute_ext_state(self, deck, problem, y):
         # Initialization for e
-        self.e = np.zeros((deck.num_nodes, deck.num_nodes))
+        self.e = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = problem.neighbors.get_index_x_family(i)
             for p in index_x_family:
@@ -81,8 +80,8 @@ class Elastic_material():
                     self.e[i,p] = np.linalg.norm(Y) - np.linalg.norm(X)
 
                 if deck.dim >= 2:
-                    self.e_s = np.zeros((deck.num_nodes, deck.num_nodes))
-                    self.e_d = np.zeros((deck.num_nodes, deck.num_nodes))
+                    self.e_s = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
+                    self.e_d = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
                     self.e_s[i, p] = self.pd_dilatation(deck, problem, self.e, i) * np.linalg.norm(X) / 3.
                     self.e_d[i, p] = self.e[i, p] - self.e_s[i, p]
 
@@ -91,7 +90,7 @@ class Elastic_material():
     # @param problem The related peridynamic problem
     # @param y The actual postions
     def compute_tscal(self, deck, problem, y):
-        self.tscal = np.zeros((deck.num_nodes, deck.num_nodes))
+        self.tscal = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = problem.neighbors.get_index_x_family(i)
             for p in index_x_family:
@@ -107,8 +106,8 @@ class Elastic_material():
                     alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
-                    self.tscal_s = np.zeros((deck.num_nodes, deck.num_nodes))
-                    self.tscal_d = np.zeros((deck.num_nodes, deck.num_nodes))
+                    self.tscal_s = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
+                    self.tscal_d = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
                     self.tscal_s[i,p] = alpha_s * self.w * self.e_s[i,p]
                     self.tscal_d[i,p] = alpha_d * self.w * self.e_d[i,p]
                     self.tscal[i,p] = self.tscal_s[i, p] + self.tscal_d[i,p]
@@ -118,8 +117,8 @@ class Elastic_material():
                     alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                     alpha_d = (15. / self.Weighted_Volume[i]) * self.K
                     # Scalar force state
-                    self.tscal_s = np.zeros((deck.num_nodes, deck.num_nodes))
-                    self.tscal_d = np.zeros((deck.num_nodes, deck.num_nodes))
+                    self.tscal_s = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
+                    self.tscal_d = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
                     self.tscal_s[i,p] = alpha_s * self.w * self.e_s[i,p]
                     self.tscal_d[i,p] = alpha_d * self.w * self.e_d[i,p]
                     self.tscal[i,p] = self.tscal_s[i,p] + self.tscal_d[i,p]
@@ -129,7 +128,7 @@ class Elastic_material():
     # @param problem The related peridynamic problem
     # @param y The actual positions
     def compute_T(self, deck, problem, y):
-        self.T = np.zeros((deck.num_nodes, deck.dim, deck.num_nodes))
+        self.T = np.zeros((deck.num_nodes, deck.dim, deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = problem.neighbors.get_index_x_family(i)
             for p in index_x_family:
@@ -139,7 +138,7 @@ class Elastic_material():
     # @param deck The input deck
     # @param problem The related peridynamic problem
     def compute_F(self, deck, problem):
-        self.F = np.zeros((deck.num_nodes, deck.dim))
+        self.F = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = problem.neighbors.get_index_x_family(i)
             for p in index_x_family:
