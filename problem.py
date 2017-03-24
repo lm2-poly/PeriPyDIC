@@ -169,40 +169,47 @@ class PD_problem():
                     for s in range(0, deck.dim):
                         if r==s:
                             jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
-                            #jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r]
        
-        #print  sum(jacobian[1,:])  
-        print "det=", np.linalg.det(jacobian)
-        print jacobian
+        #print "det=", np.linalg.det(jacobian)
+        #print jacobian
         return jacobian
        
 
                             
-    def newton_step(self, deck, ysolver, residual, var):
+    def newton_step(self, ysolver, deck, t_n, perturbation_factor, residual):
         
-        self.compute_jacobian(deck, ysolver , var)
-        print self.jacobian
-        #print np.linalg.det(self.jacobian)
-        delta_y = np.linalg.solve(self.jacobian, -residual)
-        #print delta_y
+        jacobian = self.compute_jacobian(ysolver, deck, t_n, perturbation_factor)
+        
+        print scipy.linalg.inv(jacobian) * -residual
+        
+        print "Vector" , residual
+        delta_y = scipy.linalg.solve(jacobian, -residual)
+        print "Delta_y" , delta_y
         # sys.exit(1)  
         return delta_y
 
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
     # This function calls the compute_residual function
-#    def quasi_static_solver(self, ysolver, deck):
-#        for t_n in range(1, deck.time_steps):
-#            
-#            res = float('inf')
-#            step = 0
-#            while res > deck.solver_tolerance and step < 10 :
-#                residual = self.compute_residual(ysolver, deck, t_n)
-#                res = np.linalg.norm(residual)
-#                if res > deck.solver_tolerance:
-#                    delta_y = self.newton_step(deck,ysolver, residual, self.mat_class)
-#                    ysolver += delta_y
-#            
+    def quasi_static_solver(self, ysolver, deck):
+        for t_n in range(1, deck.time_steps):
+            
+            res = float('inf')
+            step = 0
+            residual = self.compute_residual(ysolver, deck, t_n)
+            res = scipy.linalg.norm(residual)
+            print "Residual: " , res
+            while res > deck.solver_tolerance and step < 10 :
+                residual = self.compute_residual(ysolver, deck, t_n)
+                res = scipy.linalg.norm(residual)
+                if res > deck.solver_tolerance:
+                    delta_y = self.newton_step(ysolver,deck, t_n, 1.0e-6, residual)
+                    print ysolver
+                    ysolver += delta_y
+                    residual = self.compute_residual(ysolver, deck, t_n)
+                    res = scipy.linalg.norm(residual)
+                    print "solver" , ysolver
+                #sys.exit(1)
 #            #print "initial y", ysolver
 #            #solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=self.newton_step,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
 #            self.y[:,:,t_n] = ysolver
@@ -243,17 +250,17 @@ class PD_problem():
             initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
             self.strain[t_n] = (actual - initial) / initial
             
-    def quasi_static_solver(self, ysolver, deck):
+    #def quasi_static_solver(self, ysolver, deck):
 
-        for t_n in range(1, deck.time_steps):
-            solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=None,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
-            self.y[:,:,t_n] = solver.x[:,:]
-            ysolver = self.random_initial_guess(solver.x, deck)
-            if solver.success == "False":
-                print "Convergence could not be reached."
-            else:
-                print "Time Step: ", t_n, "Convergence: ", solver.success
-            #print ysolver
-            #print t_n
-        return solver
+      #  for t_n in range(1, deck.time_steps):
+      #      solver = scipy.optimize.root(self.compute_residual, ysolver, args=(deck, t_n), method=deck.solver_type,jac=None,tol=None,callback=None,options={'maxiter':1000, 'ftol':deck.solver_tolerance, 'fatol':deck.solver_tolerance})
+      #      self.y[:,:,t_n] = solver.x[:,:]
+      #      ysolver = self.random_initial_guess(solver.x, deck)
+      #      if solver.success == "False":
+      #          print "Convergence could not be reached."
+      #      else:
+      #          print "Time Step: ", t_n, "Convergence: ", solver.success
+      #      #print ysolver
+      #      #print t_n
+      #  return solver
 

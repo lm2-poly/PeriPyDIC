@@ -47,11 +47,11 @@ def main(argv):
 
 def simulation(deck):
     pb_class = problem.PD_problem(deck)
-    initialVector = deck.geometry.nodes
-    x_0 = pb_class.random_initial_guess( initialVector, deck )
-    pb_class.compute_jacobian(x_0, deck, 1, 1.0e-1)
+    x_0 = pb_class.random_initial_guess( deck.geometry.nodes, deck )
+    pb_class.compute_jacobian(x_0, deck, 1, 1.0e-6)
     sys.exit(1)
-    pb_class.quasi_static_pb_class(x_0, deck)
+    print "Initial:" , x_0
+    pb_class.quasi_static_solver(x_0, deck)
     pb_class.strain_calculation( 15, 17, deck )
 
     #writeCSV(deck,pb_class)
