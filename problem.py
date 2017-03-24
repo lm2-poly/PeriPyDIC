@@ -109,7 +109,6 @@ class PD_problem():
             logger.error("Error in problem.py: Material type unknown, please use Elastic or Viscoelastic.")
         
         internal_force = self.mat_class.f_int
-        print "tscal =", self.mat_class.t
         #internal_force = np.reshape(internal_force, (deck.num_nodes * deck.dim,-1) )
         
         return internal_force
@@ -159,30 +158,22 @@ class PD_problem():
                 for r in range(0, deck.dim):
                     eps_vector = np.zeros((deck.num_nodes , deck.dim),dtype=np.float64)
                     eps_vector[j,r] = eps
-                    force_int_p = self.compute_f(y + eps, deck, t_n)[i,:]
+                    force_int_p = self.compute_f(y + eps_vector, deck, t_n)[i,:]
                     #force_int_p = np.array([[1],[2],[3],[4],[5],[6]])
                     #force_int_p = np.array([[1,10],[2,20],[3,30],[4,40],[5,50],[6,60]])
-                    force_int_m = self.compute_f(y - eps, deck, t_n)[i,:]
+                    force_int_m = self.compute_f(y - eps_vector, deck, t_n)[i,:]
                     #force_int_m = np.array([[-1.1],[-2.1],[-3.1],[-4.1],[-5.1],[-6.1]])
                     #force_int_m = np.array([[-1.1,-11],[-2.1,-21],[-3.1,-31],[-4.1,-41],[-5.1,-51],[-6.1,-61]])
-                    force_int_diff = force_int_p - force_int_m
+                    force_int_diff = (force_int_p - force_int_m)
                     #force_int_diff = force_int_p[i,:] - force_int_m[i,:]
                     for s in range(0, deck.dim):
                         if r==s:
-                            print "i:", i, "j:", j, "r", r, "s", s
-                            print "esp_vect", eps_vector
-                            print "f_diff", force_int_diff
-                            #jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
-                            jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r]
-        #for i in ids:
-        #    jacobian = jacobian[1:,1:]
-        #    print jacobian
-           
-
+                            jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
+                            #jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r]
+       
+        #print  sum(jacobian[1,:])  
         print "det=", np.linalg.det(jacobian)
         print jacobian
-        #print jacobian[1,:]
-        #print jacobian[2,:]
         return jacobian
        
 

@@ -49,7 +49,7 @@ def simulation(deck):
     pb_class = problem.PD_problem(deck)
     initialVector = deck.geometry.nodes
     x_0 = pb_class.random_initial_guess( initialVector, deck )
-    pb_class.compute_jacobian(x_0, deck, 1, 1.0e-5)
+    pb_class.compute_jacobian(x_0, deck, 1, 1.0e-1)
     sys.exit(1)
     pb_class.quasi_static_pb_class(x_0, deck)
     pb_class.strain_calculation( 15, 17, deck )
