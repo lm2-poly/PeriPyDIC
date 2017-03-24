@@ -46,24 +46,23 @@ def main(argv):
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
 
 def simulation(deck):
-    solver = problem.PD_problem(deck)
+    pb_class = problem.PD_problem(deck)
     initialVector = deck.geometry.nodes
-    print initialVector
-    x_0 = solver.random_initial_guess( initialVector, deck )
-    print x_0
-    solver.quasi_static_solver(x_0, deck)
+    x_0 = pb_class.random_initial_guess( initialVector, deck )
+    pb_class.compute_jacobian(x_0, deck, 1, 1.0e-5)
+    sys.exit(1)
+    pb_class.quasi_static_pb_class(x_0, deck)
+    pb_class.strain_calculation( 15, 17, deck )
 
-    solver.strain_calculation( 15, 17, deck )
-
-    #writeCSV(deck,solver)
+    #writeCSV(deck,pb_class)
     #if deck.vtk_writer.vtk_enabled == True:
-    #   deck.vtk_writer.write_data(deck,solver)
+    #   deck.vtk_writer.write_data(deck,pb_class)
 
     print "delta_x =" , deck.delta_X
-    print "Horizon =" , solver.neighbors.horizon
-    print "Strain = " , np.around(solver.strain,decimals=6)
+    print "Horizon =" , pb_class.neighbors.horizon
+    print "Strain = " , np.around(pb_class.strain,decimals=6)
     #print "Nodes positions = "
-    #print solver.y
+    #print pb_class.y
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

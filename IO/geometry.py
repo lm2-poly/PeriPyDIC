@@ -44,13 +44,13 @@ class Geometry():
 
             for row in spamreader:
                 if dim >= 1:
-                    pos_x[i] = np.array(float(row[1]),dtype=np.float64)
+                    pos_x[i] = np.array(np.array(row[1]),dtype=np.float64)
                 if dim >= 2:
-                    pos_y[i] = np.array(float(row[2]),dtype=np.float64)
+                    pos_y[i] = np.array(np.array(row[2]),dtype=np.float64)
                 if dim >= 3:
-                    pos_z[i] = np.array(float(row[3]),dtype=np.float64)
+                    pos_z[i] = np.array(np.array(row[3]),dtype=np.float64)
 
-                self.volumes[i] = float(row[dim +1])
+                self.volumes[i] = np.array(np.array(row[dim + 1]),dtype=np.float64)
                 i +=1
 
             if dim == 1:
