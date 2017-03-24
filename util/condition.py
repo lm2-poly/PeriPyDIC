@@ -11,7 +11,7 @@ import numpy as np
 class ConditionFromFile():
 
     ## Volume of the boundary elements
-    boundary_volume = 0.0
+    boundary_volume = 0.
 
     ## Constructor
     # @param cType Type of the condition, e.g. Force or Displacement

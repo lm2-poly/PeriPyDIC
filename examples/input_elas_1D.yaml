@@ -1,11 +1,11 @@
 Discretization:
     Dim: 1
     Final_Time: 2.0
-    Time_Steps: 4
+    Time_Steps: 16
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_1D_test.csv
+        Name: geometry_1D.csv
 Material:
     Type: Elastic
     Young_Modulus: 4000.0
@@ -45,4 +45,4 @@ Output:
         Slice: 1
 Solver:
     Type: krylov
-    Tolerance: 1.0e-6
+    Tolerance: 1.0e-9

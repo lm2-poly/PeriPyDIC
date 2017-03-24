@@ -48,9 +48,7 @@ def main(argv):
 def simulation(deck):
     pb_class = problem.PD_problem(deck)
     x_0 = pb_class.random_initial_guess( deck.geometry.nodes, deck )
-    pb_class.compute_jacobian(x_0, deck, 1, 1.0e-6)
-    sys.exit(1)
-    print "Initial:" , x_0
+    #print "Initial:" , x_0
     pb_class.quasi_static_solver(x_0, deck)
     pb_class.strain_calculation( 15, 17, deck )
 
@@ -61,8 +59,8 @@ def simulation(deck):
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon
     print "Strain = " , np.around(pb_class.strain,decimals=6)
-    #print "Nodes positions = "
-    #print pb_class.y
+    print "Nodes positions = "
+    print pb_class.y[:,:,deck.time_steps-1]
 
 def writeCSV(deck,problem):
     for out in deck.outputs:
