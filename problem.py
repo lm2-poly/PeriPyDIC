@@ -185,9 +185,9 @@ class PD_problem():
         for con in deck.conditions:
             if con.type == "Displacement":
                 for i in con.id:
-                    removeId.append(i+con.direction-1)
+                    removeId.append(int(i+con.direction-1))
                     
-        
+        print len(jacobian) , len(residual)
         jacobian = np.delete(jacobian,removeId,0)
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
@@ -203,8 +203,26 @@ class PD_problem():
         
         #sys.exit(1)
         
+        print len(jacobian) , len(residual)
+        
         delta_y = scipy.linalg.solve(jacobian, -residual)
-        return np.reshape(np.append([0] , zip(delta_y)), (deck.num_nodes,-1))
+        
+        mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
+        mask[removeId] = False
+        
+        result = np.zeros((deck.num_nodes * deck.dim),dtype=np.float64)
+        i = 0
+        j = 0
+        for m in mask:
+            if m == True:
+                result[int(i)] = delta_y[int(j)]
+                j+= 1
+            i += 1
+        
+        #sys.exit(1)
+        #return np.reshape(np.append([0] , zip(delta_y)), (deck.num_nodes,-1))
+        #print np.reshape(result, (deck.num_nodes * deck.dim,-1))
+        return np.reshape(result, (deck.num_nodes * deck.dim,-1))
 
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
