@@ -9,6 +9,7 @@ import random
 import util.neighbor
 import scipy
 np.set_printoptions(threshold='nan')
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -177,7 +178,32 @@ class PD_problem():
     def newton_step(self, ysolver, deck, t_n, perturbation_factor, residual):
         
         jacobian = self.compute_jacobian(ysolver, deck, t_n, perturbation_factor)
-        delta_y = scipy.linalg.solve(jacobian[1:,1:], -residual[1:])
+        
+        removeId = []
+        
+        
+        for con in deck.conditions:
+            if con.type == "Displacement":
+                for i in con.id:
+                    removeId.append(i+con.direction-1)
+                    
+        
+        jacobian = np.delete(jacobian,removeId,0)
+        jacobian = np.delete(jacobian,removeId,1)
+        residual = np.delete(residual,removeId,0)
+        
+        #print len(residual) , len(jacobian)
+        
+        
+        #print tmp - jacobian[1:,1:]
+        
+        #print mask
+        
+        #print removeId
+        
+        #sys.exit(1)
+        
+        delta_y = scipy.linalg.solve(jacobian, -residual)
         return np.reshape(np.append([0] , zip(delta_y)), (deck.num_nodes,-1))
 
     # This function solves the problem at each time step, using the previous
