@@ -179,32 +179,30 @@ class PD_problem():
         
         jacobian = self.compute_jacobian(ysolver, deck, t_n, perturbation_factor)
         
+        #print residual
+        #print "---"
+        #print np.reshape(residual,(deck.dim*deck.num_nodes,1),0)
+        #sys.exit(1)
+        
+        residual = np.reshape(residual,(deck.dim*deck.num_nodes,1),0)
+        
         removeId = []
-        
-        
         for con in deck.conditions:
             if con.type == "Displacement":
                 for i in con.id:
-                    removeId.append(int(i+con.direction-1))
+                    removeId.append(int((i*deck.dim) + con.direction-1))
+        removeId.sort()          
+        #print removeId 
+        
+        #sys.exit(1)
                     
-        print len(jacobian) , len(residual)
+        #print len(jacobian) , len(residual)
         jacobian = np.delete(jacobian,removeId,0)
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
-        
-        #print len(residual) , len(jacobian)
-        
-        
-        #print tmp - jacobian[1:,1:]
-        
-        #print mask
-        
-        #print removeId
-        
+                
+        #print residual
         #sys.exit(1)
-        
-        print len(jacobian) , len(residual)
-        
         delta_y = scipy.linalg.solve(jacobian, -residual)
         
         mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
@@ -219,10 +217,13 @@ class PD_problem():
                 j+= 1
             i += 1
         
+        
+        #print result
+        #print "---"
+        #print np.reshape(result, (deck.num_nodes,deck.dim) , 0)
         #sys.exit(1)
-        #return np.reshape(np.append([0] , zip(delta_y)), (deck.num_nodes,-1))
-        #print np.reshape(result, (deck.num_nodes * deck.dim,-1))
-        return np.reshape(result, (deck.num_nodes * deck.dim,-1))
+        
+        return np.reshape(result, (deck.num_nodes,deck.dim) , 0)
 
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
@@ -243,8 +244,14 @@ class PD_problem():
                     ysolver += delta_y
                     residual = self.compute_residual(ysolver, deck, t_n)
                     res = scipy.linalg.norm(residual)
-
+                    step += 1
+                    print res, step
+                    if step == 100:
+                        print "Warning: Solver exceed limit of steps"
+                        sys.exit(1)
+                    
             self.y[:,:,t_n] = ysolver
+                
             print "t: " , t_n
 
     # Records the force vector at each time step
