@@ -58,9 +58,9 @@ def simulation(deck):
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon
-    #print "Strain = " , np.around(pb_class.strain,decimals=6)
-    print "Nodes positions = "
-    print pb_class.y
+    print "Strain = " , np.around(pb_class.strain,decimals=6)
+    #print "Nodes positions = "
+    #print pb_class.y
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

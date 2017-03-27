@@ -1,7 +1,7 @@
 Discretization:
     Dim: 2
     Final_Time: 2.0
-    Time_Steps: 4
+    Time_Steps: 16
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
@@ -49,5 +49,5 @@ Output:
             - Conditions
         Slice: 1
 Solver:
-    Type: krylov
-    Tolerance: 1.0e-7
+    Step: 1000
+    Tolerance: 1.0e-6

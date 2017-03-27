@@ -170,12 +170,12 @@ class PD_deck():
                             print "Error: No Solver tag found"
                             sys.exit(1)
                         else:
-                            if not "Type" in self.doc["Solver"]:
-                                print "Error: No Type tag in Solver found"
+                            if not "Step" in self.doc["Solver"]:
+                                print "Error: No Step tag in Solver found"
                                 sys.exit(1)
                             else:
                                 ## Type of the solver
-                                self.solver_type = self.doc["Solver"]["Type"]
+                                self.solver_step = self.doc["Solver"]["Step"]
                             if not "Tolerance" in self.doc["Solver"]:
                                 print "Error: No Tolerance tag in Solver found"
                                 sys.exit(1)

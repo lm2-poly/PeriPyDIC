@@ -215,6 +215,8 @@ class PD_problem():
             if m == True:
                 result[int(i)] = delta_y[int(j)]
                 j+= 1
+            #else:
+            #    result[int(i)] = -residual[i]
             i += 1
         
         
@@ -236,7 +238,7 @@ class PD_problem():
             residual = self.compute_residual(ysolver, deck, t_n)
             res = scipy.linalg.norm(residual)
             #print "Residual: " , res
-            while res > deck.solver_tolerance and step < 100 :
+            while res > deck.solver_tolerance and step < deck.solver_step :
                 residual = self.compute_residual(ysolver, deck, t_n)
                 res = scipy.linalg.norm(residual)
                 if res > deck.solver_tolerance:
@@ -246,8 +248,8 @@ class PD_problem():
                     res = scipy.linalg.norm(residual)
                     step += 1
                     print res, step
-                    if step == 100:
-                        print "Warning: Solver exceed limit of steps"
+                    if step == deck.solver_step:
+                        print "Warning: Solver exceed limit of " + str(deck.solver_step) + " steps"
                         sys.exit(1)
                     
             self.y[:,:,t_n] = ysolver
@@ -276,6 +278,7 @@ class PD_problem():
 
     def strain_calculation(self, id_Node_1, id_Node_2, deck):
         for t_n in range(1, deck.time_steps):
+            print self.y[id_Node_2,:,t_n] , self.y[id_Node_1,:,t_n]
             actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
             initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
             self.strain[t_n] = (actual - initial) / initial

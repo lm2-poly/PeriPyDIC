@@ -44,5 +44,5 @@ Output:
             - Conditions
         Slice: 1
 Solver:
-    Type: krylov
+    Step: 100
     Tolerance: 1.0e-9
