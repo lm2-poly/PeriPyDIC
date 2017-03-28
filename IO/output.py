@@ -31,7 +31,6 @@ class OutputCSV():
                 pos = ['X','Y','Z']
                 for i in range(0, deck.dim):
                     header.append(pos[i])
-                print "".join(header)
                 spamwriter.writerow(header)
                 for t in range(0, deck.time_steps):
                     s = [t]

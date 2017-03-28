@@ -27,7 +27,8 @@ class ConditionFromFile():
         ## Value in Newton or Meter
         self.value = float(value)
         ## Force density
-        self.force_density = self.value / self.boundary_volume
+        self.force_density = 2.* self.value /  0.25 #self.boundary_volume
+        print self.force_density , self.boundary_volume
         ## Direction of the condition
         self.direction = direction
 

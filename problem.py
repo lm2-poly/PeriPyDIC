@@ -7,7 +7,7 @@ import logging
 import numpy as np
 import random
 import util.neighbor
-import scipy
+from scipy import linalg 
 np.set_printoptions(threshold='nan')
 import sys
 
@@ -192,8 +192,7 @@ class PD_problem():
                 for i in con.id:
                     removeId.append(int((i*deck.dim) + con.direction-1))
         removeId.sort()          
-        #print removeId 
-        
+       # print removeId 
         #sys.exit(1)
                     
         #print len(jacobian) , len(residual)
@@ -203,16 +202,26 @@ class PD_problem():
                 
         #print residual
         #sys.exit(1)
-        delta_y = scipy.linalg.solve(jacobian, -residual)
         
+        #delta_y = sp.cg(jacobian, -residual)
+        
+        delta_y = linalg.solve(jacobian, -residual)
+        
+        #print delta_y 
+       
         mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
         mask[removeId] = False
+        
+        #print mask
+        #sys.exit(1)
+        
         
         result = np.zeros((deck.num_nodes * deck.dim),dtype=np.float64)
         i = 0
         j = 0
         for m in mask:
             if m == True:
+                #print  delta_y[0]
                 result[int(i)] = delta_y[int(j)]
                 j+= 1
             #else:
@@ -236,25 +245,24 @@ class PD_problem():
             res = float('inf')
             step = 0
             residual = self.compute_residual(ysolver, deck, t_n)
-            res = scipy.linalg.norm(residual)
+            res = linalg.norm(residual)
             #print "Residual: " , res
             while res > deck.solver_tolerance and step < deck.solver_step :
                 residual = self.compute_residual(ysolver, deck, t_n)
-                res = scipy.linalg.norm(residual)
+                res = linalg.norm(residual)
                 if res > deck.solver_tolerance:
-                    delta_y = self.newton_step(ysolver,deck, t_n, 1.0e-5, residual)
+                    delta_y = self.newton_step(ysolver,deck, t_n, 1.0e-6, residual)
                     ysolver += delta_y
                     residual = self.compute_residual(ysolver, deck, t_n)
-                    res = scipy.linalg.norm(residual)
+                    res = linalg.norm(residual)
                     step += 1
-                    print res, step
                     if step == deck.solver_step:
                         print "Warning: Solver exceed limit of " + str(deck.solver_step) + " steps"
                         sys.exit(1)
                     
             self.y[:,:,t_n] = ysolver
                 
-            print "t: " , t_n
+            print "t: " , t_n , "res: " , res
 
     # Records the force vector at each time step
     def update_force_data(self, mat_class, t_n):
@@ -278,8 +286,7 @@ class PD_problem():
 
     def strain_calculation(self, id_Node_1, id_Node_2, deck):
         for t_n in range(1, deck.time_steps):
-            print self.y[id_Node_2,:,t_n] , self.y[id_Node_1,:,t_n]
-            actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
+            actual = abs(self.y[id_Node_2][0][t_n] - self.y[id_Node_1][0][t_n])
             initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
             self.strain[t_n] = (actual - initial) / initial
             

@@ -52,9 +52,9 @@ def simulation(deck):
     pb_class.quasi_static_solver(x_0, deck)
     pb_class.strain_calculation( 15, 17, deck )
 
-    #writeCSV(deck,pb_class)
-    #if deck.vtk_writer.vtk_enabled == True:
-    #   deck.vtk_writer.write_data(deck,pb_class)
+    writeCSV(deck,pb_class)
+    if deck.vtk_writer.vtk_enabled == True:
+       deck.vtk_writer.write_data(deck,pb_class)
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon

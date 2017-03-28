@@ -1,7 +1,7 @@
 Discretization:
     Dim: 1
     Final_Time: 2.0
-    Time_Steps: 16
+    Time_Steps: 4
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
@@ -15,7 +15,7 @@ Boundary:
             - Force
             - Displacement
         Value: 
-            - 40.0
+            - 40
             - 0.0
         Direction:
             - 1
