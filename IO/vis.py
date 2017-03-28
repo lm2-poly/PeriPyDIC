@@ -75,7 +75,7 @@ class vtk_writer():
                             array.SetNumberOfComponents(deck.dim)
                             array.SetNumberOfTuples(num_nodes)
 
-                            force = problem.y
+                            force = problem.b
                             
                             for i in range(num_nodes):
                                 if deck.dim == 1:
