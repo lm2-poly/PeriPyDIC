@@ -23,12 +23,26 @@ class OutputCSV():
     # @param problem The object containing the computational values
     def write(self, deck, problem):
         with open(self.inputFile, 'wb') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ')
+            spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|')
             header = []
+            header.append("#Time")
+            header.append("ID")
             if self.dataType == "Position":
-                header.append("#Time")
-                for x_i in range(0, deck.num_nodes):
-                    header.append("Id"+str(x_i))
+                pos = ['X','Y','Z']
+                for i in range(0, deck.dim):
+                    header.append(pos[i])
+                print "".join(header)
                 spamwriter.writerow(header)
-                for t_n in range(0, deck.time_steps):
-                    spamwriter.writerow(np.insert(problem.y[:, t_n], 0, t_n*deck.delta_t))
+                for t in range(0, deck.time_steps):
+                    s = [t]
+                    for i in range(0,deck.num_nodes):
+                        s.append(i)
+                        if deck.dim >= 1:
+                            s.append(problem.y[i][0][t])
+                        if deck.dim >= 2:
+                            s.append(problem.y[i][1][t])
+                        if deck.dim >= 3:
+                            s.append(problem.y[i][2][t])
+                        spamwriter.writerow(s)
+                        s = [t]
+                    

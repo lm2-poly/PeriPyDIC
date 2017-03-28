@@ -51,8 +51,7 @@ class vtk_writer():
                             array.SetNumberOfTuples(num_nodes)
         
                             act = problem.y
-                            print act[i]
-                            print "----"
+                          
                             for i in range(num_nodes):
                                 if deck.dim == 1:
                                     array.SetTuple1(i,abs(act[i][0][t] - deck.geometry.nodes[i][0]))
@@ -76,6 +75,8 @@ class vtk_writer():
                             array.SetNumberOfComponents(deck.dim)
                             array.SetNumberOfTuples(num_nodes)
 
+                            force = problem.y
+                            
                             for i in range(num_nodes):
                                 if deck.dim == 1:
                                     array.SetTuple1(i,force[i][0][t])
