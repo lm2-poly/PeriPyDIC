@@ -33,14 +33,13 @@ class vtk_writer():
                 points.SetNumberOfPoints(num_nodes)
                 points.SetDataTypeToDouble()
                 for i in range(0,num_nodes):
-                    act = problem.y[:, t]
+                    act = problem.y
                     if deck.dim == 1:
-                        points.InsertPoint(i,act[i],0.,0.)
+                        points.InsertPoint(i,act[i][0][t],0.,0.)
                     if deck.dim == 2:
-                        act = problem.y[:, t]
-                        points.InsertPoint(i,act[i],act[num_nodes+i],0.)
+                        points.InsertPoint(i,act[i][0][t],act[i][1][t],0.)
                     if deck.dim == 3:
-                        points.InsertPoint(i,problem.y[t][i],problem.y[t][num_nodes+i],problem.y[t][2*num_nodes+i])
+                        points.InsertPoint(i,act[i][0][t],act[i][1][t],act[i][2][t])
                     grid.SetPoints(points)
                     dataOut = grid.GetPointData()
                     for out_type in self.types:
@@ -50,15 +49,14 @@ class vtk_writer():
                             array.SetName("Displacement")
                             array.SetNumberOfComponents(deck.dim)
                             array.SetNumberOfTuples(num_nodes)
-
-                            #if deck.dim >= 2:
-                            act = problem.y[:, t]
-
+        
+                            act = problem.y
+                          
                             for i in range(num_nodes):
                                 if deck.dim == 1:
-                                    array.SetTuple1(i,abs(act[i] - deck.geometry.nodes[i][0]))
+                                    array.SetTuple1(i,abs(act[i][0][t] - deck.geometry.nodes[i][0]))
                                 if deck.dim == 2:
-                                    array.SetTuple2(i,abs(act[i] - deck.geometry.nodes[i][0]),abs(act[num_nodes+i] - deck.geometry.nodes[i][1]))
+                                    array.SetTuple2(i,abs(act[i][0][t] - deck.geometry.nodes[i][0]),abs(act[i][1][t] - deck.geometry.nodes[i][1]))
                             dataOut.AddArray(array)
 
                         if out_type == "Neighbors":
@@ -77,14 +75,13 @@ class vtk_writer():
                             array.SetNumberOfComponents(deck.dim)
                             array.SetNumberOfTuples(num_nodes)
 
-                            #if deck.dim >= 2:
-                            act = problem.b[:, t]
-
+                            force = problem.b
+                            
                             for i in range(num_nodes):
                                 if deck.dim == 1:
-                                    array.SetTuple1(i,act[i])
+                                    array.SetTuple1(i,force[i][0][t])
                                 if deck.dim == 2:
-                                    array.SetTuple2(i,act[i], act[num_nodes+i])
+                                    array.SetTuple2(i,force[i][0][t], force[i][1][t])
                             dataOut.AddArray(array)
 
                         if out_type == "Conditions":

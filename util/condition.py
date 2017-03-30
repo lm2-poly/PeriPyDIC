@@ -11,7 +11,7 @@ import numpy as np
 class ConditionFromFile():
 
     ## Volume of the boundary elements
-    boundary_volume = 0.0
+    boundary_volume = 0.
 
     ## Constructor
     # @param cType Type of the condition, e.g. Force or Displacement
@@ -26,8 +26,6 @@ class ConditionFromFile():
         self.type = cType
         ## Value in Newton or Meter
         self.value = float(value)
-        ## Force density
-        self.force_density = self.value / self.boundary_volume
         ## Direction of the condition
         self.direction = direction
 
@@ -51,7 +49,5 @@ class ConditionFromFile():
             i = 0
             for row in spamreader:
                 ids[i] = int(row[0])
-                self.boundary_volume += volume[int(ids[i])]
                 i += 1
-
             return ids

@@ -170,15 +170,22 @@ class PD_deck():
                             print "Error: No Solver tag found"
                             sys.exit(1)
                         else:
-                            if not "Type" in self.doc["Solver"]:
-                                print "Error: No Type tag in Solver found"
+                            if not "Max_Iteration" in self.doc["Solver"]:
+                                print "Error: No Max_Iteration tag in Solver found"
                                 sys.exit(1)
                             else:
-                                ## Type of the solver
-                                self.solver_type = self.doc["Solver"]["Type"]
+                                ## Maximum iteration
+                                self.solver_max_it = self.doc["Solver"]["Max_Iteration"]
                             if not "Tolerance" in self.doc["Solver"]:
                                 print "Error: No Tolerance tag in Solver found"
                                 sys.exit(1)
                             else:
                                 ## Tolerance of the solver
                                 self.solver_tolerance = float(self.doc["Solver"]["Tolerance"])
+                            if not "Jacobian_Perturbation" in self.doc["Solver"]:
+                                print "Error: No Jacobian_Perturbation tag in Solver found"
+                                sys.exit(1)
+                            else:
+                                ## Perturbation factor for the Jacobian matrix
+                                self.solver_perturbation = float(self.doc["Solver"]["Jacobian_Perturbation"])
+                            

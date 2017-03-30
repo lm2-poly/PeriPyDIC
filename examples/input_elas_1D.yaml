@@ -15,7 +15,7 @@ Boundary:
             - Force
             - Displacement
         Value: 
-            - 40.0
+            - 40
             - 0.0
         Direction:
             - 1
@@ -44,5 +44,5 @@ Output:
             - Conditions
         Slice: 1
 Solver:
-    Type: krylov
-    Tolerance: 1.0e-6
+    Step: 1000
+    Tolerance: 1.0e-9

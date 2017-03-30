@@ -5,11 +5,11 @@ Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_2D.csv
+        Name: geometry_2D_test.csv
 Material:
     Type: Elastic
-    Bulk_Modulus: 3333.33
-    Shear_Modulus: 1538.0
+    Bulk_Modulus: 3333.3333
+    Shear_Modulus: 1538.4615
 Boundary:
     Condition:
         Type: 
@@ -31,7 +31,7 @@ Boundary:
     Shape:
         Type: Ramp
         Values:
-            - 1.5
+            - 2.0
             - 2.0
             - 2.0
 Output:
@@ -41,7 +41,7 @@ Output:
         File:
             - nodes_positions_m4_dx0_50.csv
     VTK:
-        Path: ./out/
+        Path: ./out2/
         Type:
             - Displacement
             - Neighbors
@@ -49,5 +49,6 @@ Output:
             - Conditions
         Slice: 1
 Solver:
-    Type: krylov
-    Tolerance: 1.0e-7
+    Max_Iteration: 100
+    Tolerance: 1.0e-2
+    Jacobian_Perturbation: 1.0e-6
