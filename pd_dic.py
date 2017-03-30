@@ -8,6 +8,8 @@ import IO.deck
 import problem
 import numpy as np
 np.set_printoptions(threshold='nan')
+import time
+import pdb
 
 def main(argv):
     """
@@ -46,11 +48,12 @@ def main(argv):
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
 
 def simulation(deck):
+    t0 = time.time()
     pb_class = problem.PD_problem(deck)
-    x_0 = pb_class.random_initial_guess( deck.geometry.nodes, deck )
-    #print "Initial:" , x_0
-    pb_class.quasi_static_solver(x_0, deck)
-    pb_class.strain_calculation( 15, 17, deck )
+    y_0 = deck.geometry.nodes.copy()
+    pb_class.quasi_static_solver(y_0, deck)
+    eps_longi = pb_class.strain_calculation( 3, 5, deck )
+    eps_trans = pb_class.strain_calculation( 12, 20, deck )
 
     writeCSV(deck,pb_class)
     if deck.vtk_writer.vtk_enabled == True:
@@ -58,9 +61,11 @@ def simulation(deck):
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon
-    print "Strain = " , np.around(pb_class.strain,decimals=6)
+    print "Strain Longi = " , np.around(eps_longi,decimals=6)
+    print "Strain Trans = " , np.around(eps_trans,decimals=6)
     #print "Nodes positions = "
     #print pb_class.y
+    print "Duration:", time.time() - t0 , "seconds"
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

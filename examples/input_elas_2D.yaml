@@ -8,8 +8,8 @@ Discretization:
         Name: geometry_2D_test.csv
 Material:
     Type: Elastic
-    Bulk_Modulus: 3333.33
-    Shear_Modulus: 1538.0
+    Bulk_Modulus: 3333.3333
+    Shear_Modulus: 1538.4615
 Boundary:
     Condition:
         Type: 
@@ -17,7 +17,7 @@ Boundary:
             - Displacement
             - Displacement
         Value: 
-            - 19.9947971267
+            - 40.0
             - 0.0
             - 0.0
         Direction:
@@ -25,13 +25,13 @@ Boundary:
             - 1
             - 2
         File: 
-            - force_condition_2D_test.csv
-            - displ_condition_2D_test.csv
-            - displ_condition_2D_test.csv
+            - force_condition_2D.csv
+            - displ_condition_2D.csv
+            - displ_condition_2D.csv
     Shape:
         Type: Ramp
         Values:
-            - 1.5
+            - 2.0
             - 2.0
             - 2.0
 Output:
@@ -49,5 +49,6 @@ Output:
             - Conditions
         Slice: 1
 Solver:
-    Step: 5000
-    Tolerance: 1.0e-4
+    Max_Iteration: 100
+    Tolerance: 1.0e-2
+    Jacobian_Perturbation: 1.0e-6

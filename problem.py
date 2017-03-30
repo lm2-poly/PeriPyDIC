@@ -31,7 +31,6 @@ class PD_problem():
         self.y = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         self.y[:,:,0] = deck.geometry.nodes[:,:]
 
-        self.strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
         self.forces = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
 
@@ -47,36 +46,32 @@ class PD_problem():
                     for i in con.id:
                         # x direction
                         if con.direction == 1:
-                            self.b[int(i), 0, t_n] = self.ramp_loading( deck, t_n , con )
+                            self.b[int(i), 0, t_n] = self.shape_loading( deck, t_n , con , i )
                         # y direction
                         if con.direction == 2:
-                            self.b[int(i),  1 , t_n] = self.ramp_loading( deck, t_n , con )
+                            self.b[int(i),  1 , t_n] = self.shape_loading( deck, t_n , con , i )
                         # z direction
                         if con.direction == 3:
-                            self.b[int(i), 2, t_n] = self.ramp_loading( deck, t_n , con )
+                            self.b[int(i), 2, t_n] = self.shape_loading( deck, t_n , con , i )
         #print self.b
 
     # Provide the loading shape to use to compute the loading vector b
-    def ramp_loading(self, deck, t_n, con):
+    def shape_loading(self, deck, t_n, con, i):
         Time_t = deck.delta_t*(t_n)
         if deck.shape_type == "Ramp":
-            if con.type == "Force":
-                if Time_t <= deck.shape_values[0]:
-                    result = (con.force_density*Time_t)/deck.shape_values[0]
-                    return result
-                elif Time_t > deck.shape_values[0] and Time_t <= deck.shape_values[1]:
-                    result = con.force_density
-                    return result
-                elif Time_t > deck.shape_values[1] and Time_t <= deck.shape_values[2]:
-                    result = con.force_density - con.force_density*(Time_t - deck.shape_values[1])/(deck.shape_values[2] - deck.shape_values[1])
-                    return result
-                else:
-                    result = 0
-                    return result
-            elif con.type == "Displacement":
-                logger.error("Ramp loading in displacement: coming soon. See compute_u_load(deck)")
+            force_density = con.value / deck.geometry.volumes[int(i)]
+            if Time_t <= deck.shape_values[0]:
+                result = (force_density*Time_t)/deck.shape_values[0]
+                return result
+            elif Time_t > deck.shape_values[0] and Time_t <= deck.shape_values[1]:
+                result = force_density
+                return result
+            elif Time_t > deck.shape_values[1] and Time_t <= deck.shape_values[2]:
+                result = force_density - force_density*(Time_t - deck.shape_values[1])/(deck.shape_values[2] - deck.shape_values[1])
+                return result
             else:
-                logger.error("Error in problem.py: Type of BC unknown, please use Force or Displacement.")
+                result = 0
+                return result
         else:
             logger.error("Error in problem.py: Shape of BC unknown, please use Ramp.")
 
@@ -108,8 +103,7 @@ class PD_problem():
             logger.error("Error in problem.py: Material type unknown, please use Elastic or Viscoelastic.")
         
         internal_force = self.mat_class.f_int
-        #internal_force = np.reshape(internal_force, (deck.num_nodes * deck.dim,-1) )
-        
+        #internal_force = np.reshape(internal_force, (deck.num_nodes * deck.dim,-1) ) 
         return internal_force
     
     # Computes the residual vector used in the quasi_static_solver function
@@ -136,8 +130,7 @@ class PD_problem():
                 if con.type == "Displacement":
                     if i in con.id:
                         found = True
-            if found == False:
-                
+            if found == False:  
                 residual[i,:] = internal_force[i,:] + self.b[i,:, t_n]               
         return residual
 
@@ -168,22 +161,10 @@ class PD_problem():
                     for s in range(0, deck.dim):
                         if r==s:
                             jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
-       
-        #print "det=", np.linalg.det(jacobian)
-        #print jacobian
         return jacobian
-       
-
                             
     def newton_step(self, ysolver, deck, t_n, perturbation_factor, residual):
-        
         jacobian = self.compute_jacobian(ysolver, deck, t_n, perturbation_factor)
-        
-        #print residual
-        #print "---"
-        #print np.reshape(residual,(deck.dim*deck.num_nodes,1),0)
-        #sys.exit(1)
-        
         residual = np.reshape(residual,(deck.dim*deck.num_nodes,1),0)
         
         removeId = []
@@ -192,48 +173,24 @@ class PD_problem():
                 for i in con.id:
                     removeId.append(int((i*deck.dim) + con.direction-1))
         removeId.sort()          
-       # print removeId 
-        #sys.exit(1)
-                    
-        #print len(jacobian) , len(residual)
+
         jacobian = np.delete(jacobian,removeId,0)
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
-                
-        #print residual
-        #sys.exit(1)
-        
-        #delta_y = sp.cg(jacobian, -residual)
         
         delta_y = linalg.solve(jacobian, -residual)
-        
-        #print delta_y 
        
         mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
         mask[removeId] = False
-        
-        #print mask
-        #sys.exit(1)
-        
         
         result = np.zeros((deck.num_nodes * deck.dim),dtype=np.float64)
         i = 0
         j = 0
         for m in mask:
             if m == True:
-                #print  delta_y[0]
                 result[int(i)] = delta_y[int(j)]
                 j+= 1
-            #else:
-            #    result[int(i)] = -residual[i]
             i += 1
-        
-        
-        #print result
-        #print "---"
-        #print np.reshape(result, (deck.num_nodes,deck.dim) , 0)
-        #sys.exit(1)
-        
         return np.reshape(result, (deck.num_nodes,deck.dim) , 0)
 
     # This function solves the problem at each time step, using the previous
@@ -241,28 +198,24 @@ class PD_problem():
     # This function calls the compute_residual function
     def quasi_static_solver(self, ysolver, deck):
         for t_n in range(1, deck.time_steps):
-            
             res = float('inf')
-            step = 0
+            iteration = 1
             residual = self.compute_residual(ysolver, deck, t_n)
             res = linalg.norm(residual)
-            #print "Residual: " , res
-            while res > deck.solver_tolerance and step < deck.solver_step :
+            while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :
                 residual = self.compute_residual(ysolver, deck, t_n)
                 res = linalg.norm(residual)
+                if iteration == deck.solver_max_it:
+                    print "Warning: Solver reached limit of " + str(deck.solver_max_it) + " iterations"
+                    #sys.exit(1)  
                 if res > deck.solver_tolerance:
-                    delta_y = self.newton_step(ysolver,deck, t_n, 1.0e-6, residual)
+                    delta_y = self.newton_step(ysolver,deck, t_n, deck.solver_perturbation, residual)
                     ysolver += delta_y
                     residual = self.compute_residual(ysolver, deck, t_n)
                     res = linalg.norm(residual)
-                    step += 1
-                    if step == deck.solver_step:
-                        print "Warning: Solver exceed limit of " + str(deck.solver_step) + " steps"
-                        sys.exit(1)
-                    
+                    iteration += 1  
             self.y[:,:,t_n] = ysolver
-                
-            print "t: " , t_n , "res: " , res
+            print "t_n:" , t_n , "res:" , res , "Iteration #",iteration-1
 
     # Records the force vector at each time step
     def update_force_data(self, mat_class, t_n):
@@ -276,17 +229,11 @@ class PD_problem():
     def update_ext_state_visco_data(self, mat_class, t_n):
         self.ext_visco[:, :, :, t_n] = mat_class.e_visco
 
-    # Initial guess
-    def random_initial_guess(self, z, deck):
-        y = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
-        for i in range(0,deck.num_nodes):
-            for j in range(0,deck.dim):
-                y[i,j] = z[i,j] + 1.e-4 * random.uniform(-1, 1) * deck.delta_X
-        return y
-
     def strain_calculation(self, id_Node_1, id_Node_2, deck):
+        strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
         for t_n in range(1, deck.time_steps):
-            actual = abs(self.y[id_Node_2][0][t_n] - self.y[id_Node_1][0][t_n])
+            actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
             initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
-            self.strain[t_n] = (actual - initial) / initial
+            strain[t_n] = (actual - initial) / initial
+        return strain
             

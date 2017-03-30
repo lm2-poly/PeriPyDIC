@@ -44,5 +44,5 @@ Output:
             - Conditions
         Slice: 1
 Solver:
-    Step: 100
+    Step: 1000
     Tolerance: 1.0e-9
