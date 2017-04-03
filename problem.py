@@ -5,7 +5,6 @@
 
 import logging
 import numpy as np
-import random
 import util.neighbor
 from scipy import linalg 
 np.set_printoptions(threshold='nan')
@@ -31,7 +30,7 @@ class PD_problem():
         self.y = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         self.y[:,:,0] = deck.geometry.nodes[:,:]
 
-        self.forces = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
+        self.force_int = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
 
     # Creates a loading vector b which describes the force or displacement applied on each node
@@ -219,7 +218,7 @@ class PD_problem():
 
     # Records the force vector at each time step
     def update_force_data(self, mat_class, t_n):
-        self.forces[:,:, t_n] = mat_class.f_int
+        self.force_int[:,:, t_n] = mat_class.f_int
 
     # Records the ext_state vector at each time step
     def update_ext_state_data(self, mat_class, t_n):

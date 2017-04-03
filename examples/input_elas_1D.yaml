@@ -36,7 +36,7 @@ Output:
         File:
             - nodes_positions_m4_dx0_50.csv
     VTK:
-        Path: ./out/
+        Path: ./out1/
         Type:
             - Displacement
             - Neighbors
@@ -44,5 +44,6 @@ Output:
             - Conditions
         Slice: 1
 Solver:
-    Step: 1000
-    Tolerance: 1.0e-9
+    Max_Iteration: 100
+    Tolerance: 1.0e-2
+    Jacobian_Perturbation: 1.0e-6
