@@ -58,15 +58,20 @@ class PD_problem():
     def shape_loading(self, deck, t_n, con, i):
         Time_t = deck.delta_t*(t_n)
         if deck.shape_type == "Ramp":
-            force_density = con.value / deck.geometry.volumes[int(i)]
+            
+            if con.type == "Force":
+                value = con.value / deck.geometry.volumes[int(i)]
+            if con.type == "Discplacement":
+                value = con.value 
+                
             if Time_t <= deck.shape_values[0]:
-                result = (force_density*Time_t)/deck.shape_values[0]
+                result = (value*Time_t)/deck.shape_values[0]
                 return result
             elif Time_t > deck.shape_values[0] and Time_t <= deck.shape_values[1]:
-                result = force_density
+                result = value
                 return result
             elif Time_t > deck.shape_values[1] and Time_t <= deck.shape_values[2]:
-                result = force_density - force_density*(Time_t - deck.shape_values[1])/(deck.shape_values[2] - deck.shape_values[1])
+                result = value - value*(Time_t - deck.shape_values[1])/(deck.shape_values[2] - deck.shape_values[1])
                 return result
             else:
                 result = 0
@@ -121,6 +126,19 @@ class PD_problem():
                     # z direction
                     if con.direction == 3:
                         y[int(id_node),2] = deck.geometry.nodes[int(id_node),2] + con.value
+                        
+            if con.type == "Displacement" and con.shape == "Ramp":
+                for i in con.id:
+                    # x direction
+                    if con.direction == 1:
+                        y[int(id_node),0] = self.shape_loading( deck, t_n , con , i )
+                    # y direction
+                    if con.direction == 2:
+                        y[int(id_node),1] = self.shape_loading( deck, t_n , con , i )
+                    # z direction
+                    if con.direction == 3:
+                        y[int(id_node),2] = self.shape_loading( deck, t_n , con , i )   
+                         
         for i in range(0,deck.num_nodes):
             found = False
             for con in deck.conditions:
