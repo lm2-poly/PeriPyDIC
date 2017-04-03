@@ -20,25 +20,53 @@ class CCM_calcul():
         self.y = problem.y
         self.force_int = problem.force_int
         self.ext = problem.ext
-        self.num_nodes = deck.num_nodes
-        self.dim = deck.dim 
-        self.time_steps = deck.time_steps
         
-        self.compute_u_displacement()
+        self.dim = deck.dim
+        self.num_nodes = deck.num_nodes
+        self.time_steps = deck.time_steps
+        self.node_volumes = deck.geometry.volumes        
+        self.influence_function = deck.influence_function
+        
+        #self.compute_u_displacement()
 
-    # Compute the displacement for each Node
+    # Compute the displacement for each node
     def compute_u_displacement(self):
         self.u = np.zeros((self.num_nodes, self.dim, self.time_steps),dtype=np.float64)
         for t_n in range(1, self.time_steps):
             for i in range(0, self.num_nodes):
                 self.u[i,:,t_n] = self.y[i,:,t_n] - self.y[i,:,t_n-1]
+            
+    # Return the image of (xi - xp) under the reference position vector state X 
+    def X_vector_state(self, problem, i, p):
+        image = self.x[p,:] - self.x[i,:]
+        image = np.reshape(image,(self.dim,1))
+        return image
 
-            
-    # Compute the the global internal force density vector
-    def X_vector_state(self, i, p):
+    # Return the image of (xi - xp) under the deformation vector state Y 
+    def Y_vector_state(self, problem, i, p, t_n):
+        image = self.y[p,:,t_n] - self.y[i,:,t_n]
+        image = np.reshape(image,(self.dim,1))
+        return image
+        
+    # Return the shape tensor K related to node i
+    def K_shape_tensor(self, problem, i):
+        K = np.zeros((self.dim, self.dim),dtype=np.float64)
         index_x_family = problem.neighbors.get_index_x_family(i)
-        if p in index_x_family:
-            X = self.x[p,:] - self.x[i,:]
-        else:
-            X = np.zeros((1, self.dim),dtype=np.float64)
+        for p in index_x_family:
+            X = self.X_vector_state(problem, i, p)
+            K += self.influence_function * np.dot(X,X.T) * self.node_volumes[p]
+        return K
+
+    # Return the deformation gradient tensor epsilon related to node i
+    def epsilon_tensor(self, problem, i, t_n):
+        tmp = np.zeros((self.dim, self.dim),dtype=np.float64)       
+        index_x_family = problem.neighbors.get_index_x_family(i)
+        for p in index_x_family:
+            Y = self.Y_vector_state(problem, i, p, t_n)            
+            X = self.X_vector_state(problem, i, p)
+            tmp += self.influence_function * np.dot(Y,X.T) * self.node_volumes[p]
+        epsilon = np.dot(tmp, linalg.inv(self.K_shape_tensor(problem, i))) - np.identity(self.dim, dtype=np.float64)
+        return epsilon[0,0]
             
+            
+        

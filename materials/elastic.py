@@ -61,7 +61,7 @@ class Elastic_material():
                     if deck.dim == 3:
                         self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
 
-    # Compute the the global internal force density vector
+    # Compute the global internal force density vector
     def compute_f_int(self, deck, problem, y):
         self.f_int = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
         for i in range(0, deck.num_nodes):

@@ -6,6 +6,7 @@ import sys
 import getopt
 import IO.deck
 import problem
+import IO.ccm
 import numpy as np
 np.set_printoptions(threshold='nan')
 import time
@@ -49,11 +50,10 @@ def main(argv):
 
 def simulation(deck):
     t0 = time.time()
+    y_0 = deck.geometry.nodes.copy()    
     pb_class = problem.PD_problem(deck)
-    y_0 = deck.geometry.nodes.copy()
     pb_class.quasi_static_solver(y_0, deck)
-    eps_longi = pb_class.strain_calculation( 3, 5, deck )
-    eps_trans = pb_class.strain_calculation( 12, 20, deck )
+    ccm_class = IO.ccm.CCM_calcul(deck, pb_class)
 
     writeCSV(deck,pb_class)
     if deck.vtk_writer.vtk_enabled == True:
@@ -61,8 +61,14 @@ def simulation(deck):
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon
+    
+    eps_longi = pb_class.strain_calculation( 16, 17, deck )
+    #eps_trans = pb_class.strain_calculation( 12, 20, deck )
     print "Strain Longi = " , np.around(eps_longi,decimals=6)
-    print "Strain Trans = " , np.around(eps_trans,decimals=6)
+    #print "Strain Trans = " , np.around(eps_trans,decimals=6)  
+    
+    eps_tensor = ccm_class.epsilon_tensor(pb_class, 16, 4)
+    print "epsilon_tensor", np.around(eps_tensor,decimals=12)
     #print "Nodes positions = "
     #print pb_class.y
     print "Duration:", time.time() - t0 , "seconds"
