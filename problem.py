@@ -121,7 +121,6 @@ class PD_problem():
                     # z direction
                     if con.direction == 3:
                         y[int(id_node),2] = deck.geometry.nodes[int(id_node),2] + con.value
-
         for i in range(0,deck.num_nodes):
             found = False
             for con in deck.conditions:
@@ -163,7 +162,7 @@ class PD_problem():
                             
     def newton_step(self, ysolver, deck, t_n, perturbation_factor, residual):
         jacobian = self.compute_jacobian(ysolver, deck, t_n, perturbation_factor)
-        residual = np.reshape(residual,(deck.dim*deck.num_nodes,1),0)
+        residual = np.reshape(residual,(deck.dim*deck.num_nodes,1))
         
         removeId = []
         for con in deck.conditions:
@@ -189,7 +188,7 @@ class PD_problem():
                 result[int(i)] = delta_y[int(j)]
                 j+= 1
             i += 1
-        return np.reshape(result, (deck.num_nodes,deck.dim) , 0)
+        return np.reshape(result, (deck.num_nodes,deck.dim))
 
     # This function solves the problem at each time step, using the previous
     # time step solution as an initial guess.
@@ -227,11 +226,11 @@ class PD_problem():
     def update_ext_state_visco_data(self, mat_class, t_n):
         self.ext_visco[:, :, :, t_n] = mat_class.e_visco
 
-    def strain_calculation(self, id_Node_1, id_Node_2, deck):
-        strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
-        for t_n in range(1, deck.time_steps):
-            actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
-            initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
-            strain[t_n] = (actual - initial) / initial
-        return strain
+#    def strain_calculation(self, id_Node_1, id_Node_2, deck):
+#        strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
+#        for t_n in range(1, deck.time_steps):
+#            actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
+#            initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
+#            strain[t_n] = (actual - initial) / initial
+#        return strain
             
