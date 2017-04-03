@@ -81,7 +81,7 @@ class PD_deck():
                                 ## List of all conditions specified in the configuration file
                                 self.conditions = []
                                 for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
-                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i]))
+                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i],self.doc["Boundary"]["Condition"]["Shape"][i]))
                             if not "Shape" in self.doc["Boundary"]:
                                 print "Error: No Shape tag found"
                                 sys.exit(1)

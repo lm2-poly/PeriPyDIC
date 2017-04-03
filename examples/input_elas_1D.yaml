@@ -23,6 +23,9 @@ Boundary:
         File: 
             - force_condition_1D.csv
             - displ_condition_1D.csv
+        Shape:
+            - Ramp
+            - Fixed
     Shape:
         Type: Ramp
         Values:
