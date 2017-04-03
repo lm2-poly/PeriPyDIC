@@ -110,7 +110,7 @@ class PD_problem():
         residual = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
         internal_force = self.compute_f(y, deck, t_n)
         for con in deck.conditions:
-            if con.type == "Displacement":
+            if con.type == "Displacement" and con.shape == "Fixed":
                 for id_node in con.id:
                     # x direction
                     if con.direction == 1:
