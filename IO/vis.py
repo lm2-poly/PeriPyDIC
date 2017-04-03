@@ -4,6 +4,7 @@
 #@author: patrick.diehl@polymtl.ca
 
 import pkgutil
+from ipapython.certmonger import resubmit_request
 vtk_loader = pkgutil.find_loader('vtk')
 found_vtk = vtk_loader is not None
 if found_vtk == True:
@@ -66,7 +67,7 @@ class vtk_writer():
                             array.SetNumberOfTuples(num_nodes)
 
                             for i in range(num_nodes):
-                                 array.SetTuple1(i,len(problem.neighbors.get_index_x_family(i)))
+                                array.SetTuple1(i,len(problem.neighbors.get_index_x_family(i)))
                             dataOut.AddArray(array)
 
                         if out_type == "Force":
@@ -96,8 +97,48 @@ class vtk_writer():
                                     if i not in con.id:
                                         array.SetTuple1(i,0)
                                     else:
-                                         array.SetTuple1(i,1)
+                                        array.SetTuple1(i,1)
                                 dataOut.AddArray(array)
+                                
+                        if out_type == "Volume_Force":
+                            
+                            force = problem.b
+                            for con in deck.conditions:
+                                if con.type == "Force":
+                                    result_x = 0.
+                                    result_y = 0.
+                                    result_z = 0.
+                                    for i in con.id:
+                                        result_x += force[i][0][t] * deck.geometry.volumes[i]
+                                        if deck.dim >= 2:
+                                            result_y += force[i][1][t] * deck.geometry.volumes[i]
+                                        if deck.dim >= 3:
+                                            result_z += force[i][2][t] * deck.geometry.volumes[i]
+
+                                    
+                                    array = vtk.vtkDoubleArray()
+                                    array.SetName("Volume_"+con.type+"_"+str(con.value)+"_"+str(con.direction))
+                                    array.SetNumberOfComponents(deck.dim)
+                                    array.SetNumberOfTuples(num_nodes)
+
+                                
+                                    for i in range(num_nodes):
+                                        if i in con.id:
+                                            if deck.dim ==1:
+                                                array.SetTuple1(i,result_x)
+                                            if deck.dim == 2:
+                                                array.SetTuple2(i,result_x,result_y)
+                                            if deck.dim == 3:
+                                                array.SetTuple3(i,result_x,result_y,result_z)
+                                        else:
+                                            if deck.dim ==1:
+                                                array.SetTuple1(i,0.)
+                                            if deck.dim == 2:
+                                                array.SetTuple2(i,0.,0.)
+                                            if deck.dim == 3:
+                                                array.SetTuple3(i,0.,0.,0.)
+                                    dataOut.AddArray(array)
+                                    
 
                 writer.SetInputData(grid)
 

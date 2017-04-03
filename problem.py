@@ -41,17 +41,18 @@ class PD_problem():
         for t_n in range(1, deck.time_steps):
             for con in deck.conditions:
                 if con.type == "Force":
-                    #Madenci approach
-                    for i in con.id:
-                        # x direction
-                        if con.direction == 1:
-                            self.b[int(i), 0, t_n] = self.shape_loading( deck, t_n , con , i )
-                        # y direction
-                        if con.direction == 2:
-                            self.b[int(i),  1 , t_n] = self.shape_loading( deck, t_n , con , i )
-                        # z direction
-                        if con.direction == 3:
-                            self.b[int(i), 2, t_n] = self.shape_loading( deck, t_n , con , i )
+                    if con.shape == "Ramp":
+                        #Madenci approach
+                        for i in con.id:
+                            # x direction
+                            if con.direction == 1:
+                                self.b[int(i), 0, t_n] = self.shape_loading( deck, t_n , con , i )
+                            # y direction
+                            if con.direction == 2:
+                                self.b[int(i),  1 , t_n] = self.shape_loading( deck, t_n , con , i )
+                            # z direction
+                            if con.direction == 3:
+                                self.b[int(i), 2, t_n] = self.shape_loading( deck, t_n , con , i )
         #print self.b
 
     # Provide the loading shape to use to compute the loading vector b
