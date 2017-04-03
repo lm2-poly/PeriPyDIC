@@ -8,7 +8,8 @@ import IO.deck
 import problem
 import IO.ccm
 import numpy as np
-np.set_printoptions(threshold='nan')
+np.set_printoptions(precision=15, threshold='nan')
+#np.set_printoptions(formatter={'float': lambda x: "%.2f" % x})
 import time
 import pdb
 
@@ -61,14 +62,9 @@ def simulation(deck):
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon
-    
-    eps_longi = pb_class.strain_calculation( 16, 17, deck )
-    #eps_trans = pb_class.strain_calculation( 12, 20, deck )
-    print "Strain Longi = " , np.around(eps_longi,decimals=6)
-    #print "Strain Trans = " , np.around(eps_trans,decimals=6)  
-    
-    eps_tensor = ccm_class.epsilon_tensor(pb_class, 16, 4)
-    print "epsilon_tensor", np.around(eps_tensor,decimals=12)
+        
+    strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
+    print "epsilon_tensor", strain_tensor
     #print "Nodes positions = "
     #print pb_class.y
     print "Duration:", time.time() - t0 , "seconds"
