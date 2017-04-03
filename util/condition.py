@@ -19,7 +19,8 @@ class ConditionFromFile():
     # @param value The value, which is applied
     # @param volume The volume of the nodes
     # @param direction The direction where the conditions is applied
-    def __init__(self,cType,inFile,value,volume,direction):
+    # @param shape The shape of the condition
+    def __init__(self,cType,inFile,value,volume,direction,shape):
         ## Ids of the node where this condition is applied
         self.id = self.readCondition(inFile,volume)
         ## Type of the condition (Force or Displacement)
@@ -28,6 +29,8 @@ class ConditionFromFile():
         self.value = float(value)
         ## Direction of the condition
         self.direction = direction
+        ## Shape of condition
+        self.shape = shape
 
     ##Reads the ids from the inFile where this condition should be applied.
     # @param inFile File name of the CSV file with the ids of the nodes
@@ -51,3 +54,5 @@ class ConditionFromFile():
                 ids[i] = int(row[0])
                 i += 1
             return ids
+
+    

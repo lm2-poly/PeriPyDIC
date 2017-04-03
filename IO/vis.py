@@ -4,7 +4,6 @@
 #@author: patrick.diehl@polymtl.ca
 
 import pkgutil
-from ipapython.certmonger import resubmit_request
 vtk_loader = pkgutil.find_loader('vtk')
 found_vtk = vtk_loader is not None
 if found_vtk == True:
