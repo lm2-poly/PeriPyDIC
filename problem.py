@@ -7,7 +7,6 @@ import logging
 import numpy as np
 import util.neighbor
 from scipy import linalg 
-np.set_printoptions(threshold='nan')
 import sys
 
 logger = logging.getLogger(__name__)
