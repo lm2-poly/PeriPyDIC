@@ -93,6 +93,8 @@ class Elastic_material():
                     # Scalar force state
                     e_s = self.dilatation[i] * linalg.norm(X) / 3.
                     e_d = self.e[i, p] - e_s
+                    # In 2D t has more term than in 1D and 3D and t is not decomposed into isotropic part and deviatoric parts
+                    # t_s and t_d make no sense in 2D and then t is not t_s + t_d
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
