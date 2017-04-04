@@ -25,7 +25,7 @@ class ConditionFromFile():
         self.id = self.readCondition(inFile,volume)
         ## Type of the condition (Force or Displacement)
         self.type = cType
-        ## Value in Newton or Meter
+        ## Value in Newton or Millimeter
         self.value = float(value)
         ## Direction of the condition
         self.direction = direction

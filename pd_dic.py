@@ -8,8 +8,8 @@ import IO.deck
 import problem
 import IO.ccm
 import numpy as np
-np.set_printoptions(precision=15, threshold='nan')
-#np.set_printoptions(formatter={'float': lambda x: "%.2f" % x})
+np.set_printoptions(precision=8, threshold='nan', suppress=True)
+#np.set_printoptions(formatter={'float': lambda x: "%.3f" % x}, threshold='nan')
 import time
 import pdb
 
@@ -65,6 +65,9 @@ def simulation(deck):
         
     strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
     print "epsilon_tensor", strain_tensor
+    
+    strain_longi = pb_class.strain_calculation( 3, 5, deck )
+    print "strain_longi", strain_longi
     #print "Nodes positions = "
     #print pb_class.y
     print "Duration:", time.time() - t0 , "seconds"

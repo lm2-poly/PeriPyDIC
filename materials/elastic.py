@@ -56,7 +56,10 @@ class Elastic_material():
                         self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
         
                     if deck.dim == 2:
+                        #Plane stress                        
                         self.dilatation[i] += (2. / self.Weighted_Volume[i]) * ((2. * self.Nu - 1.) / (self.Nu - 1.)) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        #Plane strain                        
+                        #self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
         
                     if deck.dim == 3:
                         self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
@@ -81,7 +84,11 @@ class Elastic_material():
 
                 if deck.dim == 2:
                     # PD material parameter
-                    alpha_s = (9. / self.Weighted_Volume[i]) * self.K
+                    # Plane stress
+                    alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
+                    # Plane strain
+                    #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
+                    
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
                     e_s = self.dilatation[i] * linalg.norm(X) / 3.
@@ -93,7 +100,7 @@ class Elastic_material():
                 if deck.dim == 3:
                     # PD material parameter
                     alpha_s = (9. / self.Weighted_Volume[i]) * self.K
-                    alpha_d = (15. / self.Weighted_Volume[i]) * self.K
+                    alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
                     e_s = self.dilatation[i] * linalg.norm(X) / 3.
                     e_d = self.e[i, p] - e_s

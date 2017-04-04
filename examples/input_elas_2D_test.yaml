@@ -2,7 +2,7 @@ Discretization:
     Dim: 2
     Final_Time: 1.0
     Time_Steps: 1
-    Horizon_Factor_m_value: 1.0
+    Horizon_Factor_m_value: 2.0
     Influence_Function: 1.0
     File: 
         Name: geometry_2D_test.csv
@@ -17,7 +17,7 @@ Boundary:
             - Displacement
             - Displacement
         Value: 
-            - 100.0
+            - 20.0
             - 0.0
             - 0.0
         Direction:
@@ -54,5 +54,5 @@ Output:
         Slice: 1
 Solver:
     Max_Iteration: 1000
-    Tolerance: 1.0e-3
+    Tolerance: 1.0e-2
     Jacobian_Perturbation: 1.0e-6

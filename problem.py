@@ -244,11 +244,11 @@ class PD_problem():
     def update_ext_state_visco_data(self, mat_class, t_n):
         self.ext_visco[:, :, :, t_n] = mat_class.e_visco
 
-#    def strain_calculation(self, id_Node_1, id_Node_2, deck):
-#        strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
-#        for t_n in range(1, deck.time_steps):
-#            actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
-#            initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
-#            strain[t_n] = (actual - initial) / initial
-#        return strain
+    def strain_calculation(self, id_Node_1, id_Node_2, deck):
+        strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
+        for t_n in range(1, deck.time_steps):
+            actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
+            initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
+            strain[t_n] = (actual - initial) / initial
+        return strain
             
