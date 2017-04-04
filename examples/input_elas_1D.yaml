@@ -46,6 +46,7 @@ Output:
             - Force
             - Conditions
             - Volume_Force
+            - Strain
         Slice: 1
 Solver:
     Max_Iteration: 100

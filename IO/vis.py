@@ -23,9 +23,9 @@ class vtk_writer():
             ## Slice for the timesteps
             self.slice_length = slice_length
 
-        def write_data(self,deck,problem):
+        def write_data(self,deck,problem,ccm_class):
             num_nodes = deck.num_nodes
-            for t in range(1,deck.time_steps,self.slice_length):
+            for t in range(0,deck.time_steps,self.slice_length):
                 writer = vtk.vtkXMLUnstructuredGridWriter()
                 writer.SetFileName(self.path+"output_"+str(t)+".vtu")
                 grid = vtk.vtkUnstructuredGrid()
@@ -54,9 +54,9 @@ class vtk_writer():
                           
                             for i in range(num_nodes):
                                 if deck.dim == 1:
-                                    array.SetTuple1(i,abs(act[i][0][t] - deck.geometry.nodes[i][0]))
+                                    array.SetTuple1(i,act[i][0][t] - deck.geometry.nodes[i][0])
                                 if deck.dim == 2:
-                                    array.SetTuple2(i,abs(act[i][0][t] - deck.geometry.nodes[i][0]),abs(act[i][1][t] - deck.geometry.nodes[i][1]))
+                                    array.SetTuple2(i,act[i][0][t] - deck.geometry.nodes[i][0],act[i][1][t] - deck.geometry.nodes[i][1])
                             dataOut.AddArray(array)
 
                         if out_type == "Neighbors":
@@ -138,7 +138,37 @@ class vtk_writer():
                                                 array.SetTuple3(i,0.,0.,0.)
                                     dataOut.AddArray(array)
                                     
+                        if out_type == "Strain":
+                            array = vtk.vtkDoubleArray()
+                            array.SetName("Strain")
+                            if deck.dim == 1:
+                                array.SetNumberOfComponents(1)
+                            if deck.dim == 2:
+                                array.SetNumberOfComponents(3)
+                            if deck.dim == 3:
+                                array.SetNumberOfComponents(6)    
+                            array.SetNumberOfTuples(num_nodes)
 
+                            for i in range(num_nodes):
+                                strain = ccm_class.global_strain
+                                if deck.dim ==1:
+                                    array.SetTuple1(i,strain[i,0,t])
+                                if deck.dim == 2:
+                                    xx = strain[i*deck.dim,0,t]
+                                    xy = strain[i*deck.dim,1,t]
+                                    yy = strain[i*deck.dim+1,1,t]
+                                    array.SetTuple3(i,xx,yy,xy)
+                                if deck.dim == 3:
+                                    xx = strain[i*deck.dim,0,t]
+                                    xy = strain[i*deck.dim,1,t]
+                                    yy = strain[i*deck.dim+1,1,t]
+                                    yz = strain[i*deck.dim+1,1,t]
+                                    xz = strain[i*deck.dim,2,t]
+                                    zz = strain[i*deck.dim+2,2,t]
+                                    array.SetTuple6(i,xx,yy,zz,xy,xz,yz)    
+                            
+                            dataOut.AddArray(array)
+                                 
                 writer.SetInputData(grid)
 
                 writer.GetCompressor().SetCompressionLevel(0)

@@ -58,7 +58,7 @@ def simulation(deck):
 
     writeCSV(deck,pb_class)
     if deck.vtk_writer.vtk_enabled == True:
-       deck.vtk_writer.write_data(deck,pb_class)
+       deck.vtk_writer.write_data(deck,pb_class,ccm_class)
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon
@@ -77,8 +77,6 @@ def writeCSV(deck,problem):
         if out.outType == "CSV":
             out.write(deck,problem)
 
-def write_vtk(deck,problem):
-    print ""
 
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":
