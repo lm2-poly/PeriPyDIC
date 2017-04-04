@@ -51,6 +51,7 @@ Output:
             - Neighbors
             - Force
             - Conditions
+            - Strain
         Slice: 1
 Solver:
     Max_Iteration: 1000
