@@ -52,7 +52,7 @@ class PD_problem():
                             # z direction
                             if con.direction == 3:
                                 self.b[int(i), 2, t_n] = self.shape_loading( deck, t_n , con , i )
-        #print self.b
+        self.b
 
     # Provide the loading shape to use to compute the loading vector b
     def shape_loading(self, deck, t_n, con, i):
@@ -217,18 +217,18 @@ class PD_problem():
             iteration = 1
             residual = self.compute_residual(ysolver, deck, t_n)
             res = linalg.norm(residual)
-            while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :
-                residual = self.compute_residual(ysolver, deck, t_n)
-                res = linalg.norm(residual)
+            while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :             
+                #residual = self.compute_residual(ysolver, deck, t_n)
+                #res = linalg.norm(residual)
+                print "iteration", iteration                
                 if iteration == deck.solver_max_it:
                     print "Warning: Solver reached limit of " + str(deck.solver_max_it) + " iterations"
                     #sys.exit(1)  
-                if res > deck.solver_tolerance:
-                    delta_y = self.newton_step(ysolver,deck, t_n, deck.solver_perturbation, residual)
-                    ysolver += delta_y
-                    residual = self.compute_residual(ysolver, deck, t_n)
-                    res = linalg.norm(residual)
-                    iteration += 1  
+                delta_y = self.newton_step(ysolver,deck, t_n, deck.solver_perturbation, residual)
+                ysolver += delta_y
+                residual = self.compute_residual(ysolver, deck, t_n)
+                res = linalg.norm(residual)
+                iteration += 1  
             self.y[:,:,t_n] = ysolver
             print "t_n:" , t_n , "res:" , res , "Iteration #",iteration-1
 
