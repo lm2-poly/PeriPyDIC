@@ -1,7 +1,7 @@
 Discretization:
     Dim: 2
-    Final_Time: 2.0
-    Time_Steps: 8
+    Final_Time: 1.0
+    Time_Steps: 1
     Horizon_Factor_m_value: 1.5
     Influence_Function: 1.0
     File: 
@@ -35,15 +35,15 @@ Boundary:
     Shape:
         Type: Ramp
         Values:
-            - 2.0
-            - 2.0
-            - 2.0
+            - 1.0
+            - 1.0
+            - 1.0
 Output:
     CSV:
         Type:
             - Position
         File:
-            - nodes_positions_m_15_dx_25.csv
+            - nodes_positions_m_1_5_dx_0_25.csv
     VTK:
         Path: ./out2/
         Type:

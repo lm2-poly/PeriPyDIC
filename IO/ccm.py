@@ -59,7 +59,7 @@ class CCM_calcul():
         return K
 
     # Return the deformation gradient tensor epsilon related to node i
-    def deformation_tensor(self, problem, i, t_n):
+    def deformation_gradient(self, problem, i, t_n):
         tmp = np.zeros((self.dim, self.dim),dtype=np.float64)       
         index_x_family = problem.neighbors.get_index_x_family(i)
         for p in index_x_family:
@@ -72,8 +72,8 @@ class CCM_calcul():
 
     # Return the strain tensor related to node i
     def strain_tensor(self, problem, i, t_n):
-        F = self.deformation_tensor(problem, i, t_n)
-        strain = F - np.identity(self.dim, dtype=np.float64)
+        F = self.deformation_gradient(problem, i, t_n)
+        strain = (F + F.T)/2 - np.identity(self.dim, dtype=np.float64)
         return strain
 
     # Return the strain tensor for each node
