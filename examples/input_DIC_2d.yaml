@@ -1,0 +1,11 @@
+Material:
+    Type: Elastic
+    E_Modulus: 4000.0
+Data:
+    Dimension: 2
+    File: 
+        Name: DIC-Spec057-0025_0_short.csv
+        Path: ./
+Discretization:
+    Horizon_Factor_m_value: 1.0
+    Influence_Function: 1.0

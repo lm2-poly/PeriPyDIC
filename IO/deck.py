@@ -9,6 +9,7 @@ import sys
 import util.condition
 import IO.output
 import vis
+import dic
 
 ## Class handeling the input of the yaml file and storing the values
 class PD_deck():
@@ -189,3 +190,98 @@ class PD_deck():
                                 ## Perturbation factor for the Jacobian matrix
                                 self.solver_perturbation = float(self.doc["Solver"]["Jacobian_Perturbation"])
                             
+class DIC_deck():
+    
+    ## Constructor
+    # Reads the configuration in the yaml file and stores the values
+    # @param inputFile The path to the yaml file with the configuration
+    def __init__(self,inputFile):
+            if not os.path.exists(inputFile):
+                print "Error: Could not find " + inputFile
+                sys.exit(1)
+            else:
+                with open(inputFile,'r') as f:
+                    ## Container of the tags parsed from the yaml file
+                    self.doc = yaml.load(f)
+                    if not "Material" in self.doc:
+                        print "Error: Specify a Material tag in your yaml"
+                        sys.exit(1)
+                    else:
+                        if not "Type" in self.doc["Material"]:
+                            print "Error: No type tag found"
+                            sys.exit(1)
+                        else:
+                            ## Type of the material 
+                            self.material_type = self.doc["Material"]["Type"]
+                            if self.material_type == "Elastic":
+                                if not "E_Modulus" in self.doc["Material"]:
+                                    print "Error: No E_Modulus tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Young's modulus of the material
+                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                            elif self.material_type == "Viscoelastic":
+                                if not "Relax_Modulus" in self.doc["Material"]:
+                                    print "Error: No Relax_Modulus tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Relaxation modulus of the material
+                                    self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                if not "Relax_Time" in self.doc["Material"]:
+                                    print "Error: No Relax_Time tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Relaxation times
+                                    self.relax_time = self.doc["Material"]["Relax_Time"]
+                            else:
+                                print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
+                                sys.exit(1)
+                        if not "Data" in self.doc:
+                            print "Error: Specify a Data tag in your yaml"
+                            sys.exit(1)
+                        else:
+                            if not "Dimension" in self.doc["Data"]:
+                                print "Error: No Dimension tag found"
+                                sys.exit(1)
+                            else:
+                                ## Dimesion of the input data
+                                self.dim = self.doc["Data"]["Dimension"]
+                                
+                            if not "File" in self.doc["Data"]:
+                                print "Error: Specify a File tag in your yaml"
+                                sys.exit(1)
+                            else:
+                                if not "Name" in self.doc["Data"]["File"]:
+                                    print "Error: No Name tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Filename of the input file
+                                    self.filename = self.doc["Data"]["File"]["Name"]      
+                                    
+                                if not "Path" in self.doc["Data"]["File"]:
+                                    print "Error: No Path tag found"
+                                    sys.exit(1)
+                                else:
+                                    self.filepath = self.doc["Data"]["File"]["Path"]   
+                                    
+                                    self.geometry = dic.DICreader2D(self.filepath + self.filename)
+                                    self.num_nodes = len(self.geometry.nodes)
+                                    self.delta_x = self.geometry.delta_x
+                                    
+                                                              
+                                
+                        if not "Discretization" in self.doc:
+                            print "Error: Specify a Discretization tag in your yaml"
+                            sys.exit(1)
+                        else:
+                            if not "Horizon_Factor_m_value" in self.doc["Discretization"]:
+                                print "Error: No Horizon_Factor_m_value tag found"
+                                sys.exit(1)
+                            else:
+                                self.horizon_factor_m_value = self.doc["Discretization"]["Horizon_Factor_m_value"]
+                                
+                            if not "Influence_Function" in self.doc["Discretization"]:
+                                print "Error: No Influence_Function tag found"
+                                sys.exit(1)
+                            else:
+                                self.influence_function = self.doc["Discretization"]["Influence_Function"]

@@ -11,7 +11,7 @@ import numpy as np
 np.set_printoptions(precision=8, threshold='nan', suppress=True)
 #np.set_printoptions(formatter={'float': lambda x: "%.3f" % x}, threshold='nan')
 import time
-import pdb
+#import problem.dic as problem_dic
 
 def main(argv):
     """
@@ -48,6 +48,14 @@ def main(argv):
             simulation(deck)
         else:
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
+    
+    if typeIn == types[1]:
+        deck = IO.deck.DIC_deck(inputFile)
+        dic(deck) 
+        
+def dic(deck):
+    problem = problem_dic.DIC_problem(deck)
+    print problem.y
 
 def simulation(deck):
     t0 = time.time()

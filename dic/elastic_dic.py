@@ -12,7 +12,7 @@ Created on Sun Dec 13 16:16:07 2015
 @author: rolland.delorme@gmail.com
 @author: diehl@ins.uni-bonn.de
 """
-import IO.PD_deck
+
 from problem import PD_problem
 import numpy as np
 
