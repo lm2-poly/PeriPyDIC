@@ -13,7 +13,7 @@ class vtk_writer():
 
     if found_vtk == True:
 
-        def __init__(self,path,types,slice_length):
+        def __init__(self,path="",types="",slice_length=-1):
             ## IS vtk enabled
             self.vtk_enabled = True
             ## Path for the output
@@ -177,5 +177,5 @@ class vtk_writer():
 
     else:
 
-        def __init__(self,path,types,slice_length):
+        def __init__(self,path="",types="",slice_length=-1):
             self.vtk_enabled = False

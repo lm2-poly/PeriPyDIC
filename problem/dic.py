@@ -4,21 +4,54 @@
 #@author: patrick.diehl@polymtl.ca
 
 import util.neighbor
-from DIC import elastic
+from materials.elastic import Elastic_material
 import numpy as np
 
 class DIC_problem():
     
     def __init__(self, deck):
-        ## Amount of nodes
-        #self.len_x = deck.dim *  deck.num_nodes
-        ## Neighbors for each DIC pixel are stored here
-        #self.neighbors = util.neighbor.NeighborSearch(deck)
+        # NeighborSearch
+        self.neighbors = util.neighbor.NeighborSearch(deck)
         
-        ## Actual positions
-        #self.y = np.zeros( ( self.len_x, 2) )
         
-        ## Force 
-        #self.force_int = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
+        # Compute the weighted volume for each node in a vector.
+        self.weighted_function(deck)
         
-        #self.material = elastic.elastic_material_dic(deck,self)
+        # Actual position from DIC result
+        self.y = np.zeros((deck.num_nodes, deck.dim,1),dtype=np.float64)
+        
+        # Internal forces 
+        self.force_int = np.zeros((deck.num_nodes, deck.dim,1),dtype=np.float64)
+        # Extension state
+        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes,1),dtype=np.float64 )
+        
+        
+        if deck.material_type == "Elastic":
+            
+            mat_class = Elastic_material( deck, self, deck.geometry.act )
+            self.update_force_data(mat_class)
+            self.update_ext_state_data(mat_class)
+    
+        self.update_pos(deck.geometry.act)
+    
+    # Computes the weights for each PD node
+    def weighted_function(self, deck):
+        self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
+        for i in range(0, deck.num_nodes):
+            index_x_family = self.neighbors.get_index_x_family(i)
+            for p in index_x_family:
+                X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
+                self.weighted_volume[i] += deck.influence_function * (np.linalg.norm(X))**2 * deck.geometry.volumes[p] 
+    
+    
+    # Records the force vector at each time step
+    def update_force_data(self, mat_class):
+        self.force_int[:,:, 0] = mat_class.f_int
+    
+    
+    # Records the ext_state vector at each time step
+    def update_ext_state_data(self, mat_class):
+        self.ext[:, :, 0] = mat_class.e
+
+    def update_pos(self,act):
+        self.y[:,:, 0] = act

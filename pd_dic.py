@@ -54,8 +54,11 @@ def main(argv):
         dic(deck) 
         
 def dic(deck):
-    problem = problem_dic.DIC_problem(deck)
+    pb_class = problem_dic.DIC_problem(deck)
+    ccm_class = IO.ccm.CCM_calcul(deck, pb_class)
     
+    if deck.vtk_writer.vtk_enabled == True:
+        deck.vtk_writer.write_data(deck,pb_class,ccm_class)
 
 def simulation(deck):
     t0 = time.time()
@@ -66,7 +69,7 @@ def simulation(deck):
 
     writeCSV(deck,pb_class)
     if deck.vtk_writer.vtk_enabled == True:
-       deck.vtk_writer.write_data(deck,pb_class,ccm_class)
+        deck.vtk_writer.write_data(deck,pb_class,ccm_class)
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_class.neighbors.horizon

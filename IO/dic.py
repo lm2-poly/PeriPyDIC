@@ -45,26 +45,32 @@ class DICreader2D():
     def determineUnitHorizon(self):
         # Find unique values for x:
         sorted_x_set = sorted(set(self.x))
-        sorted_y_set = sorted(set(self.y))
+        #sorted_y_set = sorted(set(self.y))
         
         self.delta_x = abs(sorted_x_set[1] - sorted_x_set[0])
         
     def extractData(self):
         self.x = np.zeros((self.length))
-        self.dx = np.zeros((self.length))
+        dx = np.zeros((self.length))
         self.y = np.zeros((self.length))
-        self.dy = np.zeros((self.length))
+        dy = np.zeros((self.length))
+        self.volumes = np.zeros((self.length))
         
         for i in range(0, len(self.data)):
             self.x[i] = self.data[i][0]
             self.y[i] = self.data[i][1]
             
-            self.dx[i] = self.data[i][3]
-            self.dy[i] = self.data[i][4]
+            dx[i] = self.data[i][3]
+            dy[i] = self.data[i][4]
+            
+            self.volumes[i] = 0.1
             
         del self.data
         
         self.nodes = np.empty((self.length, self.dim))
         self.nodes[:,0] = self.x
         self.nodes[:,1] = self.y
+        self.act = np.empty((self.length, self.dim))
+        self.act[:,0] = self.x + dx
+        self.act[:,1] = self.y + dy
         

@@ -4,7 +4,6 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 from scipy import linalg
-import sys
 np.set_printoptions(precision=8, threshold='nan')
 #np.set_printoptions(formatter={'float': lambda x: "%.3f" % x}, threshold='nan')
 

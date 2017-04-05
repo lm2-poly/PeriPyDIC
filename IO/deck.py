@@ -139,7 +139,7 @@ class PD_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
-
+                       
                         if "Output" in self.doc:
                             if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
@@ -167,6 +167,11 @@ class PD_deck():
                                     self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
                                     if self.vtk_writer.vtk_enabled == False:
                                         print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
+                            else:
+                                self.vtk_writer = IO.vis.vtk_writer()
+                        else:
+                            self.vtk_writer = IO.vis.vtk_writer()
+                             
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)
@@ -214,12 +219,14 @@ class DIC_deck():
                             ## Type of the material 
                             self.material_type = self.doc["Material"]["Type"]
                             if self.material_type == "Elastic":
-                                if not "E_Modulus" in self.doc["Material"]:
-                                    print "Error: No E_Modulus tag found"
-                                    sys.exit(1)
-                                else:
-                                    ## Young's modulus of the material
+                                ## Young's modulus of the material
+                                if "E_Modulus" in self.doc["Material"]:
                                     self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                                if "Bulk_Modulus" in self.doc["Material"]:
+                                    self.bulk_modulus = float(self.doc["Material"]["Bulk_Modulus"])
+                                if "Shear_Modulus" in self.doc["Material"]:
+                                    self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"])    
+                                    
                             elif self.material_type == "Viscoelastic":
                                 if not "Relax_Modulus" in self.doc["Material"]:
                                     print "Error: No Relax_Modulus tag found"
@@ -267,9 +274,7 @@ class DIC_deck():
                                     self.geometry = dic.DICreader2D(self.filepath + self.filename)
                                     self.num_nodes = len(self.geometry.nodes)
                                     self.delta_X = self.geometry.delta_x
-                                    
-                                                              
-                                
+                                       
                         if not "Discretization" in self.doc:
                             print "Error: Specify a Discretization tag in your yaml"
                             sys.exit(1)
@@ -285,3 +290,22 @@ class DIC_deck():
                                 sys.exit(1)
                             else:
                                 self.influence_function = self.doc["Discretization"]["Influence_Function"]
+                                
+                        self.time_steps = 1
+                        
+                        #self.vtk_writer = IO.vis.vtk_writer()
+                        
+                        if "Output" in self.doc:
+                            if "VTK" in self.doc["Output"]:
+                                if not "Path" in self.doc["Output"]["VTK"]:
+                                    print "Error: No Path tag found in VTK"
+                                    sys.exit(1)
+                                elif not "Type" in self.doc["Output"]["VTK"]:
+                                    print "Error: No Type tag found in VTK"
+                                    sys.exit(1)
+                                else:
+                                    self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],1)
+                                    if self.vtk_writer.vtk_enabled == False:
+                                        print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
+                            
+                                

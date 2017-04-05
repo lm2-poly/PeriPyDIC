@@ -4,7 +4,6 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 from scipy import linalg
-import sys
 np.set_printoptions(threshold='nan')
 
 ## Class to compute, as a vector state, the global internal volumic force of an elastic material using its material properties
@@ -56,7 +55,7 @@ class Elastic_material():
                         self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
         
                     if deck.dim == 2:
-                        #Plane stress                        
+                        #Plane stress                   
                         self.dilatation[i] += (2. / self.Weighted_Volume[i]) * ((2. * self.Nu - 1.) / (self.Nu - 1.)) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
                         #Plane strain                        
                         #self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
