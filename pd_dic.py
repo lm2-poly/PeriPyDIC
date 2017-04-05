@@ -5,7 +5,7 @@
 import sys
 import getopt
 import IO.deck
-import problem
+import problem.pd
 import IO.ccm
 import numpy as np
 np.set_printoptions(precision=8, threshold='nan', suppress=True)
@@ -60,7 +60,7 @@ def dic(deck):
 def simulation(deck):
     t0 = time.time()
     y_0 = deck.geometry.nodes.copy()    
-    pb_class = problem.PD_problem(deck)
+    pb_class = problem.pd.PD_problem(deck)
     pb_class.quasi_static_solver(y_0, deck)
     ccm_class = IO.ccm.CCM_calcul(deck, pb_class)
 

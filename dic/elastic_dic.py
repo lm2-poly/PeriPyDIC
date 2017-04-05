@@ -13,7 +13,7 @@ Created on Sun Dec 13 16:16:07 2015
 @author: diehl@ins.uni-bonn.de
 """
 
-from problem import PD_problem
+from problem.pd import PD_problem
 import numpy as np
 
 class elastic_material_dic():

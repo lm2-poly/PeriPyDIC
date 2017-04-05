@@ -7,7 +7,6 @@ import logging
 import numpy as np
 import util.neighbor
 from scipy import linalg 
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +51,7 @@ class PD_problem():
                             # z direction
                             if con.direction == 3:
                                 self.b[int(i), 2, t_n] = self.shape_loading( deck, t_n , con , i )
-        self.b
+        #self.b
 
     # Provide the loading shape to use to compute the loading vector b
     def shape_loading(self, deck, t_n, con, i):
