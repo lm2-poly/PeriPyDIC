@@ -266,7 +266,7 @@ class DIC_deck():
                                     
                                     self.geometry = dic.DICreader2D(self.filepath + self.filename)
                                     self.num_nodes = len(self.geometry.nodes)
-                                    self.delta_x = self.geometry.delta_x
+                                    self.delta_X = self.geometry.delta_x
                                     
                                                               
                                 

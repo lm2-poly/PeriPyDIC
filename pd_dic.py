@@ -55,7 +55,7 @@ def main(argv):
         
 def dic(deck):
     problem = problem_dic.DIC_problem(deck)
-    print problem.y
+    
 
 def simulation(deck):
     t0 = time.time()
