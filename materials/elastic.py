@@ -30,6 +30,10 @@ class Elastic_material():
             self.Mu = deck.shear_modulus
             ## Poisson ratio of the material
             self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
+            # Plane stress                   
+            self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
+            # Plane strain
+            #self.factor2d = 1
 
         if deck.dim == 3:
             ## Bulk modulus of the material
@@ -55,10 +59,7 @@ class Elastic_material():
                         self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
         
                     if deck.dim == 2:
-                        #Plane stress                   
-                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * ((2. * self.Nu - 1.) / (self.Nu - 1.)) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
-                        #Plane strain                        
-                        #self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
         
                     if deck.dim == 3:
                         self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
@@ -92,9 +93,8 @@ class Elastic_material():
                     # Scalar force state
                     e_s = self.dilatation[i] * linalg.norm(X) / 3.
                     e_d = self.e[i, p] - e_s
-                    # In 2D t has more term than in 1D and 3D and t is not decomposed into isotropic part and deviatoric parts
-                    # t_s and t_d make no sense in 2D and then t is not t_s + t_d
-                    t_s = alpha_s * self.w * e_s
+                    
+                    t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * self.w * e_s / 3.
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
 

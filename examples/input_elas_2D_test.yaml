@@ -55,5 +55,5 @@ Output:
         Slice: 1
 Solver:
     Max_Iteration: 1000
-    Tolerance: 1.0e-2
+    Tolerance: 1.0e-4
     Jacobian_Perturbation: 1.0e-6
