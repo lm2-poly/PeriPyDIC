@@ -110,11 +110,12 @@ class vtk_writer():
                                 result_y = 0.
                                 result_z = 0.
                                 for i in con.id:
-                                    result_x += force[i][0][t] * deck.geometry.volumes[i]
+                                    index = int(i)
+                                    result_x += force[index][0][t] * deck.geometry.volumes[index]
                                     if deck.dim >= 2:
-                                        result_y += force[i][1][t] * deck.geometry.volumes[i]
+                                        result_y += force[index][1][t] * deck.geometry.volumes[index]
                                     if deck.dim >= 3:
-                                        result_z += force[i][2][t] * deck.geometry.volumes[i]
+                                        result_z += force[index][2][t] * deck.geometry.volumes[index]
 
                                     
                                 array = vtk.vtkDoubleArray()
