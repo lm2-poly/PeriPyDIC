@@ -5,7 +5,7 @@ Material:
 Data:
     Dimension: 2
     File: 
-        Name: new.csv
+        Name: DIC-Spec057-0025_0_short.csv
         Path: ./
 Discretization:
     Horizon_Factor_m_value: 1.0
