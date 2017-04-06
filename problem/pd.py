@@ -51,7 +51,7 @@ class PD_problem():
                             # z direction
                             if con.direction == 3:
                                 self.b[int(i), 2, t_n] = self.shape_loading( deck, t_n , con , i )
-        #self.b
+        #print self.b
 
     # Provide the loading shape to use to compute the loading vector b
     def shape_loading(self, deck, t_n, con, i):
