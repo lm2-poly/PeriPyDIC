@@ -41,133 +41,135 @@ class vtk_writer():
                     if deck.dim == 3:
                         points.InsertPoint(i,act[i][0][t],act[i][1][t],act[i][2][t])
                     grid.SetPoints(points)
-                    dataOut = grid.GetPointData()
-                    for out_type in self.types:
+                
+                dataOut = grid.GetPointData()
+                
+                for out_type in self.types:
 
-                        if out_type == "Displacement":
-                            array = vtk.vtkDoubleArray()
-                            array.SetName("Displacement")
-                            array.SetNumberOfComponents(deck.dim)
-                            array.SetNumberOfTuples(num_nodes)
+                    if out_type == "Displacement":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Displacement")
+                        array.SetNumberOfComponents(deck.dim)
+                        array.SetNumberOfTuples(num_nodes)
         
-                            act = problem.y
+                        act = problem.y
                           
-                            for i in range(num_nodes):
-                                if deck.dim == 1:
-                                    array.SetTuple1(i,act[i][0][t] - deck.geometry.nodes[i][0])
-                                if deck.dim == 2:
-                                    array.SetTuple2(i,act[i][0][t] - deck.geometry.nodes[i][0],act[i][1][t] - deck.geometry.nodes[i][1])
+                        for i in range(num_nodes):
+                            if deck.dim == 1:
+                                array.SetTuple1(i,act[i][0][t] - deck.geometry.nodes[i][0])
+                            if deck.dim == 2:
+                                array.SetTuple2(i,act[i][0][t] - deck.geometry.nodes[i][0],act[i][1][t] - deck.geometry.nodes[i][1])
                             dataOut.AddArray(array)
 
-                        if out_type == "Neighbors":
+                    if out_type == "Neighbors":
+                        array = vtk.vtkIntArray()
+                        array.SetName("Neighbors")
+                        array.SetNumberOfComponents(1)
+                        array.SetNumberOfTuples(num_nodes)
+
+                        for i in range(num_nodes):
+                            array.SetTuple1(i,len(problem.neighbors.get_index_x_family(i)))
+                        dataOut.AddArray(array)
+
+                    if out_type == "Force":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Volume_Force")
+                        array.SetNumberOfComponents(deck.dim)
+                        array.SetNumberOfTuples(num_nodes)
+
+                        force = problem.b
+                            
+                        for i in range(num_nodes):
+                            if deck.dim == 1:
+                                array.SetTuple1(i,force[i][0][t])
+                            if deck.dim == 2:
+                                array.SetTuple2(i,force[i][0][t], force[i][1][t])
+                            dataOut.AddArray(array)
+
+                    if out_type == "Conditions":
+
+                        for con in deck.conditions:
                             array = vtk.vtkIntArray()
-                            array.SetName("Neighbors")
+                            array.SetName("Condition_"+con.type+"_"+str(con.value)+"_"+str(con.direction))
                             array.SetNumberOfComponents(1)
                             array.SetNumberOfTuples(num_nodes)
 
                             for i in range(num_nodes):
-                                array.SetTuple1(i,len(problem.neighbors.get_index_x_family(i)))
-                            dataOut.AddArray(array)
-
-                        if out_type == "Force":
-                            array = vtk.vtkDoubleArray()
-                            array.SetName("Volume_Force")
-                            array.SetNumberOfComponents(deck.dim)
-                            array.SetNumberOfTuples(num_nodes)
-
-                            force = problem.b
+                                if i not in con.id:
+                                    array.SetTuple1(i,0)
+                                else:
+                                    array.SetTuple1(i,1)
+                        dataOut.AddArray(array)
+                                
+                    if out_type == "Volume_Force":
                             
-                            for i in range(num_nodes):
-                                if deck.dim == 1:
-                                    array.SetTuple1(i,force[i][0][t])
-                                if deck.dim == 2:
-                                    array.SetTuple2(i,force[i][0][t], force[i][1][t])
-                            dataOut.AddArray(array)
+                        force = problem.b
+                        for con in deck.conditions:
+                            if con.type == "Force":
+                                result_x = 0.
+                                result_y = 0.
+                                result_z = 0.
+                                for i in con.id:
+                                    result_x += force[i][0][t] * deck.geometry.volumes[i]
+                                    if deck.dim >= 2:
+                                        result_y += force[i][1][t] * deck.geometry.volumes[i]
+                                    if deck.dim >= 3:
+                                        result_z += force[i][2][t] * deck.geometry.volumes[i]
 
-                        if out_type == "Conditions":
-
-                            for con in deck.conditions:
-                                array = vtk.vtkIntArray()
-                                array.SetName("Condition_"+con.type+"_"+str(con.value)+"_"+str(con.direction))
-                                array.SetNumberOfComponents(1)
+                                    
+                                array = vtk.vtkDoubleArray()
+                                array.SetName("Volume_"+con.type+"_"+str(con.value)+"_"+str(con.direction))
+                                array.SetNumberOfComponents(deck.dim)
                                 array.SetNumberOfTuples(num_nodes)
 
+                                
                                 for i in range(num_nodes):
-                                    if i not in con.id:
-                                        array.SetTuple1(i,0)
+                                    if i in con.id:
+                                        if deck.dim ==1:
+                                            array.SetTuple1(i,result_x)
+                                        if deck.dim == 2:
+                                            array.SetTuple2(i,result_x,result_y)
+                                        if deck.dim == 3:
+                                            array.SetTuple3(i,result_x,result_y,result_z)
                                     else:
-                                        array.SetTuple1(i,1)
-                                dataOut.AddArray(array)
-                                
-                        if out_type == "Volume_Force":
-                            
-                            force = problem.b
-                            for con in deck.conditions:
-                                if con.type == "Force":
-                                    result_x = 0.
-                                    result_y = 0.
-                                    result_z = 0.
-                                    for i in con.id:
-                                        result_x += force[i][0][t] * deck.geometry.volumes[i]
-                                        if deck.dim >= 2:
-                                            result_y += force[i][1][t] * deck.geometry.volumes[i]
-                                        if deck.dim >= 3:
-                                            result_z += force[i][2][t] * deck.geometry.volumes[i]
-
-                                    
-                                    array = vtk.vtkDoubleArray()
-                                    array.SetName("Volume_"+con.type+"_"+str(con.value)+"_"+str(con.direction))
-                                    array.SetNumberOfComponents(deck.dim)
-                                    array.SetNumberOfTuples(num_nodes)
-
-                                
-                                    for i in range(num_nodes):
-                                        if i in con.id:
-                                            if deck.dim ==1:
-                                                array.SetTuple1(i,result_x)
-                                            if deck.dim == 2:
-                                                array.SetTuple2(i,result_x,result_y)
-                                            if deck.dim == 3:
-                                                array.SetTuple3(i,result_x,result_y,result_z)
-                                        else:
-                                            if deck.dim ==1:
-                                                array.SetTuple1(i,0.)
-                                            if deck.dim == 2:
-                                                array.SetTuple2(i,0.,0.)
-                                            if deck.dim == 3:
-                                                array.SetTuple3(i,0.,0.,0.)
-                                    dataOut.AddArray(array)
-                                    
-                        if out_type == "Strain":
-                            array = vtk.vtkDoubleArray()
-                            array.SetName("Strain")
-                            if deck.dim == 1:
-                                array.SetNumberOfComponents(1)
-                            if deck.dim == 2:
-                                array.SetNumberOfComponents(3)
-                            if deck.dim == 3:
-                                array.SetNumberOfComponents(6)    
-                            array.SetNumberOfTuples(num_nodes)
-
-                            for i in range(num_nodes):
-                                strain = ccm_class.global_strain
-                                if deck.dim ==1:
-                                    array.SetTuple1(i,strain[i,0,t])
-                                if deck.dim == 2:
-                                    xx = strain[i*deck.dim,0,t]
-                                    xy = strain[i*deck.dim,1,t]
-                                    yy = strain[i*deck.dim+1,1,t]
-                                    array.SetTuple3(i,xx,yy,xy)
-                                if deck.dim == 3:
-                                    xx = strain[i*deck.dim,0,t]
-                                    xy = strain[i*deck.dim,1,t]
-                                    yy = strain[i*deck.dim+1,1,t]
-                                    yz = strain[i*deck.dim+1,1,t]
-                                    xz = strain[i*deck.dim,2,t]
-                                    zz = strain[i*deck.dim+2,2,t]
-                                    array.SetTuple6(i,xx,yy,zz,xy,xz,yz)    
-                            
+                                        if deck.dim ==1:
+                                            array.SetTuple1(i,0.)
+                                        if deck.dim == 2:
+                                            array.SetTuple2(i,0.,0.)
+                                        if deck.dim == 3:
+                                            array.SetTuple3(i,0.,0.,0.)
                             dataOut.AddArray(array)
+                                    
+                    if out_type == "Strain":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Strain")
+                        if deck.dim == 1:
+                            array.SetNumberOfComponents(1)
+                        if deck.dim == 2:
+                            array.SetNumberOfComponents(3)
+                        if deck.dim == 3:
+                            array.SetNumberOfComponents(6)    
+                        array.SetNumberOfTuples(num_nodes)
+
+                        for i in range(num_nodes):
+                            strain = ccm_class.global_strain
+                            if deck.dim ==1:
+                                array.SetTuple1(i,strain[i,0,t])
+                            if deck.dim == 2:
+                                xx = strain[i*deck.dim,0,t]
+                                xy = strain[i*deck.dim,1,t]
+                                yy = strain[i*deck.dim+1,1,t]
+                                array.SetTuple3(i,xx,yy,xy)
+                            if deck.dim == 3:
+                                xx = strain[i*deck.dim,0,t]
+                                xy = strain[i*deck.dim,1,t]
+                                yy = strain[i*deck.dim+1,1,t]
+                                yz = strain[i*deck.dim+1,1,t]
+                                xz = strain[i*deck.dim,2,t]
+                                zz = strain[i*deck.dim+2,2,t]
+                                array.SetTuple6(i,xx,yy,zz,xy,xz,yz)    
+                            
+                        dataOut.AddArray(array)
                                  
                 writer.SetInputData(grid)
 
