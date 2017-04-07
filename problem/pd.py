@@ -10,6 +10,7 @@ from scipy import linalg
 
 logger = logging.getLogger(__name__)
 
+## Class to define the peridynamic problem, i.e. applying boundaries conditions to the geomety and solve the problem
 class PD_problem():
 
     def __init__(self, deck):

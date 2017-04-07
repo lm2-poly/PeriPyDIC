@@ -53,13 +53,13 @@ class PD_deck():
                             print "Error: No Horizon_Factor tag found"
                             sys.exit(1)
                         else:
-                            ## The m value of the horizon factor
+                            ## "m" value of the horizon factor
                             self.horizon_factor_m_value = float(self.doc["Discretization"]["Horizon_Factor_m_value"])
                         if not "Influence_Function" in self.doc["Discretization"]:
                             print "Error: Influence_Function tag found"
                             sys.exit(1)
                         else:
-                            ## The influence function
+                            ## Influence function
                             self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
                         if not ("File") in self.doc["Discretization"]:
                             print "Error: No File tag found"
@@ -67,7 +67,7 @@ class PD_deck():
                         ## Object for handling the discrete nodes
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
-                        ## The minimal nodal spacing in x direction
+                        ## The minimal nodal spacing
                         self.delta_X = self.geometry.getMinDist()
                         ## Amount of nodes
                         self.num_nodes = self.geometry.amount
@@ -163,7 +163,8 @@ class PD_deck():
                                 elif not "Slice" in self.doc["Output"]["VTK"]:
                                     print "Error: No Slice tag found in VTK"
                                     sys.exit(1)
-                                else:
+                                else:                                    
+                                    ## Visualization ToolKit (VTK) writer
                                     self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
                                     if self.vtk_writer.vtk_enabled == False:
                                         print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
@@ -180,13 +181,13 @@ class PD_deck():
                                 print "Error: No Max_Iteration tag in Solver found"
                                 sys.exit(1)
                             else:
-                                ## Maximum iteration
+                                ## Maximum number iteration
                                 self.solver_max_it = self.doc["Solver"]["Max_Iteration"]
                             if not "Tolerance" in self.doc["Solver"]:
                                 print "Error: No Tolerance tag in Solver found"
                                 sys.exit(1)
                             else:
-                                ## Tolerance of the solver
+                                ## Absolute tolerance of the solver
                                 self.solver_tolerance = float(self.doc["Solver"]["Tolerance"])
                             if not "Jacobian_Perturbation" in self.doc["Solver"]:
                                 print "Error: No Jacobian_Perturbation tag in Solver found"
@@ -219,12 +220,14 @@ class DIC_deck():
                             ## Type of the material 
                             self.material_type = self.doc["Material"]["Type"]
                             if self.material_type == "Elastic":
-                                ## Young's modulus of the material
                                 if "E_Modulus" in self.doc["Material"]:
-                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                                    ## Young modulus of the material                                    
+                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])                                
                                 if "Bulk_Modulus" in self.doc["Material"]:
+                                    ## Bulk modulus of the material
                                     self.bulk_modulus = float(self.doc["Material"]["Bulk_Modulus"])
                                 if "Shear_Modulus" in self.doc["Material"]:
+                                    ## Shear modulus of the material                                    
                                     self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"])    
                                     
                             elif self.material_type == "Viscoelastic":
@@ -251,7 +254,7 @@ class DIC_deck():
                                 print "Error: No Dimension tag found"
                                 sys.exit(1)
                             else:
-                                ## Dimesion of the input data
+                                ## The dimension of the input data
                                 self.dim = self.doc["Data"]["Dimension"]
                                 
                             if not "File" in self.doc["Data"]:
@@ -269,10 +272,13 @@ class DIC_deck():
                                     print "Error: No Path tag found"
                                     sys.exit(1)
                                 else:
+                                    ## File path                                    
                                     self.filepath = self.doc["Data"]["File"]["Path"]   
-                                    
+                                    ## Nodes uploaded from DIC input file
                                     self.geometry = dic.DICreader2D(self.filepath + self.filename)
+                                    ## Amount of nodes                                    
                                     self.num_nodes = len(self.geometry.nodes)
+                                    ## Minimal nodal spacing                                    
                                     self.delta_X = self.geometry.delta_x
                                        
                         if not "Discretization" in self.doc:
@@ -283,14 +289,16 @@ class DIC_deck():
                                 print "Error: No Horizon_Factor_m_value tag found"
                                 sys.exit(1)
                             else:
+                                ## "m" value of the horizon factor                                
                                 self.horizon_factor_m_value = self.doc["Discretization"]["Horizon_Factor_m_value"]
                                 
                             if not "Influence_Function" in self.doc["Discretization"]:
                                 print "Error: No Influence_Function tag found"
                                 sys.exit(1)
                             else:
+                                ## Influence function                                
                                 self.influence_function = self.doc["Discretization"]["Influence_Function"]
-                                
+                        ## Amount of time steps        
                         self.time_steps = 1
                         
                         #self.vtk_writer = IO.vis.vtk_writer()
@@ -304,6 +312,7 @@ class DIC_deck():
                                     print "Error: No Type tag found in VTK"
                                     sys.exit(1)
                                 else:
+                                    ## Visualization ToolKit (VTK) writer
                                     self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],1)
                                     if self.vtk_writer.vtk_enabled == False:
                                         print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
