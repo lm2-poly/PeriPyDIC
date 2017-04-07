@@ -200,7 +200,7 @@ class PD_problem():
                             jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
         return jacobian
 
-    ## Provide the displacement increment resultiong for the Newton's method, for each node for a given time step t_n
+    ## Provide the displacement increment resulting for the Newton's method, for each node for a given time step t_n
     # @param deck The input deck    
     # @param ysolver Initial guess for Actual nodes' position
     # @param t_n Id of the time step

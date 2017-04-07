@@ -18,7 +18,6 @@ class DIC_problem():
         ## NeighborSearch
         self.neighbors = util.neighbor.NeighborSearch(deck)
 
-
         ## Compute the weighted volume for each node in a vector.
         self.weighted_function(deck)
 
@@ -27,6 +26,7 @@ class DIC_problem():
 
         ## Internal forces
         self.force_int = np.zeros((deck.num_nodes, deck.dim,1),dtype=np.float64)
+        
         ## Extension state
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes,1),dtype=np.float64 )
 
