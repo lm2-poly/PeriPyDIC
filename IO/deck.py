@@ -9,6 +9,7 @@ import sys
 import util.condition
 import IO.output
 import vis
+import dic
 
 ## Class handeling the input of the yaml file and storing the values
 class PD_deck():
@@ -52,13 +53,13 @@ class PD_deck():
                             print "Error: No Horizon_Factor tag found"
                             sys.exit(1)
                         else:
-                            ## The m value of the horizon factor
+                            ## "m" value of the horizon factor
                             self.horizon_factor_m_value = float(self.doc["Discretization"]["Horizon_Factor_m_value"])
                         if not "Influence_Function" in self.doc["Discretization"]:
                             print "Error: Influence_Function tag found"
                             sys.exit(1)
                         else:
-                            ## The influence function
+                            ## Influence function
                             self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
                         if not ("File") in self.doc["Discretization"]:
                             print "Error: No File tag found"
@@ -66,7 +67,7 @@ class PD_deck():
                         ## Object for handling the discrete nodes
                         self.geometry = geometry.Geometry()
                         self.geometry.readNodes(self.dim,self.doc["Discretization"]["File"]["Name"])
-                        ## The minimal nodal spacing in x direction
+                        ## The minimal nodal spacing
                         self.delta_X = self.geometry.getMinDist()
                         ## Amount of nodes
                         self.num_nodes = self.geometry.amount
@@ -81,7 +82,7 @@ class PD_deck():
                                 ## List of all conditions specified in the configuration file
                                 self.conditions = []
                                 for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
-                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i]))
+                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i],self.doc["Boundary"]["Condition"]["Shape"][i]))
                             if not "Shape" in self.doc["Boundary"]:
                                 print "Error: No Shape tag found"
                                 sys.exit(1)
@@ -138,7 +139,7 @@ class PD_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
-
+                       
                         if "Output" in self.doc:
                             if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
@@ -162,10 +163,16 @@ class PD_deck():
                                 elif not "Slice" in self.doc["Output"]["VTK"]:
                                     print "Error: No Slice tag found in VTK"
                                     sys.exit(1)
-                                else:
+                                else:                                    
+                                    ## Visualization ToolKit (VTK) writer
                                     self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
                                     if self.vtk_writer.vtk_enabled == False:
                                         print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
+                            else:
+                                self.vtk_writer = IO.vis.vtk_writer()
+                        else:
+                            self.vtk_writer = IO.vis.vtk_writer()
+                             
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)
@@ -174,13 +181,13 @@ class PD_deck():
                                 print "Error: No Max_Iteration tag in Solver found"
                                 sys.exit(1)
                             else:
-                                ## Maximum iteration
+                                ## Maximum number iteration
                                 self.solver_max_it = self.doc["Solver"]["Max_Iteration"]
                             if not "Tolerance" in self.doc["Solver"]:
                                 print "Error: No Tolerance tag in Solver found"
                                 sys.exit(1)
                             else:
-                                ## Tolerance of the solver
+                                ## Absolute tolerance of the solver
                                 self.solver_tolerance = float(self.doc["Solver"]["Tolerance"])
                             if not "Jacobian_Perturbation" in self.doc["Solver"]:
                                 print "Error: No Jacobian_Perturbation tag in Solver found"
@@ -189,3 +196,125 @@ class PD_deck():
                                 ## Perturbation factor for the Jacobian matrix
                                 self.solver_perturbation = float(self.doc["Solver"]["Jacobian_Perturbation"])
                             
+class DIC_deck():
+    
+    ## Constructor
+    # Reads the configuration in the yaml file and stores the values
+    # @param inputFile The path to the yaml file with the configuration
+    def __init__(self,inputFile):
+            if not os.path.exists(inputFile):
+                print "Error: Could not find " + inputFile
+                sys.exit(1)
+            else:
+                with open(inputFile,'r') as f:
+                    ## Container of the tags parsed from the yaml file
+                    self.doc = yaml.load(f)
+                    if not "Material" in self.doc:
+                        print "Error: Specify a Material tag in your yaml"
+                        sys.exit(1)
+                    else:
+                        if not "Type" in self.doc["Material"]:
+                            print "Error: No type tag found"
+                            sys.exit(1)
+                        else:
+                            ## Type of the material 
+                            self.material_type = self.doc["Material"]["Type"]
+                            if self.material_type == "Elastic":
+                                if "E_Modulus" in self.doc["Material"]:
+                                    ## Young modulus of the material                                    
+                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])                                
+                                if "Bulk_Modulus" in self.doc["Material"]:
+                                    ## Bulk modulus of the material
+                                    self.bulk_modulus = float(self.doc["Material"]["Bulk_Modulus"])
+                                if "Shear_Modulus" in self.doc["Material"]:
+                                    ## Shear modulus of the material                                    
+                                    self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"])    
+                                    
+                            elif self.material_type == "Viscoelastic":
+                                if not "Relax_Modulus" in self.doc["Material"]:
+                                    print "Error: No Relax_Modulus tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Relaxation modulus of the material
+                                    self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                if not "Relax_Time" in self.doc["Material"]:
+                                    print "Error: No Relax_Time tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Relaxation times
+                                    self.relax_time = self.doc["Material"]["Relax_Time"]
+                            else:
+                                print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
+                                sys.exit(1)
+                        if not "Data" in self.doc:
+                            print "Error: Specify a Data tag in your yaml"
+                            sys.exit(1)
+                        else:
+                            if not "Dimension" in self.doc["Data"]:
+                                print "Error: No Dimension tag found"
+                                sys.exit(1)
+                            else:
+                                ## The dimension of the input data
+                                self.dim = self.doc["Data"]["Dimension"]
+                                
+                            if not "File" in self.doc["Data"]:
+                                print "Error: Specify a File tag in your yaml"
+                                sys.exit(1)
+                            else:
+                                if not "Name" in self.doc["Data"]["File"]:
+                                    print "Error: No Name tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## Filename of the input file
+                                    self.filename = self.doc["Data"]["File"]["Name"]      
+                                    
+                                if not "Path" in self.doc["Data"]["File"]:
+                                    print "Error: No Path tag found"
+                                    sys.exit(1)
+                                else:
+                                    ## File path                                    
+                                    self.filepath = self.doc["Data"]["File"]["Path"]   
+                                    ## Nodes uploaded from DIC input file
+                                    self.geometry = dic.DICreader2D(self.filepath + self.filename)
+                                    ## Amount of nodes                                    
+                                    self.num_nodes = len(self.geometry.nodes)
+                                    ## Minimal nodal spacing                                    
+                                    self.delta_X = self.geometry.delta_x
+                                       
+                        if not "Discretization" in self.doc:
+                            print "Error: Specify a Discretization tag in your yaml"
+                            sys.exit(1)
+                        else:
+                            if not "Horizon_Factor_m_value" in self.doc["Discretization"]:
+                                print "Error: No Horizon_Factor_m_value tag found"
+                                sys.exit(1)
+                            else:
+                                ## "m" value of the horizon factor                                
+                                self.horizon_factor_m_value = self.doc["Discretization"]["Horizon_Factor_m_value"]
+                                
+                            if not "Influence_Function" in self.doc["Discretization"]:
+                                print "Error: No Influence_Function tag found"
+                                sys.exit(1)
+                            else:
+                                ## Influence function                                
+                                self.influence_function = self.doc["Discretization"]["Influence_Function"]
+                        ## Amount of time steps        
+                        self.time_steps = 1
+                        
+                        #self.vtk_writer = IO.vis.vtk_writer()
+                        
+                        if "Output" in self.doc:
+                            if "VTK" in self.doc["Output"]:
+                                if not "Path" in self.doc["Output"]["VTK"]:
+                                    print "Error: No Path tag found in VTK"
+                                    sys.exit(1)
+                                elif not "Type" in self.doc["Output"]["VTK"]:
+                                    print "Error: No Type tag found in VTK"
+                                    sys.exit(1)
+                                else:
+                                    ## Visualization ToolKit (VTK) writer
+                                    self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],1)
+                                    if self.vtk_writer.vtk_enabled == False:
+                                        print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
+                            
+                                

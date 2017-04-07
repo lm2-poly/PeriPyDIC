@@ -1,11 +1,11 @@
 Discretization:
     Dim: 2
-    Final_Time: 2.0
-    Time_Steps: 4
-    Horizon_Factor_m_value: 1.0
+    Final_Time: 1.0
+    Time_Steps: 1
+    Horizon_Factor_m_value: 3.75
     Influence_Function: 1.0
     File: 
-        Name: geometry_2D_test.csv
+        Name: geometry_2D.csv
 Material:
     Type: Elastic
     Bulk_Modulus: 3333.3333
@@ -17,29 +17,33 @@ Boundary:
             - Displacement
             - Displacement
         Value: 
-            - 40.0
+            - -40.0
             - 0.0
             - 0.0
         Direction:
-            - 1
+            - 2
             - 1
             - 2
         File: 
             - force_condition_2D.csv
             - displ_condition_2D.csv
             - displ_condition_2D.csv
+        Shape:
+            - Ramp
+            - Fixed
+            - Fixed
     Shape:
         Type: Ramp
         Values:
-            - 2.0
-            - 2.0
-            - 2.0
+            - 1.0
+            - 1.0
+            - 1.0
 Output:
     CSV:
         Type:
             - Position
         File:
-            - nodes_positions_m4_dx0_50.csv
+            - nodes_positions_m_3_75_dx_1_0.csv
     VTK:
         Path: ./out2/
         Type:
@@ -47,8 +51,9 @@ Output:
             - Neighbors
             - Force
             - Conditions
+            - Strain
         Slice: 1
 Solver:
-    Max_Iteration: 100
+    Max_Iteration: 1000
     Tolerance: 1.0e-2
     Jacobian_Perturbation: 1.0e-6

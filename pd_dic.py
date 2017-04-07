@@ -5,11 +5,13 @@
 import sys
 import getopt
 import IO.deck
-import problem
+import problem.pd
+import IO.ccm
 import numpy as np
-np.set_printoptions(threshold='nan')
+np.set_printoptions(precision=8, threshold='nan', suppress=True)
+#np.set_printoptions(formatter={'float': lambda x: "%.3f" % x}, threshold='nan')
 import time
-import pdb
+import problem.dic as problem_dic
 
 def main(argv):
     """
@@ -46,25 +48,43 @@ def main(argv):
             simulation(deck)
         else:
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
+    
+    if typeIn == types[1]:
+        deck = IO.deck.DIC_deck(inputFile)
+        dic(deck) 
+        
+def dic(deck):
+    pb_solver_class = problem_dic.DIC_problem(deck)
+    ccm_class = IO.ccm.CCM_calcul(deck, pb_solver_class)
+    
+    if deck.vtk_writer.vtk_enabled == True:
+        deck.vtk_writer.write_data(deck,pb_solver_class,ccm_class)
 
 def simulation(deck):
     t0 = time.time()
-    pb_class = problem.PD_problem(deck)
-    y_0 = deck.geometry.nodes.copy()
-    pb_class.quasi_static_solver(y_0, deck)
-    eps_longi = pb_class.strain_calculation( 3, 5, deck )
-    eps_trans = pb_class.strain_calculation( 12, 20, deck )
+    y_0 = deck.geometry.nodes.copy()    
+    pb_solver_class = problem.pd.PD_problem(deck)
+    pb_solver_class.quasi_static_solver(deck, y_0)
+    ccm_class = IO.ccm.CCM_calcul(deck, pb_solver_class)
 
-    writeCSV(deck,pb_class)
+    writeCSV(deck,pb_solver_class)
     if deck.vtk_writer.vtk_enabled == True:
-       deck.vtk_writer.write_data(deck,pb_class)
+        deck.vtk_writer.write_data(deck,pb_solver_class,ccm_class)
 
     print "delta_x =" , deck.delta_X
-    print "Horizon =" , pb_class.neighbors.horizon
-    print "Strain Longi = " , np.around(eps_longi,decimals=6)
-    print "Strain Trans = " , np.around(eps_trans,decimals=6)
+    print "Horizon =" , pb_solver_class.neighbors.horizon
+        
+    strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
+    print "epsilon_tensor", strain_tensor
+    
+#    stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
+#    print "stress_tensor", stress_tensor
+#    print ccm_class.C
+    
+    strain_longi = pb_solver_class.strain_calculation(deck, 3, 5)
+    print "strain_longi", strain_longi
     #print "Nodes positions = "
-    #print pb_class.y
+    #print pb_solver_class.y
     print "Duration:", time.time() - t0 , "seconds"
 
 def writeCSV(deck,problem):
@@ -72,8 +92,6 @@ def writeCSV(deck,problem):
         if out.outType == "CSV":
             out.write(deck,problem)
 
-def write_vtk(deck,problem):
-    print ""
 
 # Start the function __main__ at __init__ call
 if __name__ == "__main__":

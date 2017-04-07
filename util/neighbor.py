@@ -12,15 +12,14 @@ class NeighborSearch():
     # @param deck The input deck
     def __init__(self,deck):
         ## Safety factor for the search of the neighborhood
-        # @param deck The input deck
         self.safety_factor = 1.001
         ## Horizon of the neighborhood
         self.horizon = deck.horizon_factor_m_value*deck.delta_X*self.safety_factor
         self.findNeighbors(deck)
 
-    ## Returns the family of node x_i
-    # @param x_i Id of the node
-    # @return The ids of the neighbors of node x_i
+    ## Returns the family of node "i"
+    # @param i Id of the node
+    # @return The ids of the neighbors of node "i"
     def get_index_x_family(self, i):
         return self.family[i]
 

@@ -1,7 +1,7 @@
 Discretization:
     Dim: 1
-    Final_Time: 2.0
-    Time_Steps: 4
+    Final_Time: 1.0
+    Time_Steps: 1
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
@@ -23,26 +23,32 @@ Boundary:
         File: 
             - force_condition_1D.csv
             - displ_condition_1D.csv
+        Shape:
+            - Ramp
+            - Fixed
     Shape:
         Type: Ramp
         Values:
-            - 1.5
-            - 2.0
-            - 2.0
+            - 1.0
+            - 1.0
+            - 1.0
 Output:
     CSV:
         Type:
             - Position
         File:
-            - nodes_positions_m4_dx0_50.csv
+            - nodes_positions_dx0_50.csv
     VTK:
-        Path: ./out/
+        Path: ./out1/
         Type:
             - Displacement
             - Neighbors
             - Force
             - Conditions
+            - Volume_Force
+            - Strain
         Slice: 1
 Solver:
-    Step: 1000
-    Tolerance: 1.0e-9
+    Max_Iteration: 100
+    Tolerance: 1.0e-6
+    Jacobian_Perturbation: 1.0e-6

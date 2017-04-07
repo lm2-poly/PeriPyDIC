@@ -10,22 +10,22 @@
 
 # Getting started
 
-###Dependencies
+### Dependencies
 
    The following python packages are **required**:
    * `numpy`
    * `pyyaml`
    * `scipy.optimize`
-
-   Optional packages:
-   * `matplotlib.pyplot`
+   
+   The following tools are **optional** 
    * `doxygen`
+   * `dot` 
 
 ## Usage
 ```bash
 python pd_dic.py -i input.yaml -t pd   
 ```   
-Where `-i` has to be the confriguration in yaml format and `-t` is the type, which can be `pd` for peridynamic simulations.
+Where `-i` has to be the configuration in `yaml format` and `-t` is the type, which can be `pd` for peridynamic simulations and `dic` for processing results from digital image correlation.
 
 ## Input description
 
@@ -38,7 +38,9 @@ Material:
     E_Modulus: 4000.0
 ```
 The available `Type` are until now `Elastic` and `Viscoelastic`. 
+
 ### Geometry
+
 The discretization and the nodes are described with
 ```yaml
 Discretization:
@@ -51,12 +53,14 @@ Discretization:
         Name: geometry_dx0_50.csv
 ```
 where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force withrespect to the distance of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. An example for this file is provided here:
-```yaml
+
+```
 #id x y z volume
 0 0.0 0.0 0.0 1.0 
 1 1.0 1.0 1.0 1.0
 ```
 The shape for the load is given here
+
 ```yaml
  Shape:
         Type: Ramp
@@ -64,10 +68,11 @@ The shape for the load is given here
             - 1.5
             - 2.0
             - 2.0
-```yaml
-where `Type` describes the shape and `Values` specifiy the geomerty of the shape.
+```
+where `Type` describes the shape and `Values` specify the geometry of the shape.
 
 ### Boundary Conditions
+
 Boundary conditions can be described with
 ```yaml
 Boundary:
@@ -82,7 +87,7 @@ Boundary:
             - file.csv
 ```
 where the `Type` either can be `Force` or `Displacement`, `Value` describes the value in Newton or Millimeter whis is applied at the nodes
-described in `File`, and `Direction` describes the direction (X=1,Y=2,Z=3) where the condition is applied. The file has to be provided in the CSV format with spaces as delimiter with the id ofthe nodes where the condition 
+described in `File`, and `Direction` describes the direction (X=1,Y=2,Z=3) where the condition is applied. The file has to be provided in the CSV format with spaces as delimiter with the id of the nodes where the condition 
 should be applied. Here, is an example for a `file.csv`
 ```yaml
 #id
@@ -91,8 +96,12 @@ should be applied. Here, is an example for a `file.csv`
 ```
 ### Output
 
+For writing simulation attributes the `Output` tag can be used.
+
 #### CSV
-For writing simulation attributes as CSV format the `Output` tag can be used.
+
+For writing the simulation attributes to the CSV format the tag `CSV` is used. 
+
 ```yaml
 Output:
     CSV:
@@ -103,12 +112,33 @@ Output:
 ```
 Where `Type` specifies the attribute and `File` the file name of the output file.
 
+#### VTK
+
+For writing the simulation attributes to the VTK unstructured grid format the tag `VTK` is used
+
+```yaml
+VTK:
+	Path: ./
+	Type:
+	- Displacement
+	- Neighbors
+	- Force
+	- Conditions
+	- Volume_Force
+	- Strain
+Slice: 1
+```
+Where `Path` is the path for the output, `Type` specify the simulation attributes, which are considered for the output, and `Slice` defines that every n-th time step is written.
+ 
 ### Solver
-Here, the `Type` and the `Tolerance` can be specified.
+
+Here, `Max_Iteration`, `Tolerance` of the solver can be specified. With `Jacobian_Perturbation` the perturbation for assembly the Jacobian matrix is defined.
+
 ```yaml
 Solver:
-    Type: krylov
-    Tolerance: 1.0e-12
+    Max_Iteration: 100
+    Tolerance: 1.0e-6
+    Jacobian_Perturbation: 1.0e-6
 ```
 
 ## Examples
@@ -116,6 +146,7 @@ Solver:
 An example for an elastic material and an viscoelastic material is provided in the example folder
 
 # License
-The code is licensed under the MIT License developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/).
+
+The code is licensed under the GNU General Public License v3.0 developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/).
 
 Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="http://dx.doi.org/10.1016/S0022-5096(99)00029-0" rel="dct:source">http://dx.doi.org/10.1016/S0022-5096(99)00029-0</a>.

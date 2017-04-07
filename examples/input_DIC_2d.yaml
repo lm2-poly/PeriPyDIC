@@ -1,0 +1,19 @@
+Material:
+    Type: Elastic
+    Bulk_Modulus: 3333.3333
+    Shear_Modulus: 1538.4615
+Data:
+    Dimension: 2
+    File: 
+        Name: DIC-Spec057-0025_0_short.csv
+        Path: ./
+Discretization:
+    Horizon_Factor_m_value: 1.0
+    Influence_Function: 1.0
+Output:
+    VTK:
+        Path: ./outDIC/
+        Type:
+            - Displacement
+            - Neighbors
+            - Strain
