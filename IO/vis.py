@@ -8,11 +8,16 @@ vtk_loader = pkgutil.find_loader('vtk')
 found_vtk = vtk_loader is not None
 if found_vtk == True:
     import vtk
-
+## Handles the output of the simulation results to vtk unstrucutred grids
 class vtk_writer():
 
     if found_vtk == True:
 
+        ## Constructor
+        #
+        # @param path The path where the output is written
+        # @param types The simulation attributes considered as output
+        # @param slice_length Every n-th time step is written
         def __init__(self,path="",types="",slice_length=-1):
             ## IS vtk enabled
             self.vtk_enabled = True
@@ -20,9 +25,14 @@ class vtk_writer():
             self.path = path
             ## Types of the attributes
             self.types = types
-            ## Slice for the timesteps
+            ## Slice for the time steps
             self.slice_length = slice_length
 
+        ## Writes the data to a vtk unstrucutred grid files
+        #
+        # @param deck The deck with the input from the yaml file
+        # @param problem The problem contains the simulation results
+        # @param ccm_class The results from the computation from ccm 
         def write_data(self,deck,problem,ccm_class):
             num_nodes = deck.num_nodes
             for t in range(0,deck.time_steps,self.slice_length):
@@ -180,5 +190,10 @@ class vtk_writer():
 
     else:
 
+        ## Constructor
+        #
+        # @param path The path where the output is written
+        # @param types The simulation attributes considered as output
+        # @param slice_length Every n-th time step is written
         def __init__(self,path="",types="",slice_length=-1):
             self.vtk_enabled = False
