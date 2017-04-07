@@ -6,8 +6,8 @@
 import logging
 import numpy as np
 import util.neighbor
-from scipy import linalg 
-import sys
+from scipy import linalg
+#import sys
 
 logger = logging.getLogger(__name__)
 
@@ -199,9 +199,8 @@ class PD_problem():
                     for s in range(0, deck.dim):
                         if r==s:
                             jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
-        print "Det =", linalg.det(jacobian)
-        print np.allclose(jacobian, jacobian.T, atol=1e-8)
-        #sys.exit(1)
+        #print "Det =", linalg.det(jacobian)
+        #print np.allclose(jacobian, jacobian.T, atol=1e-8)
         return jacobian
 
     ## Provide the displacement increment resulting for the Newton's method, for each node for a given time step t_n
