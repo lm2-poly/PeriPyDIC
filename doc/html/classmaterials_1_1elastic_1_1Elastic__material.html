@@ -71,64 +71,78 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Class to compute, as a vector state, the global internal volumic force of an elastic material using its material properties.  
+<p>Class to compute the global internal volumic force at each node of an elastic material using its material properties.  
  <a href="classmaterials_1_1elastic_1_1Elastic__material.html#details">More...</a></p>
+<div class="dynheader">
+Collaboration diagram for materials.elastic.Elastic_material:</div>
+<div class="dyncontent">
+<div class="center"><img src="classmaterials_1_1elastic_1_1Elastic__material__coll__graph.png" border="0" usemap="#materials_8elastic_8Elastic__material_coll__map" alt="Collaboration graph"/></div>
+</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1a2e8a508bd846ecd15633d6a74bd32a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a1a2e8a508bd846ecd15633d6a74bd32a">__init__</a> (self, deck, problem, y)</td></tr>
-<tr class="memdesc:a1a2e8a508bd846ecd15633d6a74bd32a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a1a2e8a508bd846ecd15633d6a74bd32a">More...</a><br /></td></tr>
-<tr class="separator:a1a2e8a508bd846ecd15633d6a74bd32a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade127e725701563dd6e3acae76b8673b"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#ade127e725701563dd6e3acae76b8673b">compute_ext_state</a> (self, deck, problem, y)</td></tr>
-<tr class="memdesc:ade127e725701563dd6e3acae76b8673b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to compute the scalar extension state.  <a href="#ade127e725701563dd6e3acae76b8673b">More...</a><br /></td></tr>
-<tr class="separator:ade127e725701563dd6e3acae76b8673b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0830b9588857b641feec9411019bcf4"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#ae0830b9588857b641feec9411019bcf4">compute_T</a> (self, deck, problem, y)</td></tr>
-<tr class="memdesc:ae0830b9588857b641feec9411019bcf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to compute the vector force state.  <a href="#ae0830b9588857b641feec9411019bcf4">More...</a><br /></td></tr>
-<tr class="separator:ae0830b9588857b641feec9411019bcf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63a8ed63a6c064bbf037319df7a5e3ea"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a63a8ed63a6c064bbf037319df7a5e3ea">compute_Ts</a> (self, deck, problem)</td></tr>
-<tr class="memdesc:a63a8ed63a6c064bbf037319df7a5e3ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to compute, as a vector state, the global internal volumic force within the equation of motion.  <a href="#a63a8ed63a6c064bbf037319df7a5e3ea">More...</a><br /></td></tr>
-<tr class="separator:a63a8ed63a6c064bbf037319df7a5e3ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0d904048160dd66d658e7fb543029f5"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#ad0d904048160dd66d658e7fb543029f5">__init__</a> (self, deck, data_solver, y)</td></tr>
+<tr class="memdesc:ad0d904048160dd66d658e7fb543029f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ad0d904048160dd66d658e7fb543029f5">More...</a><br /></td></tr>
+<tr class="separator:ad0d904048160dd66d658e7fb543029f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d203ff137225aba8df3fc44b6884b29"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a0d203ff137225aba8df3fc44b6884b29">compute_dilatation</a> (self, deck, data_solver, y)</td></tr>
+<tr class="memdesc:a0d203ff137225aba8df3fc44b6884b29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the dilatation for each node.  <a href="#a0d203ff137225aba8df3fc44b6884b29">More...</a><br /></td></tr>
+<tr class="separator:a0d203ff137225aba8df3fc44b6884b29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1dc971db0e713716340d9f8380c29b6"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#ad1dc971db0e713716340d9f8380c29b6">compute_f_int</a> (self, deck, data_solver, y)</td></tr>
+<tr class="memdesc:ad1dc971db0e713716340d9f8380c29b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the global internal force density at each node.  <a href="#ad1dc971db0e713716340d9f8380c29b6">More...</a><br /></td></tr>
+<tr class="separator:ad1dc971db0e713716340d9f8380c29b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a4183efc6e9d2ae618b4a2f2b2ace185c"><td class="memItemLeft" align="right" valign="top"><a id="a4183efc6e9d2ae618b4a2f2b2ace185c"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a4183efc6e9d2ae618b4a2f2b2ace185c">len_x</a></td></tr>
-<tr class="memdesc:a4183efc6e9d2ae618b4a2f2b2ace185c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Amount of nodes in x direction. <br /></td></tr>
-<tr class="separator:a4183efc6e9d2ae618b4a2f2b2ace185c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d1ab290ce04c8d114391e61c256fbb8"><td class="memItemLeft" align="right" valign="top"><a id="a7d1ab290ce04c8d114391e61c256fbb8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a7d1ab290ce04c8d114391e61c256fbb8">E_Modulus</a></td></tr>
-<tr class="memdesc:a7d1ab290ce04c8d114391e61c256fbb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Young's modulus of the material. <br /></td></tr>
-<tr class="separator:a7d1ab290ce04c8d114391e61c256fbb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac78acd395faef15b9e2f4b72c73f4cb0"><td class="memItemLeft" align="right" valign="top"><a id="ac78acd395faef15b9e2f4b72c73f4cb0"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#ac78acd395faef15b9e2f4b72c73f4cb0">w</a></td></tr>
-<tr class="memdesc:ac78acd395faef15b9e2f4b72c73f4cb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar influence function. <br /></td></tr>
+<tr class="memdesc:ac78acd395faef15b9e2f4b72c73f4cb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Influence function. <br /></td></tr>
 <tr class="separator:ac78acd395faef15b9e2f4b72c73f4cb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4dfb6b9fda88fce08351d5e45fdc8cd7"><td class="memItemLeft" align="right" valign="top"><a id="a4dfb6b9fda88fce08351d5e45fdc8cd7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a4dfb6b9fda88fce08351d5e45fdc8cd7">M</a></td></tr>
-<tr class="memdesc:a4dfb6b9fda88fce08351d5e45fdc8cd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deformed direction vector state. <br /></td></tr>
-<tr class="separator:a4dfb6b9fda88fce08351d5e45fdc8cd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28aa1e16f2e012472defe4f67230eb4b"><td class="memItemLeft" align="right" valign="top"><a id="a28aa1e16f2e012472defe4f67230eb4b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a28aa1e16f2e012472defe4f67230eb4b">Weighted_Volume</a></td></tr>
+<tr class="memdesc:a28aa1e16f2e012472defe4f67230eb4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weighted volume. <br /></td></tr>
+<tr class="separator:a28aa1e16f2e012472defe4f67230eb4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66e48960815d811ea17e621ba97466f8"><td class="memItemLeft" align="right" valign="top"><a id="a66e48960815d811ea17e621ba97466f8"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a66e48960815d811ea17e621ba97466f8">Young_Modulus</a></td></tr>
+<tr class="memdesc:a66e48960815d811ea17e621ba97466f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Young modulus of the material. <br /></td></tr>
+<tr class="separator:a66e48960815d811ea17e621ba97466f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a28fb2047f59737ba7ccabe7a5ea729"><td class="memItemLeft" align="right" valign="top"><a id="a2a28fb2047f59737ba7ccabe7a5ea729"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a2a28fb2047f59737ba7ccabe7a5ea729">K</a></td></tr>
+<tr class="memdesc:a2a28fb2047f59737ba7ccabe7a5ea729"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bulk modulus of the material. <br /></td></tr>
+<tr class="separator:a2a28fb2047f59737ba7ccabe7a5ea729"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7f73f07714c4f463356b885abbfba3e"><td class="memItemLeft" align="right" valign="top"><a id="ad7f73f07714c4f463356b885abbfba3e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#ad7f73f07714c4f463356b885abbfba3e">Mu</a></td></tr>
+<tr class="memdesc:ad7f73f07714c4f463356b885abbfba3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shear modulus of the material. <br /></td></tr>
+<tr class="separator:ad7f73f07714c4f463356b885abbfba3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f7a93f5c2c092467ac4aa5bbe0cd4d8"><td class="memItemLeft" align="right" valign="top"><a id="a4f7a93f5c2c092467ac4aa5bbe0cd4d8"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a4f7a93f5c2c092467ac4aa5bbe0cd4d8">Nu</a></td></tr>
+<tr class="memdesc:a4f7a93f5c2c092467ac4aa5bbe0cd4d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Poisson ratio of the material. <br /></td></tr>
+<tr class="separator:a4f7a93f5c2c092467ac4aa5bbe0cd4d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a237c956e688f97217e9bfd20c655014b"><td class="memItemLeft" align="right" valign="top"><a id="a237c956e688f97217e9bfd20c655014b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a237c956e688f97217e9bfd20c655014b">factor2d</a></td></tr>
+<tr class="memdesc:a237c956e688f97217e9bfd20c655014b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Factor applied for 2D plane stress to compute dilatation and force state. <br /></td></tr>
+<tr class="separator:a237c956e688f97217e9bfd20c655014b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4029dd60e2a0d38aa2393f492004bfc1"><td class="memItemLeft" align="right" valign="top"><a id="a4029dd60e2a0d38aa2393f492004bfc1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a4029dd60e2a0d38aa2393f492004bfc1">dilatation</a></td></tr>
+<tr class="memdesc:a4029dd60e2a0d38aa2393f492004bfc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dilatation at each node. <br /></td></tr>
+<tr class="separator:a4029dd60e2a0d38aa2393f492004bfc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad37f39fd0ebd0ec79c361333f4222720"><td class="memItemLeft" align="right" valign="top"><a id="ad37f39fd0ebd0ec79c361333f4222720"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#ad37f39fd0ebd0ec79c361333f4222720">e</a></td></tr>
-<tr class="memdesc:ad37f39fd0ebd0ec79c361333f4222720"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar extension state. <br /></td></tr>
+<tr class="memdesc:ad37f39fd0ebd0ec79c361333f4222720"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extension between Node "i" and Node "p" within its family. <br /></td></tr>
 <tr class="separator:ad37f39fd0ebd0ec79c361333f4222720"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1240eca411b35d3f5b9011b01d253f9e"><td class="memItemLeft" align="right" valign="top"><a id="a1240eca411b35d3f5b9011b01d253f9e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a1240eca411b35d3f5b9011b01d253f9e">tscal</a></td></tr>
-<tr class="memdesc:a1240eca411b35d3f5b9011b01d253f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar force state. <br /></td></tr>
-<tr class="separator:a1240eca411b35d3f5b9011b01d253f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07428ff80984b35808e13ec46b585d5d"><td class="memItemLeft" align="right" valign="top"><a id="a07428ff80984b35808e13ec46b585d5d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a07428ff80984b35808e13ec46b585d5d">T</a></td></tr>
-<tr class="memdesc:a07428ff80984b35808e13ec46b585d5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector force state. <br /></td></tr>
-<tr class="separator:a07428ff80984b35808e13ec46b585d5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a20819e4af54f59d7aac6943e8d5bd7"><td class="memItemLeft" align="right" valign="top"><a id="a3a20819e4af54f59d7aac6943e8d5bd7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a3a20819e4af54f59d7aac6943e8d5bd7">Ts</a></td></tr>
-<tr class="memdesc:a3a20819e4af54f59d7aac6943e8d5bd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sum of (T[xi] - T[xp])*Vol[xi] equivalent to the global internal volumic force. <br /></td></tr>
-<tr class="separator:a3a20819e4af54f59d7aac6943e8d5bd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a5e87dfddcfc5ad03f54943db599aaa"><td class="memItemLeft" align="right" valign="top"><a id="a8a5e87dfddcfc5ad03f54943db599aaa"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a8a5e87dfddcfc5ad03f54943db599aaa">f_int</a></td></tr>
+<tr class="memdesc:a8a5e87dfddcfc5ad03f54943db599aaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal force density at each node. <br /></td></tr>
+<tr class="separator:a8a5e87dfddcfc5ad03f54943db599aaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48ece2db424a745be9c0d9343b7b97e6"><td class="memItemLeft" align="right" valign="top"><a id="a48ece2db424a745be9c0d9343b7b97e6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmaterials_1_1elastic_1_1Elastic__material.html#a48ece2db424a745be9c0d9343b7b97e6">t</a></td></tr>
+<tr class="memdesc:a48ece2db424a745be9c0d9343b7b97e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scalar force state. <br /></td></tr>
+<tr class="separator:a48ece2db424a745be9c0d9343b7b97e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Class to compute, as a vector state, the global internal volumic force of an elastic material using its material properties. </p>
+<div class="textblock"><p>Class to compute the global internal volumic force at each node of an elastic material using its material properties. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a1a2e8a508bd846ecd15633d6a74bd32a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a2e8a508bd846ecd15633d6a74bd32a">&sect;&nbsp;</a></span>__init__()</h2>
+<a id="ad0d904048160dd66d658e7fb543029f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0d904048160dd66d658e7fb543029f5">&sect;&nbsp;</a></span>__init__()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -149,7 +163,7 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>problem</em>, </td>
+          <td class="paramname"><em>data_solver</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -169,8 +183,8 @@ Public Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">deck</td><td>The input deck </td></tr>
-    <tr><td class="paramname">problem</td><td>The related peridynamic problem </td></tr>
-    <tr><td class="paramname">y</td><td>The actual postions </td></tr>
+    <tr><td class="paramname">data_solver</td><td>Data from the peridynamic problem/solving class </td></tr>
+    <tr><td class="paramname">y</td><td>Actual nodes' position </td></tr>
   </table>
   </dd>
 </dl>
@@ -178,14 +192,14 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ade127e725701563dd6e3acae76b8673b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade127e725701563dd6e3acae76b8673b">&sect;&nbsp;</a></span>compute_ext_state()</h2>
+<a id="a0d203ff137225aba8df3fc44b6884b29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d203ff137225aba8df3fc44b6884b29">&sect;&nbsp;</a></span>compute_dilatation()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def materials.elastic.Elastic_material.compute_ext_state </td>
+          <td class="memname">def materials.elastic.Elastic_material.compute_dilatation </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -200,7 +214,7 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>problem</em>, </td>
+          <td class="paramname"><em>data_solver</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -216,26 +230,26 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Function to compute the scalar extension state. </p>
+<p>Compute the dilatation for each node. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">deck</td><td>The input deck </td></tr>
-    <tr><td class="paramname">problem</td><td>The related peridynamic problem </td></tr>
-    <tr><td class="paramname">y</td><td>The actual postions </td></tr>
+    <tr><td class="paramname">data_solver</td><td>Data from the peridynamic problem/solving class </td></tr>
+    <tr><td class="paramname">y</td><td>The actual nodes' position </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="ae0830b9588857b641feec9411019bcf4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0830b9588857b641feec9411019bcf4">&sect;&nbsp;</a></span>compute_T()</h2>
+<a id="ad1dc971db0e713716340d9f8380c29b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1dc971db0e713716340d9f8380c29b6">&sect;&nbsp;</a></span>compute_f_int()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">def materials.elastic.Elastic_material.compute_T </td>
+          <td class="memname">def materials.elastic.Elastic_material.compute_f_int </td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>self</em>, </td>
@@ -250,7 +264,7 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>problem</em>, </td>
+          <td class="paramname"><em>data_solver</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -266,55 +280,12 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Function to compute the vector force state. </p>
+<p>Compute the global internal force density at each node. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">deck</td><td>The input deck </td></tr>
-    <tr><td class="paramname">problem</td><td>The related peridynamic problem </td></tr>
-    <tr><td class="paramname">y</td><td>The actual postions </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a63a8ed63a6c064bbf037319df7a5e3ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63a8ed63a6c064bbf037319df7a5e3ea">&sect;&nbsp;</a></span>compute_Ts()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">def materials.elastic.Elastic_material.compute_Ts </td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>self</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>deck</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>problem</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Function to compute, as a vector state, the global internal volumic force within the equation of motion. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">deck</td><td>The input deck </td></tr>
-    <tr><td class="paramname">problem</td><td>The related peridynamic problem </td></tr>
+    <tr><td class="paramname">data_solver</td><td>Data from the peridynamic problem/solving class </td></tr>
+    <tr><td class="paramname">y</td><td>The actual nodes' position </td></tr>
   </table>
   </dd>
 </dl>
