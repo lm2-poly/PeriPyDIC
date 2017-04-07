@@ -15,19 +15,19 @@ class DIC_problem():
     # actual positions, extension states and force states
     # @param deck Deck object containig data from the .yaml file
     def __init__(self, deck):
-        # NeighborSearch
+        ## NeighborSearch
         self.neighbors = util.neighbor.NeighborSearch(deck)
 
 
-        # Compute the weighted volume for each node in a vector.
+        ## Compute the weighted volume for each node in a vector.
         self.weighted_function(deck)
 
-        # Actual position from DIC result
+        ## Actual position from DIC result
         self.y = np.zeros((deck.num_nodes, deck.dim,1),dtype=np.float64)
 
-        # Internal forces
+        ## Internal forces
         self.force_int = np.zeros((deck.num_nodes, deck.dim,1),dtype=np.float64)
-        # Extension state
+        ## Extension state
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes,1),dtype=np.float64 )
 
 
@@ -42,6 +42,7 @@ class DIC_problem():
     ## Computes the weights for each PD node
     # @param deck Deck object containig data from the .yaml file
     def weighted_function(self, deck):
+        ## Weighted volumes vector
         self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
@@ -49,19 +50,21 @@ class DIC_problem():
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 self.weighted_volume[i] += deck.influence_function * (np.linalg.norm(X))**2 * deck.geometry.volumes[p]
 
-
     ## Records the force vector at each time step
-    # @param Material class object for the elastic/viscoelastic material models
+    # @param mat_class Material class object for the elastic/viscoelastic material models
     def update_force_data(self, mat_class):
+        ## Internal forces state
         self.force_int[:,:, 0] = mat_class.f_int
 
 
     ## Records the ext_state vector at each time step
-    # @param Material class object for the elastic/viscoelastic material models
+    # @param mat_class Material class object for the elastic/viscoelastic material models
     def update_ext_state_data(self, mat_class):
+        ## Extension state
         self.ext[:, :, 0] = mat_class.e
 
     ## Records the actual position vector at each time step
     # @param act Actual position obtained from DIC data
     def update_pos(self,act):
+        ## Actual position state
         self.y[:,:, 0] = act
