@@ -72,8 +72,8 @@ class Geometry():
                 del pos_y
                 del pos_z
 
-    ## Computes the min distance between all nodes
-    # @return Minimal dim
+    ## Computes the minimal distance between all nodes
+    # @return Minimal distance
     def getMinDist(self):
         tmp = float('inf')
         for i in range(0,self.amount):

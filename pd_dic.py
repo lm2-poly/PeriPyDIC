@@ -64,7 +64,7 @@ def simulation(deck):
     t0 = time.time()
     y_0 = deck.geometry.nodes.copy()    
     pb_solver_class = problem.pd.PD_problem(deck)
-    pb_solver_class.quasi_static_solver(y_0, deck)
+    pb_solver_class.quasi_static_solver(deck, y_0)
     ccm_class = IO.ccm.CCM_calcul(deck, pb_solver_class)
 
     writeCSV(deck,pb_solver_class)
@@ -81,7 +81,7 @@ def simulation(deck):
 #    print "stress_tensor", stress_tensor
 #    print ccm_class.C
     
-    strain_longi = pb_solver_class.strain_calculation( 3, 5, deck )
+    strain_longi = pb_solver_class.strain_calculation(deck, 3, 5)
     print "strain_longi", strain_longi
     #print "Nodes positions = "
     #print pb_solver_class.y

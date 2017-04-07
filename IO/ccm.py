@@ -5,9 +5,9 @@
 import numpy as np
 from scipy import linalg
 np.set_printoptions(precision=8, threshold='nan')
-import sys
+#import sys
 
-## Class to compute the wll-known strain and stress tensors defined in the classical continuum mechanics
+## Class to compute the well-known strain and stress tensors defined in the classical continuum mechanics
 class CCM_calcul():
 
     ## Constructor
@@ -15,16 +15,16 @@ class CCM_calcul():
     # @param data_solver Data from the peridynamic problem/solving class
     def __init__(self, deck, data_solver):
         
-        ## Nodes' initial positions
+        ## Nodes' initial position
         self.x = deck.geometry.nodes
         
         ## Nodes' positions stored for each time step
         self.y = data_solver.y
         
-        ## Global internal force density vector storing the force density attached to each node for each time step
+        ## Global internal force density array storing the force density attached to each node for each time step
         self.force_int = data_solver.force_int
         
-        ## Extension matrix storing the extension at each node between the node and its family        
+        ## Extension array storing the extension for each node between itself and its family        
         self.ext = data_solver.ext
         
         ## Dimension of the data_solver (1D, 2D or 3D)
@@ -42,36 +42,37 @@ class CCM_calcul():
         ## Influence function
         self.influence_function = deck.influence_function
         
-        ## Golbal strain tensor storing the strain tensor for each node at each time step      
-        self.global_strain_tensor(data_solver)
+        ## Compute the global strain tensor storing the strain tensor for each node at each time step      
+        self.compute_global_strain_tensor(data_solver)
 
 #        self.compute_u_displacement()
-#        self.global_stress_tensor(data_solver)
+#        self.compute_global_stress_tensor(data_solver)
            
-    ## Return the image of (xi - xp) under the reference position vector state X 
+    ## Provide the image of (xi - xp) under the reference position vector state X 
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param i Id of node #i
-    # @param p Id of node #p with node #i family 
-    # @return the image 
+    # @param i Id of Node "i"
+    # @param p Id of Node "p" with Node "i" family 
+    # @return Image of (xi - xp) under the deformation vector state X 
     def X_vector_state(self, data_solver, i, p):
         image = self.x[p,:] - self.x[i,:]
         image = np.reshape(image,(self.dim,1))
         return image
 
-    ## Return the image of (xi - xp) under the deformation vector state Y
+    ## Provide the image of (xi - xp) under the deformation vector state Y
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param i Id of Node #i
-    # @param p Id of Node #p with Node #i family
+    # @param i Id of Node "i"
+    # @param p Id of Node "p" with Node "i" family 
     # @param t_n Id of the time step  
-    # @return the image  
+    # @return Image of (xi - xp) under the deformation vector state Y 
     def Y_vector_state(self, data_solver, i, p, t_n):
         image = self.y[p,:,t_n] - self.y[i,:,t_n]
         image = np.reshape(image,(self.dim,1))
         return image
         
-    ## Return the shape tensor K related to node i
+    ## Provide the shape tensor K related to Node "i"
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param i Id of Node #i
+    # @param i Id of Node "i"
+    # @return Shape tensor K
     def K_shape_tensor(self, data_solver, i):
         K = np.zeros((self.dim, self.dim),dtype=np.float64)
         index_x_family = data_solver.neighbors.get_index_x_family(i)
@@ -80,10 +81,11 @@ class CCM_calcul():
             K += self.influence_function * np.dot(X,X.T) * self.node_volumes[p]
         return K
 
-    ## Return the deformation gradient tensor epsilon related to Node #i
+    ## Provide the deformation gradient tensor related to Node "i"
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param i Id of Node #i
-    # @param t_n Id of the time step  
+    # @param i Id of Node "i"
+    # @param t_n Id of the time step
+    # @return Deformation gradient tensor related to Node "i" 
     def deformation_gradient(self, data_solver, i, t_n):
         tmp = np.zeros((self.dim, self.dim),dtype=np.float64)       
         index_x_family = data_solver.neighbors.get_index_x_family(i)
@@ -94,18 +96,19 @@ class CCM_calcul():
         deformation = np.dot(tmp, linalg.inv(self.K_shape_tensor(data_solver, i)))
         return deformation
         
-    ## Return the strain tensor related to node i
+    ## Provide the strain tensor related to Node "i"
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param i Id of Node #i
-    # @param t_n Id of the time step 
+    # @param i Id of Node "i"
+    # @param t_n Id of the time step
+    # @return Strain tensor related do Node "i"
     def strain_tensor(self, data_solver, i, t_n):
         F = self.deformation_gradient(data_solver, i, t_n)
         strain = (F + F.T)/2 - np.identity(self.dim, dtype=np.float64)
         return strain
 
-    ## Compute the strain tensor for each node
+    ## Compute the global strain tensor storing the strain tensor for each node at each time step
     # @param data_solver Data from the peridynamic problem/solving class
-    def global_strain_tensor(self, data_solver):
+    def compute_global_strain_tensor(self, data_solver):
         ## Golbal strain tensor storing the strain tensor for each node at each time step
         self.global_strain = np.zeros((self.num_nodes*self.dim, self.dim, self.time_steps),dtype=np.float64)        
         for t_n in range(1, self.time_steps):
@@ -169,7 +172,7 @@ class CCM_calcul():
 #        return stress
 #
 #    # Return the stress tensor for each node
-#    def global_stress_tensor(self, data_solver):
+#    def compute_global_stress_tensor(self, data_solver):
 #        self.global_stress = np.zeros((self.num_nodes*self.dim, self.dim, self.time_steps),dtype=np.float64)        
 #        for t_n in range(1, self.time_steps):
 #            for i in range(0, self.num_nodes):

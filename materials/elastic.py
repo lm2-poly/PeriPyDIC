@@ -12,7 +12,7 @@ class Elastic_material():
     ## Constructor
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param y The actual nodes' position
+    # @param y Actual nodes' position
     def __init__(self, deck, data_solver, y):
         
         ## Influence function
@@ -49,14 +49,14 @@ class Elastic_material():
         ## Compute the global internal force density at each node
         self.compute_f_int(deck, data_solver, y)
 
-    ## Compute the dilatation for each Node
+    ## Compute the dilatation for each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
     # @param y The actual nodes' position
     def compute_dilatation(self, deck, data_solver, y):
         ## Dilatation at each node        
         self.dilatation = np.zeros((deck.num_nodes),dtype=np.float64)
-        ## Extension between Node #i and Node #p within its family
+        ## Extension between Node "i" and Node "p" within its family
         self.e = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
