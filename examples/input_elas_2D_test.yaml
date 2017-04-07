@@ -2,7 +2,7 @@ Discretization:
     Dim: 2
     Final_Time: 1.0
     Time_Steps: 1
-    Horizon_Factor_m_value: 2.0
+    Horizon_Factor_m_value: 3.0
     Influence_Function: 1.0
     File: 
         Name: geometry_2D_test.csv
@@ -43,7 +43,7 @@ Output:
         Type:
             - Position
         File:
-            - nodes_positions_m_1_dx_0_5.csv
+            - nodes_positions_m_3_dx_0_5.csv
     VTK:
         Path: ./out2/
         Type:
@@ -55,5 +55,5 @@ Output:
         Slice: 1
 Solver:
     Max_Iteration: 1000
-    Tolerance: 1.0e-1
+    Tolerance: 1.0e-3
     Jacobian_Perturbation: 1.0e-6

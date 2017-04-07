@@ -7,6 +7,7 @@ import logging
 import numpy as np
 import util.neighbor
 from scipy import linalg 
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -198,6 +199,9 @@ class PD_problem():
                     for s in range(0, deck.dim):
                         if r==s:
                             jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
+        print "Det =", linalg.det(jacobian)
+        print np.allclose(jacobian, jacobian.T, atol=1e-8)
+        #sys.exit(1)
         return jacobian
 
     ## Provide the displacement increment resultiong for the Newton's method, for each node for a given time step t_n
@@ -222,7 +226,7 @@ class PD_problem():
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
         
-        delta_y = linalg.solve(jacobian, -residual)
+        delta_y = linalg.solve(jacobian, -residual, check_finite = "False", assume_a = "sym" )
        
         mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
         mask[removeId] = False
@@ -249,8 +253,7 @@ class PD_problem():
             while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :             
                 print "iteration", iteration                
                 if iteration == deck.solver_max_it:
-                    print "Warning: Solver reached limit of " + str(deck.solver_max_it) + " iterations"
-                    #sys.exit(1)  
+                    print "Warning: Solver reached limit of " + str(deck.solver_max_it) + " iterations"  
                 delta_y = self.newton_step(deck, ysolver, t_n, deck.solver_perturbation, residual)
                 ysolver += delta_y
                 residual = self.residual_vector(deck, ysolver, t_n)
