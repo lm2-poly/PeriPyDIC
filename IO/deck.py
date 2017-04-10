@@ -299,7 +299,7 @@ class DIC_deck():
                                 ## Influence function                                
                                 self.influence_function = self.doc["Discretization"]["Influence_Function"]
                         ## Amount of time steps        
-                        self.time_steps = 1
+                        self.time_steps = 2
                         
                         #self.vtk_writer = IO.vis.vtk_writer()
                         

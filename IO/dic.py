@@ -21,7 +21,6 @@ class DICreader2D():
         self.data = []
 
         self.read(path)
-        self.sortData()
         self.extractData()
         self.determineUnitHorizon()
 
@@ -38,19 +37,10 @@ class DICreader2D():
                 self.data.append(np.array(map(float, row)))
                 self.length += 1
 
-    ## Deprecated, not necessary anymore
-    # Sorts the data from the csv file with respect to the first and second
-    # pixel
-    # @param self Object pointer
-    def sortData(self):
-        self.data.sort(key=lambda x: (x[0], x[1]))
-
     ## Find unique values for x
     # @param self Object pointer
     def determineUnitHorizon(self):
-        sorted_x_set = sorted(set(self.x))
-        ## The minimal nodal spacing, extracted from DIC
-        self.delta_x = abs(sorted_x_set[1] - sorted_x_set[0])
+        self.delta_x = np.sqrt(np.power(self.x[1]-self.x[0],2)+np.power(self.y[1]-self.y[0],2))
 
     ## Stores the data extracted from the CSV file in objects which can be
     # manipulated by other modules
