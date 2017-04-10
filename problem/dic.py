@@ -22,13 +22,14 @@ class DIC_problem():
         self.weighted_function(deck)
 
         ## Actual position from DIC result
-        self.y = np.zeros((deck.num_nodes, deck.dim,1),dtype=np.float64)
+        self.y = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float64)
+	self.y[:,:,0] = deck.geometry.nodes[:,:]
 
         ## Internal forces
-        self.force_int = np.zeros((deck.num_nodes, deck.dim,1),dtype=np.float64)
+        self.force_int = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float64)
         
         ## Extension state
-        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes,1),dtype=np.float64 )
+        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes,2),dtype=np.float64 )
 
 
         if deck.material_type == "Elastic":
@@ -54,17 +55,17 @@ class DIC_problem():
     # @param mat_class Material class object for the elastic/viscoelastic material models
     def update_force_data(self, mat_class):
         ## Internal forces state
-        self.force_int[:,:, 0] = mat_class.f_int
+        self.force_int[:,:, 1] = mat_class.f_int
 
 
     ## Records the ext_state vector at each time step
     # @param mat_class Material class object for the elastic/viscoelastic material models
     def update_ext_state_data(self, mat_class):
         ## Extension state
-        self.ext[:, :, 0] = mat_class.e
+        self.ext[:, :, 1] = mat_class.e
 
     ## Records the actual position vector at each time step
     # @param act Actual position obtained from DIC data
     def update_pos(self,act):
         ## Actual position state
-        self.y[:,:, 0] = act
+        self.y[:,:, 1] = act
