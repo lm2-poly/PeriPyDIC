@@ -12,7 +12,7 @@ class NeighborSearch():
     # @param deck The input deck
     def __init__(self,deck):
         ## Safety factor for the search of the neighborhood
-        self.safety_factor = 1.1
+        self.safety_factor = deck.safety_factor
         ## Horizon of the neighborhood
         self.horizon = deck.horizon_factor_m_value*deck.delta_X*self.safety_factor
         self.findNeighbors(deck)

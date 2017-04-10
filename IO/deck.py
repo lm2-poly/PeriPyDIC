@@ -25,10 +25,15 @@ class PD_deck():
                 with open(inputFile,'r') as f:
                     ## Container of the tags parsed from the yaml file
                     self.doc = yaml.load(f)
+                    ## Safety factor for the computation of the radius
+                    self.safety_factor = 1.001
+                    
                     if not "Discretization" in self.doc:
                         print "Error: Specific a Discretization tag in your yaml"
                         sys.exit(1)
                     else:
+                        ## Safety factor for the computation of the radius
+                        self.safety_factor = 1.001
                         if not "Dim" in self.doc["Discretization"]:
                             print "Error: No Dim tag found"
                             sys.exit(1)
@@ -61,6 +66,8 @@ class PD_deck():
                         else:
                             ## Influence function
                             self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
+                        if "Saftety_Factor" in self.doc["Discretization"]:
+                            self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
                         if not ("File") in self.doc["Discretization"]:
                             print "Error: No File tag found"
                             sys.exit(1)
@@ -285,6 +292,8 @@ class DIC_deck():
                             print "Error: Specify a Discretization tag in your yaml"
                             sys.exit(1)
                         else:
+                            ## Safety factor for the computation of the radius
+                            self.safety_factor = 1.001
                             if not "Horizon_Factor_m_value" in self.doc["Discretization"]:
                                 print "Error: No Horizon_Factor_m_value tag found"
                                 sys.exit(1)
@@ -297,11 +306,11 @@ class DIC_deck():
                                 sys.exit(1)
                             else:
                                 ## Influence function                                
-                                self.influence_function = self.doc["Discretization"]["Influence_Function"]
+                                self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
+                            if "Saftety_Factor" in self.doc["Discretization"]:
+                                self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
                         ## Amount of time steps        
                         self.time_steps = 2
-                        
-                        #self.vtk_writer = IO.vis.vtk_writer()
                         
                         if "Output" in self.doc:
                             if "VTK" in self.doc["Output"]:
