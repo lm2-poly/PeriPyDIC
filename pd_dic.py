@@ -81,11 +81,11 @@ def simulation(deck):
 #    print "stress_tensor", stress_tensor
 #    print ccm_class.C
     
-    strain_longi = pb_solver_class.strain_calculation(deck, 3, 5)
+    strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
     print "strain_longi", strain_longi
     #print "Nodes positions = "
     #print pb_solver_class.y
-    print "Duration:", time.time() - t0 , "seconds"
+    print "Duration:", (time.time() - t0)/60. , "minutes"
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

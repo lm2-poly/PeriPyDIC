@@ -7,6 +7,7 @@ import logging
 import numpy as np
 import util.neighbor
 from scipy import linalg
+np.set_printoptions(precision=8, threshold='nan', suppress=True)
 #import sys
 
 logger = logging.getLogger(__name__)
@@ -177,6 +178,7 @@ class PD_problem():
     # @param t_n Id of the time step
     # @param perturbation_factor Magnitude of the perturbation factor
     # @return Jacobian matrix
+    @profile
     def jacobian_matrix(self, deck, ysolver, t_n, perturbation_factor):
         eps = perturbation_factor * deck.delta_X
         jacobian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim),dtype=np.float64)
@@ -199,8 +201,7 @@ class PD_problem():
                     for s in range(0, deck.dim):
                         if r==s:
                             jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)
-        #print "Det =", linalg.det(jacobian)
-        #print np.allclose(jacobian, jacobian.T, atol=1e-8)
+        #print "Jacobian Matrix Density =", np.count_nonzero(jacobian) / (float(deck.num_nodes) * float(deck.dim))**2 * 100., "%"
         return jacobian
 
     ## Provide the displacement increment resulting for the Newton's method, for each node for a given time step t_n
@@ -209,7 +210,8 @@ class PD_problem():
     # @param t_n Id of the time step
     # @param perturbation_factor Magnitude of the perturbation factor
     # @param residual Residual for each node resulting from a solving step
-    # @return Displacement increment for each node                             
+    # @return Displacement increment for each node 
+    @profile                            
     def newton_step(self, deck, ysolver, t_n, perturbation_factor, residual):
         jacobian = self.jacobian_matrix(deck, ysolver, t_n, perturbation_factor)
         residual = np.reshape(residual,(deck.dim*deck.num_nodes,1))
@@ -225,7 +227,8 @@ class PD_problem():
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
         
-        delta_y = linalg.solve(jacobian, -residual, check_finite = "False", assume_a = "sym" )
+        #delta_y = linalg.solve(jacobian, -residual, check_finite = "False", assume_a = "sym" )
+        delta_y = linalg.solve(jacobian, -residual, check_finite = "False")
        
         mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
         mask[removeId] = False

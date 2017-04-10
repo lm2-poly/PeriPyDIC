@@ -2,7 +2,7 @@ Discretization:
     Dim: 2
     Final_Time: 1.0
     Time_Steps: 1
-    Horizon_Factor_m_value: 4.0
+    Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File: 
         Name: geometry_2D_test.csv
@@ -55,5 +55,5 @@ Output:
         Slice: 1
 Solver:
     Max_Iteration: 1000
-    Tolerance: 1.0e-1
+    Tolerance: 1.0e-3
     Jacobian_Perturbation: 1.0e-6
