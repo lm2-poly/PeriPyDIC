@@ -209,8 +209,7 @@ class PD_problem():
     # @param t_n Id of the time step
     # @param perturbation_factor Magnitude of the perturbation factor
     # @param residual Residual for each node resulting from a solving step
-    # @return Displacement increment for each node 
-    @profile                            
+    # @return Displacement increment for each node s                          
     def newton_step(self, deck, ysolver, t_n, perturbation_factor, residual):
         jacobian = self.jacobian_matrix(deck, ysolver, t_n, perturbation_factor)
         residual = np.reshape(residual,(deck.dim*deck.num_nodes,1))
@@ -225,6 +224,8 @@ class PD_problem():
         jacobian = np.delete(jacobian,removeId,0)
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
+        
+      
         
         #delta_y = linalg.solve(jacobian, -residual, check_finite = "False", assume_a = "sym" )
         delta_y = linalg.solve(jacobian, -residual, check_finite = "False")

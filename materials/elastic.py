@@ -5,6 +5,8 @@
 import numpy as np
 from scipy import linalg
 np.set_printoptions(threshold='nan')
+from multiprocessing import Process, Lock
+import sharedmem
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Elastic_material():
@@ -73,15 +75,10 @@ class Elastic_material():
         
                     if deck.dim == 3:
                         self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
-
-    ## Compute the global internal force density at each node
-    # @param deck The input deck
-    # @param data_solver Data from the peridynamic problem/solving class
-    # @param y The actual nodes' position
-    def compute_f_int(self, deck, data_solver, y):
-        ## Internal force density at each node        
-        self.f_int = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
-        for i in range(0, deck.num_nodes):
+ 
+    def compute_f_int_slice(self, deck, data_solver, y,start, end, lock):     
+        #print start , end
+        for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
             for p in index_x_family:
                 Y = y[p,:] - y[i,:]
@@ -122,7 +119,41 @@ class Elastic_material():
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
-                
+                lock.acquire()
                 self.f_int[i,:] += self.t * M * deck.geometry.volumes[p]
                 self.f_int[p,:] += -self.t * M * deck.geometry.volumes[i]
+                lock.release()
+        #print data
                 
+    ## Compute the global internal force density at each node
+    # @param deck The input deck
+    # @param data_solver Data from the peridynamic problem/solving class
+    # @param y The actual nodes' position
+    def compute_f_int(self, deck, data_solver, y):
+        ## Internal force density at each node        
+        self.f_int = sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64)
+        
+        
+        lock = Lock()
+        threads = 4
+        part = int(deck.num_nodes/threads)
+        
+        processes = []
+        
+        for i in range(0,threads):
+            start = i * part
+            if i < threads - 1:
+                end = (i+1) * part
+            else:
+                end = deck.num_nodes
+            #print start , end , deck.num_nodes
+            processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y,start, end, lock)))
+        
+        for p in processes:
+            p.start()
+            
+        for p in processes:
+            p.join()
+        
+        
+        
