@@ -52,7 +52,7 @@ class Elastic_material():
     ## Compute the dilatation for each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param y The actual nodes' position
+    # @param y The actual nodes' position   
     def compute_dilatation(self, deck, data_solver, y):
         ## Dilatation at each node        
         self.dilatation = np.zeros((deck.num_nodes),dtype=np.float64)

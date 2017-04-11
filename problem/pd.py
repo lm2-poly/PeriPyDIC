@@ -104,7 +104,7 @@ class PD_problem():
     # @param deck The input deck    
     # @param ysolver Initial guess for Actual nodes' position
     # @param t_n Id of the time step
-    # @return Internal force density for each node
+    # @return Internal force density for each node  
     def internal_force(self, deck, ysolver, t_n):
         # Choice of the material class
         if deck.material_type == "Elastic":
@@ -178,7 +178,6 @@ class PD_problem():
     # @param t_n Id of the time step
     # @param perturbation_factor Magnitude of the perturbation factor
     # @return Jacobian matrix
-    @profile
     def jacobian_matrix(self, deck, ysolver, t_n, perturbation_factor):
         eps = perturbation_factor * deck.delta_X
         jacobian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim),dtype=np.float64)
