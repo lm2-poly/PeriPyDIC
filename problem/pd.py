@@ -6,7 +6,9 @@
 import logging
 import numpy as np
 import util.neighbor
-from scipy import linalg
+#from scipy import linalg
+from scipy.sparse import linalg
+from scipy import sparse
 np.set_printoptions(precision=8, threshold='nan', suppress=True)
 #import sys
 
@@ -228,7 +230,10 @@ class PD_problem():
       
         
         #delta_y = linalg.solve(jacobian, -residual, check_finite = "False", assume_a = "sym" )
-        delta_y = linalg.solve(jacobian, -residual, check_finite = "False")
+        #delta_y = linalg.solve(jacobian, -residual, check_finite = "False")
+        
+        s = sparse.csr_matrix(jacobian)
+        delta_y = linalg.spsolve(s, -residual)
        
         mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
         mask[removeId] = False
@@ -251,7 +256,7 @@ class PD_problem():
             res = float('inf')
             iteration = 1
             residual = self.residual_vector(deck, ysolver, t_n)
-            res = linalg.norm(residual)
+            res = np.linalg.norm(residual)
             while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :             
                 print "iteration", iteration                
                 if iteration == deck.solver_max_it:
@@ -259,7 +264,7 @@ class PD_problem():
                 delta_y = self.newton_step(deck, ysolver, t_n, deck.solver_perturbation, residual)
                 ysolver += delta_y
                 residual = self.residual_vector(deck, ysolver, t_n)
-                res = linalg.norm(residual)
+                res = np.linalg.norm(residual)
                 iteration += 1  
             self.y[:,:,t_n] = ysolver
             print "t_n:" , t_n , "res:" , res , "Iteration #",iteration-1

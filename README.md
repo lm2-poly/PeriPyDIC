@@ -16,6 +16,7 @@
    * `numpy`
    * `pyyaml`
    * `scipy.optimize`
+   * `sharedmem` 
    
    The following tools are **optional** 
    * `doxygen`

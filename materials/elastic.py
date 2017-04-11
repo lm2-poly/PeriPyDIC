@@ -55,7 +55,7 @@ class Elastic_material():
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
     # @param y The actual nodes' position   
-    def compute_dilatation_slice(self, deck, data_solver, y,start, end, lock):
+    def compute_dilatation_slice(self, deck, data_solver, y,start, end):
        
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
@@ -80,7 +80,6 @@ class Elastic_material():
         ## Extension between Node "i" and Node "p" within its family
         self.e = sharedmem.empty((deck.num_nodes, deck.num_nodes),dtype=np.float64)  
         
-        lock = Lock()
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
         
@@ -93,7 +92,7 @@ class Elastic_material():
             else:
                 end = deck.num_nodes
             #print start , end , deck.num_nodes
-            processes.append(Process(target=self.compute_dilatation_slice, args=(deck, data_solver, y,start, end, lock)))
+            processes.append(Process(target=self.compute_dilatation_slice, args=(deck, data_solver, y,start, end)))
         
         for p in processes:
             p.start()
