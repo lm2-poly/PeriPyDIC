@@ -27,6 +27,8 @@ class PD_deck():
                     self.doc = yaml.load(f)
                     ## Safety factor for the computation of the radius
                     self.safety_factor = 1.001
+                    ## Number of threads
+                    self.num_threads = 1
                     
                     if not "Discretization" in self.doc:
                         print "Error: Specific a Discretization tag in your yaml"
@@ -202,6 +204,10 @@ class PD_deck():
                             else:
                                 ## Perturbation factor for the Jacobian matrix
                                 self.solver_perturbation = float(self.doc["Solver"]["Jacobian_Perturbation"])
+                                
+                        if "Parallel" in self.doc:
+                            if "Threads" in self.doc["Parallel"]:
+                                self.num_threads = int(self.doc["Parallel"]["Threads"]) 
                             
 class DIC_deck():
     
@@ -311,7 +317,8 @@ class DIC_deck():
                                 self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
                         ## Amount of time steps        
                         self.time_steps = 2
-                        
+                        ## Number of threads
+                        self.num_threads = 1
                         if "Output" in self.doc:
                             if "VTK" in self.doc["Output"]:
                                 if not "Path" in self.doc["Output"]["VTK"]:
@@ -325,5 +332,7 @@ class DIC_deck():
                                     self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],1)
                                     if self.vtk_writer.vtk_enabled == False:
                                         print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
-                            
+                        if "Parallel" in self.doc:
+                            if "Threads" in self.doc["Parallel"]:
+                                self.num_threads = int(self.doc["Parallel"]["Threads"])    
                                 

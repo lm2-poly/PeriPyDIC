@@ -118,28 +118,38 @@ For writing the simulation attributes to the VTK unstructured grid format the ta
 
 ```yaml
 VTK:
-	Path: ./
-	Type:
-	- Displacement
-	- Neighbors
-	- Force
-	- Conditions
-	- Volume_Force
-	- Strain
+    Path: ./
+    Type:
+    - Displacement
+    - Neighbors
+    - Force
+    - Conditions
+    - Volume_Force
+    - Strain
 Slice: 1
 ```
 Where `Path` is the path for the output, `Type` specify the simulation attributes, which are considered for the output, and `Slice` defines that every n-th time step is written.
  
 ### Solver
 
-Here, `Max_Iteration`, `Tolerance` of the solver can be specified. With `Jacobian_Perturbation` the perturbation for assembly the Jacobian matrix is defined.
+Here, `Max_Iteration`, `Tolerance` of the solver can be specified. With `Jacobian_Perturbation` the perturbation for assembly the Jacobian matrix is defined and `Saftety_Factor` influences the computation of the horizon.
 
 ```yaml
 Solver:
     Max_Iteration: 100
     Tolerance: 1.0e-6
     Jacobian_Perturbation: 1.0e-6
+    Saftety_Factor: 1.001
 ```
+
+### Parallel computing
+For using multiple threads with `multiprocessing` specify the number of threads with `Threads`.
+
+```yaml
+Parallel:
+	Threads: 2
+``` 
+
 
 ## Examples
 
