@@ -204,6 +204,7 @@ class vtk_writer():
                         array = vtk.vtkDoubleArray()
                         array.SetName("Strain_DIC")
                         array.SetNumberOfComponents(3)
+                        array.SetNumberOfTuples(num_nodes)
                         
                         for i in range(num_nodes):
                             xx = deck.geometry.strain[i][0]
@@ -217,8 +218,9 @@ class vtk_writer():
                             
                     if out_type == "Strain_Error":
                         array = vtk.vtkDoubleArray()
-                        array.SetName("Strain_DIC")
+                        array.SetName("Strain_Error")
                         array.SetNumberOfComponents(3)
+                        array.SetNumberOfTuples(num_nodes)
                         
                         strain = ccm_class.global_strain[:,:,1]
                         
