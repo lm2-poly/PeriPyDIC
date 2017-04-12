@@ -93,15 +93,13 @@ class Elastic_material():
                 end = deck.num_nodes
             #print start , end , deck.num_nodes
             processes.append(Process(target=self.compute_dilatation_slice, args=(deck, data_solver, y,start, end)))
-        
-        for p in processes:
-            p.start()
-            
+            processes[i].start()
+           
         for p in processes:
             p.join()                 
     
  
-    def compute_f_int_slice(self, deck, data_solver, y,start, end, lock):     
+    def compute_f_int_slice(self, deck, data_solver, y,start, end, data):     
         #print start , end
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
@@ -144,10 +142,10 @@ class Elastic_material():
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
-                lock.acquire()
-                self.f_int[i,:] += self.t * M * deck.geometry.volumes[p]
-                self.f_int[p,:] += -self.t * M * deck.geometry.volumes[i]
-                lock.release()
+                #lock.acquire()
+                data[i,:] += self.t * M * deck.geometry.volumes[p]
+                data[p,:] += -self.t * M * deck.geometry.volumes[i]
+                #lock.release()
         #print data
                 
     ## Compute the global internal force density at each node
@@ -158,12 +156,13 @@ class Elastic_material():
         ## Internal force density at each node        
         self.f_int = sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64)
         
-        lock = Lock()
+        
+        #lock = Lock()
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
         
         processes = []
-        
+        data = []
         for i in range(0,threads):
             start = i * part
             if i < threads - 1:
@@ -171,13 +170,13 @@ class Elastic_material():
             else:
                 end = deck.num_nodes
             #print start , end , deck.num_nodes
-            processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y,start, end, lock)))
-        
-        for p in processes:
-            p.start()
+            data.append(sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64))
+            processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y,start, end, data[i])))
+            processes[i].start()
             
         for p in processes:
             p.join()
         
-        
+        for i in range(0,threads):
+            self.f_int += data[i]
         
