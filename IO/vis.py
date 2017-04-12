@@ -200,7 +200,35 @@ class vtk_writer():
                                 array.SetComponentName(5,"e_yz") 
                         dataOut.AddArray(array)
                         
-                
+                    if out_type == "Strain_DIC":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Strain_DIC")
+                        array.SetNumberOfComponents(3)
+                        
+                        for i in range(num_nodes):
+                            xx = deck.geometry.strain[i][0]
+                            xy = deck.geometry.strain[i][2]
+                            yy = deck.geometry.strain[i][1]
+                            array.SetTuple3(i,xx,yy,xy)
+                            array.SetComponentName(0,"e_xx") 
+                            array.SetComponentName(1,"e_yy") 
+                            array.SetComponentName(2,"e_xy") 
+                            
+                    if out_type == "Strain_Error":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Strain_DIC")
+                        array.SetNumberOfComponents(3)
+                        
+                        strain = ccm_class.global_strain[:,:,1]
+                        
+                        for i in range(num_nodes):
+                            xx = abs(deck.geometry.strain[i][0] - strain[i*deck.dim,0])
+                            xy = abs(deck.geometry.strain[i][2] - strain[i*deck.dim,1])
+                            yy = abs(deck.geometry.strain[i][1] - strain[i*deck.dim+1,1])
+                            array.SetTuple3(i,xx,yy,xy)
+                            array.SetComponentName(0,"error_xx") 
+                            array.SetComponentName(1,"error_yy") 
+                            array.SetComponentName(2,"error_xy") 
                                  
                 writer.SetInputData(grid)
 
