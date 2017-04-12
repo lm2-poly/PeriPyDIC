@@ -213,6 +213,7 @@ class vtk_writer():
                             array.SetComponentName(0,"e_xx") 
                             array.SetComponentName(1,"e_yy") 
                             array.SetComponentName(2,"e_xy") 
+                        dataOut.AddArray(array)
                             
                     if out_type == "Strain_Error":
                         array = vtk.vtkDoubleArray()
@@ -229,6 +230,7 @@ class vtk_writer():
                             array.SetComponentName(0,"error_xx") 
                             array.SetComponentName(1,"error_yy") 
                             array.SetComponentName(2,"error_xy") 
+                        dataOut.AddArray(array)
                                  
                 writer.SetInputData(grid)
 
