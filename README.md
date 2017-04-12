@@ -43,6 +43,7 @@ The available `Type` are until now `Elastic` and `Viscoelastic`.
 ### Geometry
 
 The discretization and the nodes are described with
+
 ```yaml
 Discretization:
     Dim: 1
@@ -50,10 +51,11 @@ Discretization:
     Time_Steps: 8
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
+    Saftety_Factor: 1.001
     File: 
         Name: geometry_dx0_50.csv
 ```
-where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force withrespect to the distance of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. An example for this file is provided here:
+where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force with respect to the distance of the horizon and `Saftety_Factor` influences the computation of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. An example for this file is provided here:
 
 ```
 #id x y z volume
@@ -133,14 +135,13 @@ Where `Path` is the path for the output, `Type` specify the simulation attribute
  
 ### Solver
 
-Here, `Max_Iteration`, `Tolerance` of the solver can be specified. With `Jacobian_Perturbation` the perturbation for assembly the Jacobian matrix is defined and `Saftety_Factor` influences the computation of the horizon.
+Here, `Max_Iteration`, `Tolerance` of the solver can be specified. With `Jacobian_Perturbation` the perturbation for assembly the Jacobian matrix is defined.
 
 ```yaml
 Solver:
     Max_Iteration: 100
     Tolerance: 1.0e-6
     Jacobian_Perturbation: 1.0e-6
-    Saftety_Factor: 1.001
 ```
 
 ### Parallel computing
@@ -148,7 +149,7 @@ For using multiple threads with `multiprocessing` specify the number of threads 
 
 ```yaml
 Parallel:
-	Threads: 2
+    Threads: 2
 ``` 
 
 
