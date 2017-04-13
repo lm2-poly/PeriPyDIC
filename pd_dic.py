@@ -77,9 +77,8 @@ def simulation(deck):
     strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
     print "epsilon_tensor", strain_tensor
     
-#    stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
-#    print "stress_tensor", stress_tensor
-#    print ccm_class.C
+    stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
+    print "stress_tensor", stress_tensor
     
     strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
     print "strain_longi", strain_longi
