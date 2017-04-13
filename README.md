@@ -16,6 +16,7 @@
    * `numpy`
    * `pyyaml`
    * `scipy.optimize`
+   * `sharedmem` 
    
    The following tools are **optional** 
    * `doxygen`
@@ -42,6 +43,7 @@ The available `Type` are until now `Elastic` and `Viscoelastic`.
 ### Geometry
 
 The discretization and the nodes are described with
+
 ```yaml
 Discretization:
     Dim: 1
@@ -49,10 +51,11 @@ Discretization:
     Time_Steps: 8
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
+    Saftety_Factor: 1.001
     File: 
         Name: geometry_dx0_50.csv
 ```
-where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force withrespect to the distance of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. An example for this file is provided here:
+where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force with respect to the distance of the horizon and `Saftety_Factor` influences the computation of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. An example for this file is provided here:
 
 ```
 #id x y z volume
@@ -118,14 +121,14 @@ For writing the simulation attributes to the VTK unstructured grid format the ta
 
 ```yaml
 VTK:
-	Path: ./
-	Type:
-	- Displacement
-	- Neighbors
-	- Force
-	- Conditions
-	- Volume_Force
-	- Strain
+    Path: ./
+    Type:
+    - Displacement
+    - Neighbors
+    - Force
+    - Conditions
+    - Volume_Force
+    - Strain
 Slice: 1
 ```
 Where `Path` is the path for the output, `Type` specify the simulation attributes, which are considered for the output, and `Slice` defines that every n-th time step is written.
@@ -140,6 +143,15 @@ Solver:
     Tolerance: 1.0e-6
     Jacobian_Perturbation: 1.0e-6
 ```
+
+### Parallel computing
+For using multiple threads with `multiprocessing` specify the number of threads with `Threads`.
+
+```yaml
+Parallel:
+    Threads: 2
+``` 
+
 
 ## Examples
 

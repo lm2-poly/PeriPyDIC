@@ -54,6 +54,8 @@ class DICreader2D():
         dy = np.zeros((self.length))
         ## Vector containing columes for each point
         self.volumes = np.zeros((self.length))
+        ## Strain from DIC
+        self.strain = np.zeros((self.length,3))
 
         for i in range(0, len(self.data)):
             self.x[i] = self.data[i][0]
@@ -61,6 +63,10 @@ class DICreader2D():
 
             dx[i] = self.data[i][3]
             dy[i] = self.data[i][4]
+            
+            self.strain[i][0] = self.data[i][6]
+            self.strain[i][1] = self.data[i][7]
+            self.strain[i][2] = self.data[i][8]
 
             self.volumes[i] = 0.1
 

@@ -57,3 +57,5 @@ Solver:
     Max_Iteration: 1000
     Tolerance: 1.0e-3
     Jacobian_Perturbation: 1.0e-6
+Parallel:
+    Threads: 8

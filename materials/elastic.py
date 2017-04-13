@@ -5,6 +5,9 @@
 import numpy as np
 from scipy import linalg
 np.set_printoptions(threshold='nan')
+from multiprocessing import Process, Lock
+import sharedmem
+import util.linalgebra
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Elastic_material():
@@ -53,42 +56,60 @@ class Elastic_material():
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
     # @param y The actual nodes' position   
-    def compute_dilatation(self, deck, data_solver, y):
-        ## Dilatation at each node        
-        self.dilatation = np.zeros((deck.num_nodes),dtype=np.float64)
-        ## Extension between Node "i" and Node "p" within its family
-        self.e = np.zeros((deck.num_nodes, deck.num_nodes),dtype=np.float64)
-        for i in range(0, deck.num_nodes):
+    def compute_dilatation_slice(self, deck, data_solver, y,start, end):
+       
+        for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
             for p in index_x_family:
                     Y = (y[p,:]) - y[i,:]
                     X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                    self.e[i,p] = linalg.norm(Y) - linalg.norm(X)
+                    self.e[i,p] = util.linalgebra.norm(Y) - util.linalgebra.norm(X)
                     
                     if deck.dim == 1:
-                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * util.linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
         
                     if deck.dim == 2:
-                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * util.linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
         
                     if deck.dim == 3:
-                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalg.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
-
-    ## Compute the global internal force density at each node
-    # @param deck The input deck
-    # @param data_solver Data from the peridynamic problem/solving class
-    # @param y The actual nodes' position
-    def compute_f_int(self, deck, data_solver, y):
-        ## Internal force density at each node        
-        self.f_int = np.zeros((deck.num_nodes, deck.dim),dtype=np.float64)
-        for i in range(0, deck.num_nodes):
+                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * util.linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        
+                        
+    def compute_dilatation(self, deck, data_solver, y):
+        ## Dilatation at each node        
+        self.dilatation = sharedmem.empty((deck.num_nodes),dtype=np.float64)
+        ## Extension between Node "i" and Node "p" within its family
+        self.e = sharedmem.empty((deck.num_nodes, deck.num_nodes),dtype=np.float64)  
+        
+        threads = deck.num_threads
+        part = int(deck.num_nodes/threads)
+        
+        processes = []
+        
+        for i in range(0,threads):
+            start = i * part
+            if i < threads - 1:
+                end = (i+1) * part
+            else:
+                end = deck.num_nodes
+            #print start , end , deck.num_nodes
+            processes.append(Process(target=self.compute_dilatation_slice, args=(deck, data_solver, y,start, end)))
+            processes[i].start()
+           
+        for p in processes:
+            p.join()                 
+    
+ 
+    def compute_f_int_slice(self, deck, data_solver, y,start, end, data):     
+        #print start , end
+        for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
             for p in index_x_family:
                 Y = y[p,:] - y[i,:]
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 
                 # Compute the direction vector between Node_p and Node_i
-                M = Y / linalg.norm(Y)
+                M = Y / util.linalgebra.norm(Y)
 
                 if deck.dim == 1:
                     # PD material parameter
@@ -105,7 +126,7 @@ class Elastic_material():
                     
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
-                    e_s = self.dilatation[i] * linalg.norm(X) / 3.
+                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
                     e_d = self.e[i, p] - e_s
                     
                     t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * self.w * e_s / 3.
@@ -117,12 +138,46 @@ class Elastic_material():
                     alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                     alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
-                    e_s = self.dilatation[i] * linalg.norm(X) / 3.
+                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
                     e_d = self.e[i, p] - e_s
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
+                #lock.acquire()
+                data[i,:] += self.t * M * deck.geometry.volumes[p]
+                data[p,:] += -self.t * M * deck.geometry.volumes[i]
+                #lock.release()
+        #print data
                 
-                self.f_int[i,:] += self.t * M * deck.geometry.volumes[p]
-                self.f_int[p,:] += -self.t * M * deck.geometry.volumes[i]
-                
+    ## Compute the global internal force density at each node
+    # @param deck The input deck
+    # @param data_solver Data from the peridynamic problem/solving class
+    # @param y The actual nodes' position
+    def compute_f_int(self, deck, data_solver, y):
+        ## Internal force density at each node        
+        self.f_int = sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64)
+        
+        
+        #lock = Lock()
+        threads = deck.num_threads
+        part = int(deck.num_nodes/threads)
+        
+        processes = []
+        data = []
+        for i in range(0,threads):
+            start = i * part
+            if i < threads - 1:
+                end = (i+1) * part
+            else:
+                end = deck.num_nodes
+            #print start , end , deck.num_nodes
+            data.append(sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64))
+            processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y,start, end, data[i])))
+            processes[i].start()
+            
+        for p in processes:
+            p.join()
+        
+        for i in range(0,threads):
+            self.f_int += data[i]
+        

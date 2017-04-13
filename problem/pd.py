@@ -6,8 +6,11 @@
 import logging
 import numpy as np
 import util.neighbor
-from scipy import linalg
+#from scipy import linalg
+from scipy.sparse import linalg
+from scipy import sparse
 np.set_printoptions(precision=8, threshold='nan', suppress=True)
+import util.linalgebra
 #import sys
 
 logger = logging.getLogger(__name__)
@@ -98,7 +101,7 @@ class PD_problem():
             index_x_family = self.neighbors.get_index_x_family(i)
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                self.weighted_volume[i] += deck.influence_function * (np.linalg.norm(X))**2 * deck.geometry.volumes[p]
+                self.weighted_volume[i] += deck.influence_function * (util.linalgebra.norm(X))**2 * deck.geometry.volumes[p]
 
     ## Provide the internal force density for each node for a given time step t_n
     # @param deck The input deck    
@@ -225,8 +228,13 @@ class PD_problem():
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
         
+      
+        
         #delta_y = linalg.solve(jacobian, -residual, check_finite = "False", assume_a = "sym" )
-        delta_y = linalg.solve(jacobian, -residual, check_finite = "False")
+        #delta_y = linalg.solve(jacobian, -residual, check_finite = "False")
+        
+        s = sparse.csr_matrix(jacobian)
+        delta_y = linalg.spsolve(s, -residual)
        
         mask = np.ones((deck.num_nodes * deck.dim), dtype=bool)
         mask[removeId] = False
@@ -249,7 +257,8 @@ class PD_problem():
             res = float('inf')
             iteration = 1
             residual = self.residual_vector(deck, ysolver, t_n)
-            res = linalg.norm(residual)
+           
+            res = util.linalgebra.norm(residual)
             while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :             
                 print "iteration", iteration                
                 if iteration == deck.solver_max_it:
@@ -257,7 +266,9 @@ class PD_problem():
                 delta_y = self.newton_step(deck, ysolver, t_n, deck.solver_perturbation, residual)
                 ysolver += delta_y
                 residual = self.residual_vector(deck, ysolver, t_n)
-                res = linalg.norm(residual)
+               
+                res = util.linalgebra.norm(residual)
+                
                 iteration += 1  
             self.y[:,:,t_n] = ysolver
             print "t_n:" , t_n , "res:" , res , "Iteration #",iteration-1
@@ -290,8 +301,8 @@ class PD_problem():
     def strain_calculation(self, deck, id_Node_1, id_Node_2):
         strain = np.zeros( ( deck.time_steps ),dtype=np.float64 )
         for t_n in range(1, deck.time_steps):
-            actual = np.linalg.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
-            initial = np.linalg.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
+            actual = util.linalgebra.norm(self.y[id_Node_2,:,t_n] - self.y[id_Node_1,:,t_n])
+            initial = util.linalgebra.norm(deck.geometry.nodes[id_Node_2,:] - deck.geometry.nodes[id_Node_1,:])
             strain[t_n] = (actual - initial) / initial
         return strain
             
