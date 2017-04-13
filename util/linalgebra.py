@@ -15,3 +15,5 @@ def norm(a):
             for i in range(0,a.shape[0]):
                 tmp += a[i][0]*a[i][0]+a[i][1]*a[i][1]
             return sqrt(tmp) 
+        if a.shape[1] == 1:
+            return sum(abs(a))
