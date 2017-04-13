@@ -29,7 +29,7 @@ class PD_problem():
         ## Global internal force density array storing the force density attached to each node for each time step
         self.force_int = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         
-        ## Extension array storing the extension at each node between the node and its family                
+        ## Extension array storing the extension at each node between the node and its family                7
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
 
         ## Compute the external force density "b" applied on each node
@@ -209,8 +209,7 @@ class PD_problem():
     # @param t_n Id of the time step
     # @param perturbation_factor Magnitude of the perturbation factor
     # @param residual Residual for each node resulting from a solving step
-    # @return Displacement increment for each node 
-    @profile                            
+    # @return Displacement increment for each node                            
     def newton_step(self, deck, ysolver, t_n, perturbation_factor, residual):
         jacobian = self.jacobian_matrix(deck, ysolver, t_n, perturbation_factor)
         residual = np.reshape(residual,(deck.dim*deck.num_nodes,1))
