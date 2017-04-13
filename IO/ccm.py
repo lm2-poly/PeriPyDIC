@@ -179,10 +179,14 @@ class CCM_calcul():
             # Plane strain
             #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
             alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
-            
             alpha_sb = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) /3.
+            K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q) 
             
-            K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)        
+        if self.dim == 3:
+            # PD material parameter
+            alpha_s = (9. / self.Weighted_Volume[i]) * self.K
+            alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu            
+            K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
         
         return K
         
