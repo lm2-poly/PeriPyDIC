@@ -75,10 +75,12 @@ def simulation(deck):
     print "Horizon =" , pb_solver_class.neighbors.horizon
         
     strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
-    print "epsilon_tensor", strain_tensor
+    print "epsilon_tensor" 
+    print strain_tensor
     
     stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
-    print "stress_tensor", stress_tensor
+    print "stress_tensor"
+    print stress_tensor
     
     strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
     print "strain_longi", strain_longi

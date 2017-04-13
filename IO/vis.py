@@ -174,30 +174,71 @@ class vtk_writer():
                         
                         for i in range(num_nodes):
                             if deck.dim ==1:
-                                array.SetComponentName(0,"e_xx") 
+                                array.SetComponentName(0,"epsil_xx") 
                                 array.SetTuple1(i,strain[i,0])
                             if deck.dim == 2:
                                 xx = strain[i*deck.dim,0]
                                 xy = strain[i*deck.dim,1]
                                 yy = strain[i*deck.dim+1,1]
                                 array.SetTuple3(i,xx,yy,xy)
-                                array.SetComponentName(0,"e_xx") 
-                                array.SetComponentName(1,"e_yy") 
-                                array.SetComponentName(2,"e_xy") 
+                                array.SetComponentName(0,"epsil_xx") 
+                                array.SetComponentName(1,"epsil_yy") 
+                                array.SetComponentName(2,"epsil_xy") 
                             if deck.dim == 3:
                                 xx = strain[i*deck.dim,0]
                                 xy = strain[i*deck.dim,1]
                                 yy = strain[i*deck.dim+1,1]
-                                yz = strain[i*deck.dim+1,1]
+                                yz = strain[i*deck.dim+1,2]
                                 xz = strain[i*deck.dim,2]
                                 zz = strain[i*deck.dim+2,2]
-                                array.SetTuple6(i,xx,yy,zz,xy,xz,yz)     
-                                array.SetComponentName(0,"e_xx") 
-                                array.SetComponentName(1,"e_yy") 
-                                array.SetComponentName(2,"e_zz") 
-                                array.SetComponentName(3,"e_xy") 
-                                array.SetComponentName(4,"e_xz") 
-                                array.SetComponentName(5,"e_yz") 
+                                array.SetTuple6(i,xx,yy,zz,yz,xz,xy)     
+                                array.SetComponentName(0,"epsil_xx") 
+                                array.SetComponentName(1,"epsil_yy") 
+                                array.SetComponentName(2,"epsil_zz") 
+                                array.SetComponentName(3,"epsil_yz") 
+                                array.SetComponentName(4,"epsil_xz") 
+                                array.SetComponentName(5,"epsil_xy") 
+                        dataOut.AddArray(array)
+
+                    if out_type == "Stress":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Stress")
+                        if deck.dim == 1:
+                            array.SetNumberOfComponents(1)
+                        if deck.dim == 2:
+                            array.SetNumberOfComponents(3)
+                        if deck.dim == 3:
+                            array.SetNumberOfComponents(6)    
+                        array.SetNumberOfTuples(num_nodes)
+
+                        stress = ccm_class.global_stress[:,:,1]
+                        
+                        for i in range(num_nodes):
+                            if deck.dim ==1:
+                                array.SetComponentName(0,"sigma_xx") 
+                                array.SetTuple1(i,strain[i,0])
+                            if deck.dim == 2:
+                                xx = stress[i*deck.dim,0]
+                                xy = stress[i*deck.dim,1]
+                                yy = stress[i*deck.dim+1,1]
+                                array.SetTuple3(i,xx,yy,xy)
+                                array.SetComponentName(0,"sigma_xx") 
+                                array.SetComponentName(1,"sigma_yy") 
+                                array.SetComponentName(2,"sigma_xy") 
+                            if deck.dim == 3:
+                                xx = stress[i*deck.dim,0]
+                                xy = stress[i*deck.dim,1]
+                                yy = stress[i*deck.dim+1,1]
+                                yz = stress[i*deck.dim+1,2]
+                                xz = stress[i*deck.dim,2]
+                                zz = stress[i*deck.dim+2,2]
+                                array.SetTuple6(i,xx,yy,zz,yz,xz,xy)     
+                                array.SetComponentName(0,"sigma_xx") 
+                                array.SetComponentName(1,"sigma_yy") 
+                                array.SetComponentName(2,"sigma_zz") 
+                                array.SetComponentName(3,"sigma_yz") 
+                                array.SetComponentName(4,"sigma_xz") 
+                                array.SetComponentName(5,"sigma_xy") 
                         dataOut.AddArray(array)
                         
                     if out_type == "Strain_DIC":
@@ -211,9 +252,9 @@ class vtk_writer():
                             xy = deck.geometry.strain[i][2]
                             yy = deck.geometry.strain[i][1]
                             array.SetTuple3(i,xx,yy,xy)
-                            array.SetComponentName(0,"e_xx") 
-                            array.SetComponentName(1,"e_yy") 
-                            array.SetComponentName(2,"e_xy") 
+                            array.SetComponentName(0,"epsil_xx") 
+                            array.SetComponentName(1,"epsil_yy") 
+                            array.SetComponentName(2,"epsil_xy") 
                         dataOut.AddArray(array)
                             
                     if out_type == "Strain_Error":
