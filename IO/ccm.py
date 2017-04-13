@@ -40,7 +40,7 @@ class CCM_calcul():
         self.node_volumes = deck.geometry.volumes        
         
         ## Influence function
-        self.influence_function = deck.influence_function
+        self.w = deck.influence_function
         
         ## Weighted volume
         self.Weighted_Volume = data_solver.weighted_volume
@@ -106,7 +106,7 @@ class CCM_calcul():
         index_x_family = data_solver.neighbors.get_index_x_family(i)
         for p in index_x_family:
             X = self.X_vector_state(data_solver, i, p)
-            K += self.influence_function * np.dot(X,X.T) * self.node_volumes[p]
+            K += self.w * np.dot(X,X.T) * self.node_volumes[p]
         return K
 
     ## Provide the deformation gradient tensor related to Node "i"
@@ -120,7 +120,7 @@ class CCM_calcul():
         for p in index_x_family:
             Y = self.Y_vector_state(data_solver, i, p, t_n)            
             X = self.X_vector_state(data_solver, i, p)
-            tmp += self.influence_function * np.dot(Y,X.T) * self.node_volumes[p]
+            tmp += self.w * np.dot(Y,X.T) * self.node_volumes[p]
         deformation = np.dot(tmp, linalg.inv(self.K_shape_tensor(data_solver, i)))
         return deformation
         
@@ -170,7 +170,20 @@ class CCM_calcul():
         if self.dim == 1:
             # PD material parameter
             alpha = self.Young_Modulus / self.Weighted_Volume[i]
-            K = alpha * self.influence_function * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
+            K = alpha * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
+        
+        if self.dim == 2:
+            # PD material parameter
+            # Plane stress
+            alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
+            # Plane strain
+            #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
+            alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
+            
+            alpha_sb = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) /3.
+            
+            K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)        
+        
         return K
         
     ## Provide the stress tensor related to Node "i"
