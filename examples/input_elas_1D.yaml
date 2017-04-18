@@ -45,12 +45,12 @@ Output:
             - Neighbors
             - Force
             - Conditions
-            - Volume_Force
             - Strain
+            - Stress
         Slice: 1
 Solver:
     Max_Iteration: 100
     Tolerance: 1.0e-6
     Jacobian_Perturbation: 1.0e-6
 Parallel:
-    Threads: 1
+    Threads: 3

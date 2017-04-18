@@ -9,7 +9,6 @@ import problem.pd
 import IO.ccm
 import numpy as np
 np.set_printoptions(precision=8, threshold='nan', suppress=True)
-#np.set_printoptions(formatter={'float': lambda x: "%.3f" % x}, threshold='nan')
 import time
 import problem.dic as problem_dic
 

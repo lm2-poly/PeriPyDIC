@@ -32,8 +32,12 @@ class PD_problem():
         ## Global internal force density array storing the force density attached to each node for each time step
         self.force_int = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         
-        ## Extension array storing the extension at each node between the node and its family                7
+        ## Extension array storing the extension at each node between the node and its family
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
+        
+        if deck.material_type == "Viscoelastic":
+            ## Viscous extension array storing the extension at each node between the node and its family
+            self.ext_visco = np.zeros( ( deck.num_nodes, deck.num_nodes, len(deck.Relax_Time), deck.time_steps ),dtype=np.float64 )            
 
         ## Compute the external force density "b" applied on each node
         self.compute_b(deck)
