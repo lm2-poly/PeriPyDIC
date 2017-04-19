@@ -4,7 +4,6 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 from scipy import linalg
-np.set_printoptions(precision=8, threshold='nan', suppress=True)
 from multiprocessing import Process, Lock
 import sharedmem
 import util.linalgebra
@@ -103,24 +102,38 @@ class Viscoelastic_material():
     # @param y The actual nodes' position 
     # @param t_n Id of the time step
     # @param start Starting Id of the loop
-    # @param end Ending Id of the loop 
-    def compute_ext_state_visco_slice(self, deck, data_solver, y, t_n, start, end):
+    # @param end Ending Id of the loop
+    def compute_dilatation_visco_slice(self, deck, data_solver, y, t_n, start, end):
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
             for p in index_x_family:
+                Y = (y[p,:]) - y[i,:]
+                X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 for k in range(1, len(self.Relax_Time)):
-                    temp_exp = np.exp((- deck.delta_t)/(self.Relax_Time[k]))
-                    delta_e = self.e[x_i, x_p] - problem.ext[x_i, x_p, t_n-1]
-                    beta = 1-(self.Relax_Time[k]*(1-temp_exp)) / deck.delta_t
-                    e_visco[x_i, x_p, k] = problem.ext[x_i, x_p, t_n-1] *(1-temp_exp) + problem.ext_visco[x_i, x_p, k, t_n-1]*temp_exp + beta*delta_e
-
+                    tmp_exp = np.exp((- deck.delta_t) / (self.Relax_Time[k]))
+                    delta_e = self.e[i, p] - data_solver.ext[i, p, t_n-1]
+                    beta = 1.0 - (self.Relax_Time[k] * (1.0 - tmp_exp)) / deck.delta_t
+                    self.e_visco[i, p, k] = data_solver.ext[i, p, t_n-1] * (1.0 - tmp_exp) + data_solver.ext_visco[i, p, k, t_n-1] * tmp_exp + beta * delta_e
+                    
+                    if deck.dim == 1:
+                        self.dilatation[i,k] += (1. / self.Weighted_Volume[i]) * self.w * util.linalgebra.norm(X) * (self.e[i,p] - self.e_visco[i, p, k]) * deck.geometry.volumes[p]
+        
+                    if deck.dim == 2:
+                        self.dilatation[i,k] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * util.linalgebra.norm(X) * (self.e[i,p] - self.e_visco[i, p, k]) * deck.geometry.volumes[p]
+        
+                    if deck.dim == 3:
+                        self.dilatation[i,k] += (3. / self.Weighted_Volume[i]) * self.w * util.linalgebra.norm(X) * (self.e[i,p] - self.e_visco[i, p, k]) * deck.geometry.volumes[p]
+                        
     ## Compute the viscoelastic part of the scalar extension state
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
     # @param y The actual nodes' position 
-    # @param t_n Id of the time step
-    def compute_ext_state_visco(self, deck, data_solver, y, t_n):
-        self.e_visco = sharedmem.empty((deck.num_nodes, deck.num_nodes, len(self.Relax_Time)),dtype=np.float64)
+    # @param t_n Id of the time step                      
+    def compute_dilatation_visco(self, deck, data_solver, y, t_n):
+        ## Dilatation at each node        
+        self.dilatation_visco = sharedmem.empty((deck.num_nodes, len(self.Relax_Time)),dtype=np.float64)
+        ## Extension between Node "i" and Node "p" within its family
+        self.e_visco = sharedmem.empty((deck.num_nodes, deck.num_nodes, len(self.Relax_Time)),dtype=np.float64) 
         
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
@@ -134,7 +147,7 @@ class Viscoelastic_material():
             else:
                 end = deck.num_nodes
 
-            processes.append(Process(target=self.compute_ext_state_visco_slice, args=(deck, data_solver, y, t_n, start, end)))
+            processes.append(Process(target=self.compute_dilatation_visco_slice, args=(deck, data_solver, y, t_n, start, end)))
             processes[i].start()
            
         for p in processes:
@@ -142,36 +155,71 @@ class Viscoelastic_material():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ## Compute the viscoelastic part of the scalar extension state
+    # @param deck The input deck
+    # @param data_solver Data from the peridynamic problem/solving class
+    # @param y The actual nodes' position 
+    # @param t_n Id of the time step
+    # @param start Starting Id of the loop
+    # @param end Ending Id of the loop 
+    def compute_ext_state_visco_slice(self, deck, data_solver, y, t_n, start, end):
+        for i in range(start, end):
+            index_x_family = data_solver.neighbors.get_index_x_family(i)
+            for p in index_x_family:
+                for k in range(1, len(self.Relax_Time)):
+                    tmp_exp = np.exp((- deck.delta_t) / (self.Relax_Time[k]))
+                    delta_e = self.e[i, p] - data_solver.ext[i, p, t_n-1]
+                    beta = 1.0 - (self.Relax_Time[k] * (1.0 - tmp_exp)) / deck.delta_t
+                    self.e_visco[i, p, k] = data_solver.ext[i, p, t_n-1] * (1.0 - tmp_exp) + data_solver.ext_visco[i, p, k, t_n-1] * tmp_exp + beta * delta_e
+
     ## Function to compute the viscous part of the scalar force state
     # @param deck The input deck
-    # @param problem The related peridynamic problem
+    # @param data_solver The related peridynamic data_solver
     # @param y The actual postions
-    def compute_t_visco(self, deck, problem, y):
+    def compute_t_visco(self, deck, data_solver, y):
         t_visco = np.zeros( (self.len_x, self.len_x ) )
         for x_i in range(0, self.len_x):
-            index_x_family = problem.neighbors.get_index_x_family(x_i)
+            index_x_family = data_solver.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 for k in range(1, len(self.Relax_Time)):
-                    t_visco[x_i, x_p] = t_visco[x_i, x_p] + (self.w / problem.weighted_function(deck, deck.geometry.nodes, x_i))*self.Relax_Modulus[k]*(self.e[x_i, x_p] - self.e_visco[x_i, x_p, k])
+                    t_visco[x_i, x_p] = t_visco[x_i, x_p] + (self.w / data_solver.weighted_function(deck, deck.geometry.nodes, x_i))*self.Relax_Modulus[k]*(self.e[x_i, x_p] - self.e_visco[x_i, x_p, k])
         ## Viscous part of the scalar state
         self.t_visco = t_visco
 
     ## Function to compute the vector force state
     # @param deck The input deck
-    # @param problem The related peridynamic problem
+    # @param data_solver The related peridynamic data_solver
     # @param y The actual postions
-    def compute_T(self, deck, problem, y):
+    def compute_T(self, deck, data_solver, y):
         tscal = np.zeros( (self.len_x, self.len_x ) )
         for x_i in range(0, self.len_x):
-            index_x_family = problem.neighbors.get_index_x_family(x_i)
+            index_x_family = data_solver.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
-                tscal[x_i, x_p] = (self.w / problem.weighted_function(deck, deck.geometry.nodes, x_i))*self.Relax_Modulus[0]*self.e[x_i, x_p] + self.t_visco[x_i, x_p]
+                tscal[x_i, x_p] = (self.w / data_solver.weighted_function(deck, deck.geometry.nodes, x_i))*self.Relax_Modulus[0]*self.e[x_i, x_p] + self.t_visco[x_i, x_p]
         ## Scalar force state
         self.tscal = tscal
 
         T = np.zeros( (self.len_x, self.len_x ) )
         for x_i in range(0, self.len_x):
-            index_x_family = problem.neighbors.get_index_x_family(x_i)
+            index_x_family = data_solver.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 T[x_i, x_p] = tscal[x_i, x_p] * self.M[x_i, x_p]
         ## Vector force state
@@ -179,11 +227,11 @@ class Viscoelastic_material():
 
     ## Function to compute, as a vector state, the global internal volumic force within the equation of motion
     # @param deck The input deck
-    # @param problem The related peridynamic problem
-    def compute_Ts(self, deck, problem):
+    # @param data_solver The related peridynamic data_solver
+    def compute_Ts(self, deck, data_solver):
         Ts = np.zeros( (self.len_x ) )
         for x_i in range(0, self.len_x):
-            index_x_family = problem.neighbors.get_index_x_family(x_i)
+            index_x_family = data_solver.neighbors.get_index_x_family(x_i)
             for x_p in index_x_family:
                 Ts[x_i] = Ts[x_i] + self.T[x_i, x_p] - self.T[x_p, x_i]
             Ts[x_i] = Ts[x_i] * deck.geometry.volumes[x_i]

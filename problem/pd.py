@@ -9,7 +9,6 @@ import util.neighbor
 #from scipy import linalg
 from scipy.sparse import linalg
 from scipy import sparse
-np.set_printoptions(precision=8, threshold='nan', suppress=True)
 import util.linalgebra
 #import sys
 

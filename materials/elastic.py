@@ -4,10 +4,10 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 from scipy import linalg
-np.set_printoptions(precision=8, threshold='nan', suppress=True)
 from multiprocessing import Process, Lock
 import sharedmem
 import util.linalgebra
+import sys
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Elastic_material():
@@ -158,6 +158,7 @@ class Elastic_material():
                 data[i,:] += self.t * M * deck.geometry.volumes[p]
                 data[p,:] += -self.t * M * deck.geometry.volumes[i]
                 #lock.release()
+                print data
                 
     ## Compute the global internal force density at each node
     # @param deck The input deck
@@ -166,7 +167,7 @@ class Elastic_material():
     def compute_f_int(self, deck, data_solver, y):
         ## Internal force density at each node        
         self.f_int = sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64)
-        
+        #self.f_int.fill(0.0)
         #lock = Lock()
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
@@ -181,6 +182,7 @@ class Elastic_material():
                 end = deck.num_nodes
             #print start , end , deck.num_nodes
             data.append(sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64))
+            #data[i].fill(0)
             processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y, start, end, data[i])))
             processes[i].start()
             
