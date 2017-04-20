@@ -37,8 +37,8 @@ Boundary:
         Type: Ramp
         Values:
             - 1.0
-            - 1.0
-            - 1.0
+            - 8.0
+            - 11.0
 Output:
     CSV:
         Type:

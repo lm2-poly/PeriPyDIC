@@ -5,7 +5,7 @@
 import numpy as np
 from scipy import linalg
 np.set_printoptions(precision=8, threshold='nan')
-#import sys
+import sys
 
 ## Class to compute the well-known strain and stress tensors defined in the classical continuum mechanics
 class CCM_calcul():
@@ -44,28 +44,47 @@ class CCM_calcul():
         
         ## Weighted volume
         self.Weighted_Volume = data_solver.weighted_volume
-
-        if deck.dim == 1:
-            ## Young modulus of the material
-            self.Young_Modulus = deck.young_modulus
         
-        if deck.dim == 2:
-            ## Bulk modulus of the material
-            self.K = deck.bulk_modulus
-            ## Shear modulus of the material
-            self.Mu = deck.shear_modulus
-            ## Poisson ratio of the material
-            self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
-            ## Factor applied for 2D plane stress to compute dilatation and force state                   
-            self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
-#            ## Plane strain
-#            self.factor2d = 1
+        ## Material type
+        self.material_type = deck.material_type
 
-        if deck.dim == 3:
-            ## Bulk modulus of the material
-            self.K = deck.bulk_modulus
-            ## Shear modulus of the material
-            self.Mu = deck.shear_modulus
+        if self.material_type == "Elastic":
+            if deck.dim == 1:
+                ## Young modulus of the material
+                self.Young_Modulus = deck.young_modulus
+            
+            if deck.dim == 2:
+                ## Bulk modulus of the material
+                self.K = deck.bulk_modulus
+                ## Shear modulus of the material
+                self.Mu = deck.shear_modulus
+                ## Poisson ratio of the material
+                self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
+                ## Factor applied for 2D plane stress to compute dilatation and force state                   
+                self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
+#                ## Plane strain
+#                self.factor2d = 1
+    
+            if deck.dim == 3:
+                ## Bulk modulus of the material
+                self.K = deck.bulk_modulus
+                ## Shear modulus of the material
+                self.Mu = deck.shear_modulus
+
+        if self.material_type == "Viscoelastic":                
+            if deck.dim == 1:
+                ## Relaxation modulus of the material
+                self.Relax_Modulus = deck.relax_modulus
+                ## Relaxation time of the material
+                self.Relax_Time = deck.relax_time
+            
+            if deck.dim == 2:
+                print "Error: 2D problem not implemented in viscoelasticity"
+                sys.exit(1)
+    
+            if deck.dim == 3:
+                print "Error: 3D problem not implemented in viscoelasticity"
+                sys.exit(1)
         
         ## Compute the global strain tensor storing the strain tensor for each node at each time step      
         self.compute_global_strain_tensor(data_solver)
@@ -74,7 +93,8 @@ class CCM_calcul():
         #self.compute_u_displacement()
 
         ## Compute the global stress tensor storing the strain tensor for each node at each time step      
-        self.compute_global_stress_tensor(data_solver)
+        if self.material_type == "Elastic":        
+            self.compute_global_stress_tensor(data_solver)
            
     ## Provide the image of (xi - xp) under the reference position vector state X 
     # @param data_solver Data from the peridynamic problem/solving class
@@ -166,29 +186,32 @@ class CCM_calcul():
         Xp = self.X_vector_state(data_solver, i, p)
         M = Xp / linalg.norm(Xp)
         Xq = self.X_vector_state(data_solver, i, q)
-                
-        if self.dim == 1:
-            # PD material parameter
-            alpha = self.Young_Modulus / self.Weighted_Volume[i]
-            K = alpha * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
-        
-        if self.dim == 2:
-            # PD material parameter
-            # Plane stress
-            alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
-            # Plane strain
-            #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
-            alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
-            alpha_sb = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) /3.
-            K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q) 
+
+        if self.material_type == "Elastic":                
+            if self.dim == 1:
+                # PD material parameter
+                alpha = self.Young_Modulus / self.Weighted_Volume[i]
+                K = alpha * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
             
-        if self.dim == 3:
-            # PD material parameter
-            alpha_s = (9. / self.Weighted_Volume[i]) * self.K
-            alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu            
-            K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
+            if self.dim == 2:
+                # PD material parameter
+                # Plane stress
+                alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
+                # Plane strain
+                #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
+                alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
+                alpha_sb = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) /3.
+                K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q) 
+                
+            if self.dim == 3:
+                # PD material parameter
+                alpha_s = (9. / self.Weighted_Volume[i]) * self.K
+                alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu            
+                K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
         
         return K
+            
+
         
     ## Provide the stress tensor related to Node "i"
     # @param data_solver Data from the peridynamic problem/solving class
@@ -202,9 +225,7 @@ class CCM_calcul():
         for p in index_x_family:
             Xp = self.X_vector_state(data_solver, i, p)
             for q in index_x_family:
-                Xq = self.X_vector_state(data_solver, i, q)
-             #   force += np.dot(self.K_modulus_tensor(data_solver, i , p, q), np.dot(self.strain_tensor(data_solver, i, t_n), Xq)) * self.node_volumes[q]
-            #stress += np.dot(force ,Xp.T) * self.node_volumes[p]                
+                Xq = self.X_vector_state(data_solver, i, q)               
                 stress += np.dot(np.dot(self.K_modulus_tensor(data_solver, i , p, q), np.dot(self.strain_tensor(data_solver, i, t_n), Xq)), Xp.T) * self.node_volumes[q] * self.node_volumes[p]
         return stress
 

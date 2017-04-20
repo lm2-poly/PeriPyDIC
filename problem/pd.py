@@ -28,15 +28,15 @@ class PD_problem():
         self.y = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         self.y[:,:,0] = deck.geometry.nodes[:,:]
         
-        ## Global internal force density array storing the force density attached to each node for each time step
+        ## Global internal force density array storing the force density attached to each node
         self.force_int = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
         
-        ## Extension array storing the extension at each node between the node and its family
+        ## Extension state at each node between the node and its family
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
         
         if deck.material_type == "Viscoelastic":
-            ## Viscous extension array storing the extension at each node between the node and its family
-            self.ext_visco = np.zeros( ( deck.num_nodes, deck.num_nodes, len(deck.Relax_Time), deck.time_steps ),dtype=np.float64 )            
+            ## Viscoelastic part of the extension state at each node between the node and its family
+            self.ext_visco = np.zeros( ( deck.num_nodes, deck.num_nodes, len(deck.relax_time), deck.time_steps ),dtype=np.float64 )            
 
         ## Compute the external force density "b" applied on each node
         self.compute_b(deck)
@@ -77,7 +77,7 @@ class PD_problem():
             
             if con.type == "Force":
                 value = con.value / deck.geometry.volumes[int(i)]
-            if con.type == "Discplacement":
+            if con.type == "Displacement":
                 value = con.value 
                 
             if Time_t <= deck.shape_values[0]:
@@ -231,8 +231,6 @@ class PD_problem():
         jacobian = np.delete(jacobian,removeId,1)
         residual = np.delete(residual,removeId,0)
         
-      
-        
         #delta_y = linalg.solve(jacobian, -residual, check_finite = "False", assume_a = "sym" )
         #delta_y = linalg.solve(jacobian, -residual, check_finite = "False")
         
@@ -280,21 +278,21 @@ class PD_problem():
     # @param mat_class Data from the material class
     # @param t_n Id of the time step
     def update_force_data(self, mat_class, t_n):
-        ## Global internal force density array storing the force density attached to each node for each time step        
+        # Global internal force density array storing the force density attached to each node       
         self.force_int[:,:, t_n] = mat_class.f_int
 
-    ## Store the extension for each node between itself and its family
+    ## Store the extension state for each node between itself and its family at each time step
     # @param mat_class Data from the material class
     # @param t_n Id of the time step 
     def update_ext_state_data(self, mat_class, t_n):
-        ## Extension array storing the extension at each node between the node and its family                        
+        # Extension state at each node between the node and its family        
         self.ext[:, :, t_n] = mat_class.e
 
-    ## Store the viscous extension for each node between itself and its family
+    ## Store the viscoelastic part of the extension state for each node between itself and its family
     # @param mat_class Data from the material class
     # @param t_n Id of the time step
     def update_ext_state_visco_data(self, mat_class, t_n):
-        ## Viscous extension array storing the extension at each node between the node and its family        
+        # Viscoelastic part of the extension state at each node between the node and its family        
         self.ext_visco[:, :, :, t_n] = mat_class.e_visco
 
     ## Provide the strain between 2 nodes

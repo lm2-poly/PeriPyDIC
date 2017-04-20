@@ -77,9 +77,10 @@ def simulation(deck):
     print "epsilon_tensor" 
     print strain_tensor
     
-    stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
-    print "stress_tensor"
-    print stress_tensor
+    if deck.material_type == "Elastic":
+        stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
+        print "stress_tensor"
+        print stress_tensor
     
     strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
     print "strain_longi", strain_longi
