@@ -208,10 +208,8 @@ class CCM_calcul():
                 alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                 alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu            
                 K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
-        
-        return K
-            
 
+        return K
         
     ## Provide the stress tensor related to Node "i"
     # @param data_solver Data from the peridynamic problem/solving class
