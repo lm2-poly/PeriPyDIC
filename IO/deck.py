@@ -34,8 +34,6 @@ class PD_deck():
                         print "Error: Specific a Discretization tag in your yaml"
                         sys.exit(1)
                     else:
-                        ## Safety factor for the computation of the radius
-                        self.safety_factor = 1.001
                         if not "Dim" in self.doc["Discretization"]:
                             print "Error: No Dim tag found"
                             sys.exit(1)
@@ -68,8 +66,8 @@ class PD_deck():
                         else:
                             ## Influence function
                             self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
-                        if "Saftety_Factor" in self.doc["Discretization"]:
-                            self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
+                        if "Safety_Factor" in self.doc["Discretization"]:
+                            self.safety_factor = float(self.doc["Discretization"]["Safety_Factor"])
                         if not ("File") in self.doc["Discretization"]:
                             print "Error: No File tag found"
                             sys.exit(1)
@@ -133,12 +131,13 @@ class PD_deck():
                                         ## Shear modulus of the material
                                         self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"])
                             elif self.material_type == "Viscoelastic":
-                                if not "Relax_Modulus" in self.doc["Material"]:
-                                    print "Error: No Relax_Modulus tag found"
-                                    sys.exit(1)
-                                else:
-                                    ## Relaxation modulus of the material
-                                    self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                if self.dim == 1:
+                                    if not "Relax_Modulus" in self.doc["Material"]:
+                                        print "Error: No Relax_Modulus tag found"
+                                        sys.exit(1)
+                                    else:
+                                        ## Relaxation modulus of the material
+                                        self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
                                 if not "Relax_Time" in self.doc["Material"]:
                                     print "Error: No Relax_Time tag found"
                                     sys.exit(1)

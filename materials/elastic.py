@@ -4,10 +4,10 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 from scipy import linalg
-np.set_printoptions(threshold='nan')
 from multiprocessing import Process, Lock
 import sharedmem
 import util.linalgebra
+import sys
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Elastic_material():
@@ -55,8 +55,10 @@ class Elastic_material():
     ## Compute the dilatation for each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
-    # @param y The actual nodes' position   
-    def compute_dilatation_slice(self, deck, data_solver, y,start, end):
+    # @param y The actual nodes' position
+    # @param start Starting Id of the loop
+    # @param end Ending Id of the loop
+    def compute_dilatation_slice(self, deck, data_solver, y, start, end):
        
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
@@ -74,7 +76,10 @@ class Elastic_material():
                     if deck.dim == 3:
                         self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * util.linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
                         
-                        
+    ## Compute the dilatation and and also the scalar extension state for each node
+    # @param deck The input deck
+    # @param data_solver Data from the peridynamic problem/solving class
+    # @param y The actual nodes' position                        
     def compute_dilatation(self, deck, data_solver, y):
         ## Dilatation at each node        
         self.dilatation = sharedmem.empty((deck.num_nodes),dtype=np.float64)
@@ -93,14 +98,19 @@ class Elastic_material():
             else:
                 end = deck.num_nodes
             #print start , end , deck.num_nodes
-            processes.append(Process(target=self.compute_dilatation_slice, args=(deck, data_solver, y,start, end)))
+            processes.append(Process(target=self.compute_dilatation_slice, args=(deck, data_solver, y, start, end)))
             processes[i].start()
            
         for p in processes:
             p.join()                 
     
- 
-    def compute_f_int_slice(self, deck, data_solver, y,start, end, data):     
+    ## Compute the global internal force density at each node
+    # @param deck The input deck
+    # @param data_solver Data from the peridynamic problem/solving class
+    # @param y The actual nodes' position
+    # @param start Starting Id of the loop
+    # @param end Ending Id of the loop
+    def compute_f_int_slice(self, deck, data_solver, y, start, end, data):     
         #print start , end
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
@@ -143,11 +153,12 @@ class Elastic_material():
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
+                    
                 #lock.acquire()
                 data[i,:] += self.t * M * deck.geometry.volumes[p]
                 data[p,:] += -self.t * M * deck.geometry.volumes[i]
                 #lock.release()
-        #print data
+                print data
                 
     ## Compute the global internal force density at each node
     # @param deck The input deck
@@ -156,8 +167,7 @@ class Elastic_material():
     def compute_f_int(self, deck, data_solver, y):
         ## Internal force density at each node        
         self.f_int = sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64)
-        
-        
+        #self.f_int.fill(0.0)
         #lock = Lock()
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
@@ -172,12 +182,12 @@ class Elastic_material():
                 end = deck.num_nodes
             #print start , end , deck.num_nodes
             data.append(sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64))
-            processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y,start, end, data[i])))
+            #data[i].fill(0)
+            processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y, start, end, data[i])))
             processes[i].start()
             
         for p in processes:
             p.join()
         
         for i in range(0,threads):
-            self.f_int += data[i]
-        
+            self.f_int += data[i]     

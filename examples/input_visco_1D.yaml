@@ -5,7 +5,7 @@ Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     File:
-        Name: geometry_dx0_50.csv
+        Name: geometry_1D.csv
 Material:
     Type: Viscoelastic
     Relax_Modulus: 
@@ -22,14 +22,17 @@ Boundary:
             - Force
             - Displacement
         Value: 
-            - 40.0
+            - 40
             - 0.0
         Direction:
             - 1
             - 1
         File: 
-            - force_condition_dx0_50.csv
-            - displ_condition_1.csv
+            - force_condition_1D.csv
+            - displ_condition_1D.csv
+        Shape:
+            - Ramp
+            - Fixed
     Shape:
         Type: Ramp
         Values:
@@ -41,7 +44,20 @@ Output:
         Type:
             - Position
         File:
-            - nodes_positions_m4_dx0_50.csv
+            - nodes_positions_dx0_50.csv
+    VTK:
+        Path: ./out1/
+        Type:
+            - Displacement
+            - Neighbors
+            - Force
+            - Conditions
+            - Strain
+            - Stress
+        Slice: 1
 Solver:
-    Type: krylov
-    Tolerance: 1.0e-12
+    Max_Iteration: 100
+    Tolerance: 1.0e-6
+    Jacobian_Perturbation: 1.0e-6
+Parallel:
+    Threads: 3

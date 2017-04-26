@@ -52,6 +52,7 @@ Output:
             - Force
             - Conditions
             - Strain
+            - Stress
         Slice: 1
 Solver:
     Max_Iteration: 1000
