@@ -161,7 +161,7 @@ class PD_deck():
                                     ## List of all outputs specified in the configuration file
                                     self.outputs = []
                                     for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
-                                        self.outputs.append(IO.output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
+                                        self.outputs.append(output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
                             if "VTK" in self.doc["Output"]:
                                 if not "Path" in self.doc["Output"]["VTK"]:
                                     print "Error: No Path tag found in VTK"
