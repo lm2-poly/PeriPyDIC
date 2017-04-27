@@ -97,7 +97,6 @@ class Elastic_material():
                 end = (i+1) * part
             else:
                 end = deck.num_nodes
-            #print start , end , deck.num_nodes
             processes.append(Process(target=self.compute_dilatation_slice, args=(deck, data_solver, y, start, end)))
             processes[i].start()
            
@@ -111,7 +110,6 @@ class Elastic_material():
     # @param start Starting Id of the loop
     # @param end Ending Id of the loop
     def compute_f_int_slice(self, deck, data_solver, y, start, end, data):     
-        #print start , end
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
             for p in index_x_family:
@@ -158,7 +156,6 @@ class Elastic_material():
                 data[i,:] += self.t * M * deck.geometry.volumes[p]
                 data[p,:] += -self.t * M * deck.geometry.volumes[i]
                 #lock.release()
-                print data
                 
     ## Compute the global internal force density at each node
     # @param deck The input deck
@@ -180,7 +177,6 @@ class Elastic_material():
                 end = (i+1) * part
             else:
                 end = deck.num_nodes
-            #print start , end , deck.num_nodes
             data.append(sharedmem.empty((deck.num_nodes, deck.dim),dtype=np.float64))
             #data[i].fill(0)
             processes.append(Process(target=self.compute_f_int_slice, args=(deck, data_solver, y, start, end, data[i])))
