@@ -4,6 +4,7 @@
 #@author: patrick.diehl@polymtl.ca
 import csv
 import numpy as np
+import deck
 
 ## A class for reading VIC3D CSV grid exports and converting them into list
 # objects usable by other classes
@@ -13,14 +14,16 @@ class DICreader2D():
     # Reads the CSV file provided, determines the unit horizon of this data and
     # and creates node initial and node actual attributes of the class usable
     # by the other modules
-    # @param path The path to the VIC3D CSV export data
-    def __init__(self, path):
+    # @param deck Deck object containing input data from the .yaml file
+    def __init__(self, deck):
         ## Dimension of the problem (2D for DIC)
         self.dim = 2
         ## Temporary variable internal to this class
         self.data = []
 
-        self.read(path)
+        self.sigma_column = deck.sigma_column
+
+        self.read(deck.filepath + "/" + deck.filename)
         self.extractData()
         self.determineUnitHorizon()
 
@@ -58,17 +61,22 @@ class DICreader2D():
         self.strain = np.zeros((self.length,3))
 
         for i in range(0, len(self.data)):
-            self.x[i] = self.data[i][0]
-            self.y[i] = self.data[i][1]
+            # Remove values for which the confidence is -1.0
+            if self.data[i][self.sigma_column] == -1.:
+                pass
+            else:
 
-            dx[i] = self.data[i][3]
-            dy[i] = self.data[i][4]
-            
-            self.strain[i][0] = self.data[i][6]
-            self.strain[i][1] = self.data[i][7]
-            self.strain[i][2] = self.data[i][8]
+                self.x[i] = self.data[i][0]
+                self.y[i] = self.data[i][1]
 
-            self.volumes[i] = 0.1
+                dx[i] = self.data[i][3]
+                dy[i] = self.data[i][4]
+
+                self.strain[i][0] = self.data[i][6]
+                self.strain[i][1] = self.data[i][7]
+                self.strain[i][2] = self.data[i][8]
+
+                self.volumes[i] = 0.1
 
         del self.data
         ## Nodes initial positions

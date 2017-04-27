@@ -6,8 +6,8 @@ import yaml
 import os.path
 import geometry
 import sys
+import output
 import util.condition
-import IO.output
 import vis
 import dic
 
@@ -29,7 +29,7 @@ class PD_deck():
                     self.safety_factor = 1.001
                     ## Number of threads
                     self.num_threads = 1
-                    
+
                     if not "Discretization" in self.doc:
                         print "Error: Specific a Discretization tag in your yaml"
                         sys.exit(1)
@@ -147,7 +147,7 @@ class PD_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
-                       
+
                         if "Output" in self.doc:
                             if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
@@ -160,7 +160,7 @@ class PD_deck():
                                     ## List of all outputs specified in the configuration file
                                     self.outputs = []
                                     for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
-                                        self.outputs.append(IO.output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
+                                        self.outputs.append(output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
                             if "VTK" in self.doc["Output"]:
                                 if not "Path" in self.doc["Output"]["VTK"]:
                                     print "Error: No Path tag found in VTK"
@@ -171,16 +171,16 @@ class PD_deck():
                                 elif not "Slice" in self.doc["Output"]["VTK"]:
                                     print "Error: No Slice tag found in VTK"
                                     sys.exit(1)
-                                else:                                    
+                                else:
                                     ## Visualization ToolKit (VTK) writer
-                                    self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
+                                    self.vtk_writer = vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],self.doc["Output"]["VTK"]["Slice"])
                                     if self.vtk_writer.vtk_enabled == False:
                                         print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
                             else:
-                                self.vtk_writer = IO.vis.vtk_writer()
+                                self.vtk_writer = vis.vtk_writer()
                         else:
-                            self.vtk_writer = IO.vis.vtk_writer()
-                             
+                            self.vtk_writer = vis.vtk_writer()
+
                         if not "Solver" in  self.doc:
                             print "Error: No Solver tag found"
                             sys.exit(1)
@@ -203,13 +203,13 @@ class PD_deck():
                             else:
                                 ## Perturbation factor for the Jacobian matrix
                                 self.solver_perturbation = float(self.doc["Solver"]["Jacobian_Perturbation"])
-                                
+
                         if "Parallel" in self.doc:
                             if "Threads" in self.doc["Parallel"]:
-                                self.num_threads = int(self.doc["Parallel"]["Threads"]) 
-                            
+                                self.num_threads = int(self.doc["Parallel"]["Threads"])
+
 class DIC_deck():
-    
+
     ## Constructor
     # Reads the configuration in the yaml file and stores the values
     # @param inputFile The path to the yaml file with the configuration
@@ -229,19 +229,19 @@ class DIC_deck():
                             print "Error: No type tag found"
                             sys.exit(1)
                         else:
-                            ## Type of the material 
+                            ## Type of the material
                             self.material_type = self.doc["Material"]["Type"]
                             if self.material_type == "Elastic":
                                 if "E_Modulus" in self.doc["Material"]:
-                                    ## Young modulus of the material                                    
-                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])                                
+                                    ## Young modulus of the material
+                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])
                                 if "Bulk_Modulus" in self.doc["Material"]:
                                     ## Bulk modulus of the material
                                     self.bulk_modulus = float(self.doc["Material"]["Bulk_Modulus"])
                                 if "Shear_Modulus" in self.doc["Material"]:
-                                    ## Shear modulus of the material                                    
-                                    self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"])    
-                                    
+                                    ## Shear modulus of the material
+                                    self.shear_modulus = float(self.doc["Material"]["Shear_Modulus"])
+
                             elif self.material_type == "Viscoelastic":
                                 if not "Relax_Modulus" in self.doc["Material"]:
                                     print "Error: No Relax_Modulus tag found"
@@ -268,7 +268,14 @@ class DIC_deck():
                             else:
                                 ## The dimension of the input data
                                 self.dim = self.doc["Data"]["Dimension"]
-                                
+
+                            if not "Sigma" in self.doc["Data"]:
+                                print "Error: No Sigma (column of confidence in CSV file) tag found"
+                                sys.exit(1)
+                            else:
+                                ## The column number of the confidence in VIC3D CSV file
+                                self.sigma_column = self.doc["Data"]["Sigma"]
+
                             if not "File" in self.doc["Data"]:
                                 print "Error: Specify a File tag in your yaml"
                                 sys.exit(1)
@@ -278,21 +285,21 @@ class DIC_deck():
                                     sys.exit(1)
                                 else:
                                     ## Filename of the input file
-                                    self.filename = self.doc["Data"]["File"]["Name"]      
-                                    
+                                    self.filename = self.doc["Data"]["File"]["Name"]
+
                                 if not "Path" in self.doc["Data"]["File"]:
                                     print "Error: No Path tag found"
                                     sys.exit(1)
                                 else:
-                                    ## File path                                    
-                                    self.filepath = self.doc["Data"]["File"]["Path"]   
+                                    ## File path
+                                    self.filepath = self.doc["Data"]["File"]["Path"]
                                     ## Nodes uploaded from DIC input file
-                                    self.geometry = dic.DICreader2D(self.filepath + self.filename)
-                                    ## Amount of nodes                                    
+                                    self.geometry = dic.DICreader2D(self)
+                                    ## Amount of nodes
                                     self.num_nodes = len(self.geometry.nodes)
-                                    ## Minimal nodal spacing                                    
+                                    ## Minimal nodal spacing
                                     self.delta_X = self.geometry.delta_x
-                                       
+
                         if not "Discretization" in self.doc:
                             print "Error: Specify a Discretization tag in your yaml"
                             sys.exit(1)
@@ -303,18 +310,18 @@ class DIC_deck():
                                 print "Error: No Horizon_Factor_m_value tag found"
                                 sys.exit(1)
                             else:
-                                ## "m" value of the horizon factor                                
+                                ## "m" value of the horizon factor
                                 self.horizon_factor_m_value = self.doc["Discretization"]["Horizon_Factor_m_value"]
-                                
+
                             if not "Influence_Function" in self.doc["Discretization"]:
                                 print "Error: No Influence_Function tag found"
                                 sys.exit(1)
                             else:
-                                ## Influence function                                
+                                ## Influence function
                                 self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
                             if "Saftety_Factor" in self.doc["Discretization"]:
                                 self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
-                        ## Amount of time steps        
+                        ## Amount of time steps
                         self.time_steps = 2
                         ## Number of threads
                         self.num_threads = 1
@@ -328,10 +335,9 @@ class DIC_deck():
                                     sys.exit(1)
                                 else:
                                     ## Visualization ToolKit (VTK) writer
-                                    self.vtk_writer = IO.vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],1)
+                                    self.vtk_writer = vis.vtk_writer(self.doc["Output"]["VTK"]["Path"],self.doc["Output"]["VTK"]["Type"],1)
                                     if self.vtk_writer.vtk_enabled == False:
                                         print "Warning: VTK found, but no PyVTK is found, so there will be no output written."
                         if "Parallel" in self.doc:
                             if "Threads" in self.doc["Parallel"]:
-                                self.num_threads = int(self.doc["Parallel"]["Threads"])    
-                                
+                                self.num_threads = int(self.doc["Parallel"]["Threads"])
