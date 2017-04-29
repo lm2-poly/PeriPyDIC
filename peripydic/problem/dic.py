@@ -16,7 +16,7 @@ class DIC_problem():
     # @param deck Deck object containig data from the .yaml file
     def __init__(self, deck):
         ## NeighborSearch
-        self.neighbors = util.neighbor.NeighborSearch(deck)
+        self.neighbors = neighbor.NeighborSearch(deck)
 
         ## Compute the weighted volume for each node in a vector.
         self.weighted_function(deck)

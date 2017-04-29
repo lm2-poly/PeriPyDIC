@@ -65,16 +65,16 @@ class Elastic_material():
             for p in index_x_family:
                     Y = (y[p,:]) - y[i,:]
                     X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                    self.e[i,p] = util.linalgebra.norm(Y) - util.linalgebra.norm(X)
+                    self.e[i,p] = linalgebra.norm(Y) - linalgebra.norm(X)
 
                     if deck.dim == 1:
-                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * util.linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * util.linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
 
                     if deck.dim == 3:
-                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * util.linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
 
     ## Compute the dilatation and and also the scalar extension state for each node
     # @param deck The input deck
@@ -117,7 +117,7 @@ class Elastic_material():
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
 
                 # Compute the direction vector between Node_p and Node_i
-                M = Y / util.linalgebra.norm(Y)
+                M = Y / linalgebra.norm(Y)
 
                 if deck.dim == 1:
                     # PD material parameter
@@ -134,7 +134,7 @@ class Elastic_material():
 
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
-                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i, p] - e_s
 
                     t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * self.w * e_s / 3.
@@ -146,7 +146,7 @@ class Elastic_material():
                     alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                     alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
-                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i, p] - e_s
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
