@@ -7,7 +7,7 @@ import os.path
 import geometry
 import sys
 import output
-import util.condition
+from ..util import condition
 import vis
 import dic
 

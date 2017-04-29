@@ -2,8 +2,8 @@
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
-import util.neighbor
-from materials.elastic import Elastic_material
+from ..util import neighbor
+from ..materials import elastic
 import numpy as np
 
 ## Copmutes extension and force states out of displacement/nodes data obtained
@@ -27,7 +27,7 @@ class DIC_problem():
 
         ## Internal forces
         self.force_int = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float64)
-        
+
         ## Extension state
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes,2),dtype=np.float64 )
 
