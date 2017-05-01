@@ -11,7 +11,7 @@ The code is developed by Ilyass Tabiai (@ilyasst), Rolland Delorme (@rollanddelo
 
 ### Publications related to the code
 
-* Martin Lévesque, Rolland Delorme, Ilyass Tabiai, Daniel Therriault and Louis Laberge Lebel, **Generalization of the ordinary state-based peridynamic model for isotropic linear viscoelasticity**, _Mechanics of Time-Dependent Materials, (), 1-27_, 10.1007/s11043-017-9342-3, 
+* Delorme, R., Tabiai, I., Laberge Lebel, L., & Lévesque, M. (2017). **Generalization of the ordinary state-based peridynamic model for isotropic linear viscoelasticity. Mechanics of Time-Dependent Materials.**, _Mechanics of Time-Dependent Materials, (), 1-27_, 10.1007/s11043-017-9342-3, 
 
 ### Documentation
 
