@@ -1,5 +1,6 @@
 Discretization:
     Dim: 2
+    Type: Plane_Stress
     Final_Time: 1.0
     Time_Steps: 1
     Horizon_Factor_m_value: 2.0
@@ -58,4 +59,4 @@ Solver:
     Tolerance: 1.0e-3
     Jacobian_Perturbation: 1.0e-6
 Parallel:
-    Threads: 1
+    Threads: 3

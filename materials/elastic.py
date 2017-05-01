@@ -28,23 +28,27 @@ class Elastic_material():
             ## Young modulus of the material
             self.Young_Modulus = deck.young_modulus
         
-        if deck.dim == 2:
+        if deck.dim >= 2:
             ## Bulk modulus of the material
             self.K = deck.bulk_modulus
             ## Shear modulus of the material
             self.Mu = deck.shear_modulus
-            ## Poisson ratio of the material
-            self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
-            ## Factor applied for 2D plane stress to compute dilatation and force state                   
-            self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
-#            ## Plane strain
-#            self.factor2d = 1
+            
+            if deck.dim == 2:
+                ## Poisson ratio of the material
+                self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
+                if deck.type2d == "Plane_Stress":
+                    ## Factor applied for 2D plane stress to compute dilatation and force state                   
+                    self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
+                if deck.type2d == "Plane_Strain":               
+                    ## Plane strain
+                    self.factor2d = 1
 
-        if deck.dim == 3:
-            ## Bulk modulus of the material
-            self.K = deck.bulk_modulus
-            ## Shear modulus of the material
-            self.Mu = deck.shear_modulus
+#        if deck.dim == 3:
+#            ## Bulk modulus of the material
+#            self.K = deck.bulk_modulus
+#            ## Shear modulus of the material
+#            self.Mu = deck.shear_modulus
 
         ## Compute the dilatation for each node
         self.compute_dilatation(deck, data_solver, y)
@@ -127,15 +131,15 @@ class Elastic_material():
 
                 if deck.dim == 2:
                     # PD material parameter
-                    # Plane stress
-                    alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
-                    # Plane strain
-                    #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
+                    if deck.type2d == "Plane_Stress": 
+                        alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
+                    if deck.type2d == "Plane_Strain": 
+                        alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
                     
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
                     e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
-                    e_d = self.e[i, p] - e_s
+                    e_d = self.e[i,p] - e_s
                     
                     t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * self.w * e_s / 3.
                     t_d = alpha_d * self.w * e_d
@@ -147,7 +151,7 @@ class Elastic_material():
                     alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar force state
                     e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
-                    e_d = self.e[i, p] - e_s
+                    e_d = self.e[i,p] - e_s
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d

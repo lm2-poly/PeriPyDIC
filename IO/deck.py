@@ -10,6 +10,7 @@ import output
 import util.condition
 import vis
 import dic
+import numpy as np
 
 ## Class handeling the input of the yaml file and storing the values
 class PD_deck():
@@ -39,7 +40,14 @@ class PD_deck():
                             sys.exit(1)
                         else:
                             ## Dimension of the problem
-                            self.dim = int(self.doc["Discretization"]["Dim"])
+                            self.dim = int(self.doc["Discretization"]["Dim"])                            
+                            if self.dim == 2:                                    
+                                if not "Type" in self.doc["Discretization"]:
+                                    print "Error: No Type tag found for 2D problem. Choose Plane_Stress or Plane_Strain"
+                                    sys.exit(1)
+                                else:
+                                    ## Type of 2D problem
+                                    self.type2d = self.doc["Discretization"]["Type"]               
                         if not "Final_Time" in self.doc["Discretization"]:
                             print "Error: No Final_Time tag found"
                             sys.exit(1)
@@ -138,12 +146,25 @@ class PD_deck():
                                     else:
                                         ## Relaxation modulus of the material
                                         self.relax_modulus = self.doc["Material"]["Relax_Modulus"]
+                                if self.dim >= 2:
+                                    if not "Relax_Bulk_Modulus" in self.doc["Material"]:
+                                        print "Error: No Relax_Bulk_Modulus tag found"
+                                        sys.exit(1)
+                                    else:
+                                        ## Relaxation Bulk modulus of the material
+                                        self.relax_bulk_modulus = np.asarray(self.doc["Material"]["Relax_Bulk_Modulus"], dtype=np.float64)
+                                    if not "Relax_Shear_Modulus" in self.doc["Material"]:
+                                        print "Error: No Relax_Shear_Modulus tag found"
+                                        sys.exit(1)
+                                    else:
+                                        ## Relaxation Shear modulus of the material
+                                        self.relax_shear_modulus = np.asarray(self.doc["Material"]["Relax_Shear_Modulus"], dtype=np.float64)
                                 if not "Relax_Time" in self.doc["Material"]:
                                     print "Error: No Relax_Time tag found"
                                     sys.exit(1)
                                 else:
                                     ## Relaxation times
-                                    self.relax_time = self.doc["Material"]["Relax_Time"]
+                                    self.relax_time = np.asarray(self.doc["Material"]["Relax_Time"], dtype=np.float64)
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
