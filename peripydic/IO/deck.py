@@ -231,7 +231,7 @@ class DIC_deck():
                             if self.material_type == "Elastic":
                                 if "E_Modulus" in self.doc["Material"]:
                                     ## Young modulus of the material
-                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                                    self.young_modulus = float(self.doc["Material"]["E_Modulus"])
                                 if "Bulk_Modulus" in self.doc["Material"]:
                                     ## Bulk modulus of the material
                                     self.bulk_modulus = float(self.doc["Material"]["Bulk_Modulus"])
