@@ -113,7 +113,7 @@ class PD_problem():
     def internal_force(self, deck, ysolver, t_n):
         # Choice of the material class
         if deck.material_type == "Elastic":
-            from materials.elastic import Elastic_material
+            from ..materials.elastic import Elastic_material
             ## Data from the material class
             self.mat_class = Elastic_material( deck, self, ysolver )
             # Data from the material class
@@ -122,7 +122,7 @@ class PD_problem():
             self.update_ext_state_data(self.mat_class, t_n)
 
         elif deck.material_type == "Viscoelastic":
-            from materials.viscoelastic import Viscoelastic_material
+            from ..materials.viscoelastic import Viscoelastic_material
             self.mat_class = Viscoelastic_material( deck, self, ysolver, t_n)
             self.update_force_data(self.mat_class, t_n)
             self.update_ext_state_data(self.mat_class, t_n)
