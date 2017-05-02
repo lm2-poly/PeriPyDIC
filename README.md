@@ -1,11 +1,21 @@
-# The problem 
+# Basic Usage
+
+```python
+from peripydic import *
+
+deck = PD_deck("./input_elas_1D.yaml")
+problem = PD_problem(deck)
+
+```
+
+# The problem
 
    Consider a 1D bar. The length of the bar and the number of sections in which the bar will be divided (the Peridynamic (PD) nodes are at the edges of each section) are provided by the user.
-   
+
    A ramp loading is applied at the edges of the bar. The user provides the number of seconds after which the ramp reaches a maximal force value and remains there.
    Additional blocks are added at the edges of the block in order to apply the load. The number of blocks added at each edge of the bar is provided as the Horizon Factor.
    The user also provides the total duration of the simulation and the total number of time steps desired.
-   
+
    The problem is then solved using an initial guess vector and the *Newton-Krylov* algorithm provided in the `scipy.optimize` package.  
 
 # Getting started
@@ -16,11 +26,11 @@
    * `numpy`
    * `pyyaml`
    * `scipy.optimize`
-   * `sharedmem` 
-   
-   The following tools are **optional** 
+   * `sharedmem`
+
+   The following tools are **optional**
    * `doxygen`
-   * `dot` 
+   * `dot`
 
 ## Usage
 ```bash
@@ -30,7 +40,7 @@ Where `-i` has to be the configuration in `yaml format` and `-t` is the type, wh
 
 ## Input description
 
-### Material 
+### Material
 
 The material parameters are described here
 ```yaml
@@ -38,7 +48,7 @@ Material:
     Type: Elastic
     E_Modulus: 4000.0
 ```
-The available `Type` are until now `Elastic` and `Viscoelastic`. 
+The available `Type` are until now `Elastic` and `Viscoelastic`.
 
 ### Geometry
 
@@ -52,14 +62,14 @@ Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     Saftety_Factor: 1.001
-    File: 
+    File:
         Name: geometry_dx0_50.csv
 ```
 where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force with respect to the distance of the horizon and `Saftety_Factor` influences the computation of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. An example for this file is provided here:
 
 ```
 #id x y z volume
-0 0.0 0.0 0.0 1.0 
+0 0.0 0.0 0.0 1.0
 1 1.0 1.0 1.0 1.0
 ```
 The shape for the load is given here
@@ -80,17 +90,17 @@ Boundary conditions can be described with
 ```yaml
 Boundary:
     Condition:
-        Type: 
+        Type:
             - Force or Displacement
-        Value: 
+        Value:
             - Float
         Direction:
             - Int
-        File: 
+        File:
             - file.csv
 ```
 where the `Type` either can be `Force` or `Displacement`, `Value` describes the value in Newton or Millimeter whis is applied at the nodes
-described in `File`, and `Direction` describes the direction (X=1,Y=2,Z=3) where the condition is applied. The file has to be provided in the CSV format with spaces as delimiter with the id of the nodes where the condition 
+described in `File`, and `Direction` describes the direction (X=1,Y=2,Z=3) where the condition is applied. The file has to be provided in the CSV format with spaces as delimiter with the id of the nodes where the condition
 should be applied. Here, is an example for a `file.csv`
 ```yaml
 #id
@@ -103,7 +113,7 @@ For writing simulation attributes the `Output` tag can be used.
 
 #### CSV
 
-For writing the simulation attributes to the CSV format the tag `CSV` is used. 
+For writing the simulation attributes to the CSV format the tag `CSV` is used.
 
 ```yaml
 Output:
@@ -132,7 +142,7 @@ VTK:
 Slice: 1
 ```
 Where `Path` is the path for the output, `Type` specify the simulation attributes, which are considered for the output, and `Slice` defines that every n-th time step is written.
- 
+
 ### Solver
 
 Here, `Max_Iteration`, `Tolerance` of the solver can be specified. With `Jacobian_Perturbation` the perturbation for assembly the Jacobian matrix is defined.
@@ -150,7 +160,7 @@ For using multiple threads with `multiprocessing` specify the number of threads 
 ```yaml
 Parallel:
     Threads: 2
-``` 
+```
 
 
 ## Examples

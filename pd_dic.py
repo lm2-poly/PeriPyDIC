@@ -4,13 +4,12 @@
 #@author: patrick.diehl@polymtl.ca
 import sys
 import getopt
-import IO.deck
-import problem.pd
-import IO.ccm
 import numpy as np
 np.set_printoptions(precision=8, threshold='nan', suppress=True)
 import time
-import problem.dic as problem_dic
+from peripydic import *
+
+
 
 def main(argv):
     """
@@ -47,21 +46,21 @@ def main(argv):
             simulation(deck)
         else:
             print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
-    
+
     if typeIn == types[1]:
         deck = IO.deck.DIC_deck(inputFile)
-        dic(deck) 
-        
+        dic(deck)
+
 def dic(deck):
-    pb_solver_class = problem_dic.DIC_problem(deck)
+    pb_solver_class = DIC_problem(deck)
     ccm_class = IO.ccm.CCM_calcul(deck, pb_solver_class)
-    
+
     if deck.vtk_writer.vtk_enabled == True:
         deck.vtk_writer.write_data(deck,pb_solver_class,ccm_class)
 
 def simulation(deck):
     t0 = time.time()
-    y_0 = deck.geometry.nodes.copy()    
+    y_0 = deck.geometry.nodes.copy()
     pb_solver_class = problem.pd.PD_problem(deck)
     pb_solver_class.quasi_static_solver(deck, y_0)
     ccm_class = IO.ccm.CCM_calcul(deck, pb_solver_class)
@@ -72,16 +71,16 @@ def simulation(deck):
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_solver_class.neighbors.horizon
-        
+
     strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
-    print "epsilon_tensor" 
+    print "epsilon_tensor"
     print strain_tensor
-    
+
     if deck.material_type == "Elastic":
         stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
         print "stress_tensor"
         print stress_tensor
-    
+
     strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
     print "strain_longi", strain_longi
     #print "Nodes positions = "
