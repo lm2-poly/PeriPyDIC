@@ -78,10 +78,7 @@ class PD_deck():
                         self.delta_X = self.geometry.getMinDist()
                         ## Amount of nodes
                         self.num_nodes = self.geometry.amount
-                        if not "Boundary" in self.doc:
-                            print "Error: No Boundary tag found"
-                            sys.exit(1)
-                        else:
+                        if "Boundary" in self.doc:
                             if not "Condition" in self.doc["Boundary"]:
                                 print "Error: No Condition tag found"
                                 sys.exit(1)

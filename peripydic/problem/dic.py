@@ -3,7 +3,7 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 from ..util import neighbor
-from ..materials import elastic
+
 import numpy as np
 
 ## Copmutes extension and force states out of displacement/nodes data obtained
@@ -23,7 +23,7 @@ class DIC_problem():
 
         ## Actual position from DIC result
         self.y = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float64)
-	self.y[:,:,0] = deck.geometry.nodes[:,:]
+        self.y[:,:,0] = deck.geometry.nodes[:,:]
 
         ## Internal forces
         self.force_int = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float64)
@@ -33,7 +33,7 @@ class DIC_problem():
 
 
         if deck.material_type == "Elastic":
-
+            from ..materials.elastic import Elastic_material
             mat_class = Elastic_material( deck, self, deck.geometry.act )
             self.update_force_data(mat_class)
             self.update_ext_state_data(mat_class)
