@@ -321,6 +321,11 @@ class DIC_deck():
                                 self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
                             if "Saftety_Factor" in self.doc["Discretization"]:
                                 self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
+                            if "Dimension" in self.doc["Discretization"]:
+                                self.dim = int(self.doc["Discretization"]["Dimension"])
+                            else:
+                                print "Error: No dimension tag found in discretization"
+                                sys.exit(1)
                         ## Amount of time steps
                         self.time_steps = 2
                         ## Number of threads
