@@ -1,16 +1,26 @@
 Discretization:
     Dim: 2
     Type: Plane_Stress
-    Final_Time: 1.0
-    Time_Steps: 1
-    Horizon_Factor_m_value: 2.0
-    Influence_Function: 1.0
-    File: 
-        Name: geometry_2D_test.csv
+    Final_Time: 20.0
+    Time_Steps: 40
+    Horizon_Factor_m_value: 1.0
+    Influence_Function: 5.0
+    File:
+        Name: geometry_2D.csv
 Material:
-    Type: Elastic
-    Bulk_Modulus: 3333.3333
-    Shear_Modulus: 1538.4615
+    Type: Viscoelastic
+    Relax_Bulk_Modulus: 
+        - 3333.3333
+        - 1666.6666
+        - 833.3333
+    Relax_Shear_Modulus: 
+        - 1538.4615
+        - 769.23075
+        - 384.61538
+    Relax_Time:
+        - NaN
+        - 1.0
+        - 100.0
 Boundary:
     Condition:
         Type: 
@@ -18,17 +28,17 @@ Boundary:
             - Displacement
             - Displacement
         Value: 
-            - 20.0
+            - -40.0
             - 0.0
             - 0.0
         Direction:
-            - 1
+            - 2
             - 1
             - 2
         File: 
-            - force_condition_2D_test.csv
-            - displ_condition_2D_test.csv
-            - displ_condition_2D_test.csv
+            - force_condition_2D.csv
+            - displ_condition_2D.csv
+            - displ_condition_2D.csv
         Shape:
             - Ramp
             - Fixed
@@ -37,26 +47,27 @@ Boundary:
         Type: Ramp
         Values:
             - 1.0
-            - 1.0
-            - 1.0
+            - 8.0
+            - 11.0
 Output:
     CSV:
         Type:
             - Position
         File:
-            - nodes_positions_m_3_dx_0_5.csv
+            - nodes_positions_m_3_75_dx_1_0.csv
     VTK:
-        Path: ./out2/
+        Path: ./out_2d_visco/
         Type:
             - Displacement
             - Neighbors
             - Force
             - Conditions
             - Strain
+            - Stress
         Slice: 1
 Solver:
     Max_Iteration: 1000
-    Tolerance: 1.0e-3
+    Tolerance: 1.0e-2
     Jacobian_Perturbation: 1.0e-6
 Parallel:
     Threads: 3

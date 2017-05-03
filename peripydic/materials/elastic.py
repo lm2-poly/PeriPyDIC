@@ -27,30 +27,32 @@ class Elastic_material():
         if deck.dim == 1:
             ## Young modulus of the material
             self.Young_Modulus = deck.young_modulus
+        
+        if deck.dim >= 2:
 
-        if deck.dim == 2:
             ## Bulk modulus of the material
             self.K = deck.bulk_modulus
             ## Shear modulus of the material
             self.Mu = deck.shear_modulus
-            ## Poisson ratio of the material
-            self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
-            ## Factor applied for 2D plane stress to compute dilatation and force state
-            self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
-#            ## Plane strain
-#            self.factor2d = 1
-
-        if deck.dim == 3:
-            ## Bulk modulus of the material
-            self.K = deck.bulk_modulus
-            ## Shear modulus of the material
-            self.Mu = deck.shear_modulus
+            
+            if deck.dim == 2:
+                ## Poisson ratio of the material
+                self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
+                if deck.type2d == "Plane_Stress":
+                    ## Factor applied for 2D plane stress to compute dilatation and force state                   
+                    self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
+                if deck.type2d == "Plane_Strain":               
+                    ## Plane strain
+                    self.factor2d = 1
 
         ## Compute the dilatation for each node
         self.compute_dilatation(deck, data_solver, y)
 
         ## Compute the global internal force density at each node
         self.compute_f_int(deck, data_solver, y)
+
+        ## Compute the strain energy density at each node
+        self.compute_strain_energy(deck, data_solver)
 
     ## Compute the dilatation for each node
     # @param deck The input deck
@@ -127,16 +129,17 @@ class Elastic_material():
 
                 if deck.dim == 2:
                     # PD material parameter
-                    # Plane stress
-                    alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
-                    # Plane strain
-                    #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)
 
+                    if deck.type2d == "Plane_Stress": 
+                        alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
+                    if deck.type2d == "Plane_Strain": 
+                        alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
+                    
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
-                    # Scalar force state
-                    e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
-                    e_d = self.e[i, p] - e_s
-
+                    # Scalar extension states
+                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_d = self.e[i,p] - e_s
+                    # Scalar force states
                     t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * self.w * e_s / 3.
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
@@ -145,9 +148,12 @@ class Elastic_material():
                     # PD material parameter
                     alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                     alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
-                    # Scalar force state
-                    e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
-                    e_d = self.e[i, p] - e_s
+
+                    # Scalar extension states
+                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_d = self.e[i,p] - e_s
+                    # Scalar force states
+
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
@@ -187,3 +193,65 @@ class Elastic_material():
 
         for i in range(0,threads):
             self.f_int += data[i]
+
+    ## Computes the strain energy density for each PD node
+    # @param deck The input deck
+    # @param data_solver Data from the peridynamic problem/solving class
+    # @param start Starting Id of the loop
+    # @param end Ending Id of the loop
+    def compute_strain_energy_slice(self, deck, data_solver, start, end):
+        for i in range(start, end):
+            index_x_family = data_solver.neighbors.get_index_x_family(i)
+            for p in index_x_family:
+                
+                if deck.dim == 1:
+                    # PD material parameter
+                    alpha = self.Young_Modulus / self.Weighted_Volume[i]
+                    # Strain energy density
+                    self.strain_energy[i] += 0.5 * alpha * deck.influence_function * self.e[i,p]**2 * deck.geometry.volumes[p]
+
+                if deck.dim >= 2:
+                    X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
+                    if deck.dim == 2:
+                        # PD material parameter
+                        if deck.type2d == "Plane_Stress": 
+                            alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
+                        if deck.type2d == "Plane_Strain": 
+                            alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                                               
+                        alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
+                        
+                    if deck.dim == 3:
+                        # PD material parameter
+                        alpha_s = (9. / self.Weighted_Volume[i]) * self.K
+                        alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
+                        
+                    # Scalar extension states
+                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_d = self.e[i,p] - e_s
+                    # Strain energy density                    
+                    self.strain_energy[i] += 0.5 * deck.influence_function * (alpha_s * e_s**2 + alpha_d * e_d**2) * deck.geometry.volumes[p] 
+                                        
+    ## Compute the strain energy density at each node
+    # @param deck The input deck
+    # @param data_solver Data from the peridynamic problem/solving class
+    def compute_strain_energy(self, deck, data_solver):
+        ## Strain energy density at each node
+        self.strain_energy = sharedmem.empty((deck.num_nodes, 1),dtype=np.float64)
+
+        threads = deck.num_threads
+        part = int(deck.num_nodes/threads)
+
+        processes = []
+
+        for i in range(0,threads):
+            start = i * part
+            if i < threads - 1:
+                end = (i+1) * part
+            else:
+                end = deck.num_nodes
+            processes.append(Process(target=self.compute_strain_energy_slice, args=(deck, data_solver, start, end)))
+            processes[i].start()
+
+        for p in processes:
+            p.join()
+
