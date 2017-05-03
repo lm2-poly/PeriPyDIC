@@ -7,7 +7,6 @@ from scipy import linalg
 from multiprocessing import Process, Lock
 import sharedmem
 import util.linalgebra
-import sys
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Viscoelastic_material():
@@ -195,12 +194,14 @@ class Viscoelastic_material():
                     self.t = alpha_0 * self.w * self.e[i,p] + t_visco
 
                 if deck.dim == 2:
+                    # Scalar extension states
                     e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
                     e_d = self.e[i,p] - e_s
                     
                     t_s_visco = 0.0
                     t_d_visco = 0.0
                     for k in range(1, len(self.Relax_Time)):
+                        # Scalar visco extension states                        
                         e_s_visco = self.dilatation_visco[i,k] * util.linalgebra.norm(X) / 3.
                         e_d_visco = self.e_visco[i,p,k] - e_s_visco                       
                         # PD viscoelastic material parameter
@@ -209,7 +210,7 @@ class Viscoelastic_material():
                         if deck.type2d == "Plane_Strain": 
                             alpha_s_k = (9. / self.Weighted_Volume[i]) * (self.K[k] + self.Mu[k] / 9.)
                         alpha_d_k = (8. / self.Weighted_Volume[i]) * self.Mu[k]                      
-                        # Viscoelastic par of the scalar force state
+                        # Viscoelastic parts of the scalar force state
                         t_s_visco += (2. * self.factor2d[k] * alpha_s_k - (3. - 2. * self.factor2d[k]) * alpha_d_k) * self.w * (e_s - e_s_visco) / 3.
                         t_d_visco += alpha_d_k * self.w * (e_d - e_d_visco)
 
@@ -219,31 +220,33 @@ class Viscoelastic_material():
                     if deck.type2d == "Plane_Strain": 
                         alpha_s_0 = (9. / self.Weighted_Volume[i]) * (self.K[0] + self.Mu[0] / 9.)
                     alpha_d_0 = (8. / self.Weighted_Volume[i]) * self.Mu[0]
-                    # Scalar force state                    
+                    # Scalar force states                    
                     t_s = (2. * self.factor2d[0] * alpha_s_0 - (3. - 2. * self.factor2d[0]) * alpha_d_0) * self.w * e_s / 3. + t_s_visco
                     t_d = alpha_d_0 * self.w * e_d + t_d_visco
                     self.t = t_s + t_d
 
                 if deck.dim == 3:
+                    # Scalar extension states 
                     e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3. 
                     e_d = self.e[i,p] - e_s
                     
                     t_s_visco = 0.0
                     t_d_visco = 0.0
                     for k in range(1, len(self.Relax_Time)):
+                        # Scalar visco extension states 
                         e_s_visco = self.dilatation_visco[i,k] * util.linalgebra.norm(X) / 3.
                         e_d_visco = self.e_visco[i,p,k] - e_s_visco
                         # PD viscoelastic material parameter
                         alpha_s_k = (9. / self.Weighted_Volume[i]) * self.K[k]
                         alpha_d_k = (15. / self.Weighted_Volume[i]) * self.Mu[k]                      
-                        # Viscoelastic par of the scalar force state
+                        # Viscoelastic parts of the scalar force state
                         t_s_visco += alpha_s_k * self.w * (e_s - e_s_visco)
                         t_d_visco += alpha_d_k * self.w * (e_d - e_d_visco)
 
                     # PD elastic material parameter 
                     alpha_s_0 = (9. / self.Weighted_Volume[i]) * self.K[0]
                     alpha_d_0 = (15. / self.Weighted_Volume[i]) * self.Mu[0]
-                    # Scalar force state                    
+                    # Scalar force states                    
                     t_s = alpha_s_0 * self.w * e_s + t_s_visco
                     t_d = alpha_d_0 * self.w * e_d + t_d_visco
                     self.t = t_s + t_d                    
@@ -283,4 +286,4 @@ class Viscoelastic_material():
             p.join()
         
         for i in range(0,threads):
-            self.f_int += data[i]     
+            self.f_int += data[i]

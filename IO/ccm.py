@@ -48,43 +48,43 @@ class CCM_calcul():
         ## Material type
         self.material_type = deck.material_type
 
-        if self.material_type == "Elastic":
+        if self.material_type == "Elastic":        
             if deck.dim == 1:
                 ## Young modulus of the material
                 self.Young_Modulus = deck.young_modulus
             
-            if deck.dim == 2:
+            if deck.dim >= 2:
                 ## Bulk modulus of the material
                 self.K = deck.bulk_modulus
                 ## Shear modulus of the material
                 self.Mu = deck.shear_modulus
-                ## Poisson ratio of the material
-                self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
-                ## Factor applied for 2D plane stress to compute dilatation and force state                   
-                self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
-#                ## Plane strain
-#                self.factor2d = 1
-    
-            if deck.dim == 3:
-                ## Bulk modulus of the material
-                self.K = deck.bulk_modulus
-                ## Shear modulus of the material
-                self.Mu = deck.shear_modulus
+                
+                if deck.dim == 2:
+                    ## Poisson ratio of the material
+                    self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
+                    if deck.type2d == "Plane_Stress":
+                        ## Factor applied for 2D plane stress to compute dilatation and force state                   
+                        self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
+                    if deck.type2d == "Plane_Strain":               
+                        ## Plane strain
+                        self.factor2d = 1
 
         if self.material_type == "Viscoelastic":                
-            if deck.dim == 1:
-                ## Relaxation modulus of the material
-                self.Relax_Modulus = deck.relax_modulus
-                ## Relaxation time of the material
-                self.Relax_Time = deck.relax_time
-            
-            if deck.dim == 2:
-                print "Error: 2D problem not implemented in viscoelasticity"
-                sys.exit(1)
-    
-            if deck.dim == 3:
-                print "Error: 3D problem not implemented in viscoelasticity"
-                sys.exit(1)
+            if deck.dim >= 2:
+                ## Bulk modulus of the material
+                self.K = deck.relax_bulk_modulus
+                ## Shear modulus of the material
+                self.Mu = deck.relax_shear_modulus
+                
+                if deck.dim == 2:
+                    ## Poisson ratio of the material
+                    self.Nu = (3. * self.K - 2. * self.Mu) / (2. * (3. * self.K + self.Mu))
+                    if deck.type2d == "Plane_Stress":
+                        ## Factor applied for 2D plane stress to compute dilatation and force state                   
+                        self.factor2d = (2. * self.Nu - 1.) / (self.Nu - 1.)
+                    if deck.type2d == "Plane_Strain":               
+                        ## Plane strain
+                        self.factor2d = 1
         
         ## Compute the global strain tensor storing the strain tensor for each node at each time step      
         self.compute_global_strain_tensor(data_solver)
