@@ -29,7 +29,6 @@ class Elastic_material():
             self.Young_Modulus = deck.young_modulus
         
         if deck.dim >= 2:
-
             ## Bulk modulus of the material
             self.K = deck.bulk_modulus
             ## Shear modulus of the material
@@ -129,7 +128,6 @@ class Elastic_material():
 
                 if deck.dim == 2:
                     # PD material parameter
-
                     if deck.type2d == "Plane_Stress": 
                         alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + ((self.Nu + 1.)/(2. * self.Nu - 1.))**2 * self.Mu / 9.)
                     if deck.type2d == "Plane_Strain": 
@@ -137,7 +135,7 @@ class Elastic_material():
                     
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar extension states
-                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i,p] - e_s
                     # Scalar force states
                     t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * self.w * e_s / 3.
@@ -148,12 +146,10 @@ class Elastic_material():
                     # PD material parameter
                     alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                     alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
-
                     # Scalar extension states
-                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i,p] - e_s
                     # Scalar force states
-
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
                     self.t = t_s + t_d
@@ -226,7 +222,7 @@ class Elastic_material():
                         alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
                         
                     # Scalar extension states
-                    e_s = self.dilatation[i] * util.linalgebra.norm(X) / 3.
+                    e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i,p] - e_s
                     # Strain energy density                    
                     self.strain_energy[i] += 0.5 * deck.influence_function * (alpha_s * e_s**2 + alpha_d * e_d**2) * deck.geometry.volumes[p] 
@@ -254,4 +250,3 @@ class Elastic_material():
 
         for p in processes:
             p.join()
-

@@ -255,4 +255,3 @@ class CCM_calcul():
         U = self.u[p,:,t_n] - self.u[i,:,t_n]
         U = np.reshape(U,(self.dim,1))
         return U
-                
