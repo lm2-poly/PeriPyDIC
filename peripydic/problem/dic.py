@@ -37,11 +37,12 @@ class DIC_problem():
             mat_class = Elastic_material( deck, self, deck.geometry.act )
             self.update_force_data(mat_class)
             self.update_ext_state_data(mat_class)
+            
 
         self.update_pos(deck.geometry.act)
-
+        self.strain_energy = mat_class.strain_energy
     ## Computes the weights for each PD node
-    # @param deck Deck object containig data from the .yaml file
+    # @param deck Deck object containing data from the .yaml file
     def weighted_function(self, deck):
         ## Weighted volumes vector
         self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
