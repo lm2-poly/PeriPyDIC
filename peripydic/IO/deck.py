@@ -7,7 +7,7 @@ import os.path
 import geometry
 import sys
 import output
-import util.condition
+from ..util import condition
 import vis
 import dic
 import numpy as np
@@ -86,10 +86,7 @@ class PD_deck():
                         self.delta_X = self.geometry.getMinDist()
                         ## Amount of nodes
                         self.num_nodes = self.geometry.amount
-                        if not "Boundary" in self.doc:
-                            print "Error: No Boundary tag found"
-                            sys.exit(1)
-                        else:
+                        if "Boundary" in self.doc:
                             if not "Condition" in self.doc["Boundary"]:
                                 print "Error: No Condition tag found"
                                 sys.exit(1)
@@ -97,7 +94,7 @@ class PD_deck():
                                 ## List of all conditions specified in the configuration file
                                 self.conditions = []
                                 for i in range(0,len(self.doc["Boundary"]["Condition"]["Value"])):
-                                    self.conditions.append(util.condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i],self.doc["Boundary"]["Condition"]["Shape"][i]))
+                                    self.conditions.append(condition.ConditionFromFile(self.doc["Boundary"]["Condition"]["Type"][i],self.doc["Boundary"]["Condition"]["File"][i],self.doc["Boundary"]["Condition"]["Value"][i],self.geometry.volumes,self.doc["Boundary"]["Condition"]["Direction"][i],self.doc["Boundary"]["Condition"]["Shape"][i]))
                             if not "Shape" in self.doc["Boundary"]:
                                 print "Error: No Shape tag found"
                                 sys.exit(1)
@@ -253,9 +250,9 @@ class DIC_deck():
                             ## Type of the material
                             self.material_type = self.doc["Material"]["Type"]
                             if self.material_type == "Elastic":
-                                if "E_Modulus" in self.doc["Material"]:
+                                if "Young_Modulus" in self.doc["Material"]:
                                     ## Young modulus of the material
-                                    self.e_modulus = float(self.doc["Material"]["E_Modulus"])
+                                    self.young_modulus = float(self.doc["Material"]["Young_Modulus"])
                                 if "Bulk_Modulus" in self.doc["Material"]:
                                     ## Bulk modulus of the material
                                     self.bulk_modulus = float(self.doc["Material"]["Bulk_Modulus"])

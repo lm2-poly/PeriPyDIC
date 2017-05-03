@@ -7,7 +7,7 @@ Data:
     Sigma: 16
     File:
         Name: VIC3D_DIC.csv
-        Path: ./examples
+        Path: ./
 Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0

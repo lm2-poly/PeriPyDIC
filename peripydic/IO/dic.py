@@ -17,7 +17,7 @@ class DICreader2D():
     # @param deck Deck object containing input data from the .yaml file
     def __init__(self, deck):
         ## Dimension of the problem (2D for DIC)
-        self.dim = 2
+        self.dim = deck.dim
         ## Temporary variable internal to this class
         self.data = []
 
@@ -67,10 +67,12 @@ class DICreader2D():
             else:
 
                 self.x[i] = self.data[i][0]
-                self.y[i] = self.data[i][1]
+                if self.dim == 2:
+                    self.y[i] = self.data[i][1]
 
                 dx[i] = self.data[i][3]
-                dy[i] = self.data[i][4]
+                if self.dim == 2:
+                    dy[i] = self.data[i][4]
 
                 self.strain[i][0] = self.data[i][6]
                 self.strain[i][1] = self.data[i][7]
@@ -82,8 +84,10 @@ class DICreader2D():
         ## Nodes initial positions
         self.nodes = np.empty((self.length, self.dim))
         self.nodes[:,0] = self.x
-        self.nodes[:,1] = self.y
+        if self.dim == 2:
+            self.nodes[:,1] = self.y
         ## Nodes actual positions
         self.act = np.empty((self.length, self.dim))
         self.act[:,0] = self.x + dx
-        self.act[:,1] = self.y + dy
+        if self.dim == 2:
+            self.act[:,1] = self.y + dy
