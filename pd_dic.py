@@ -71,20 +71,24 @@ def simulation(deck):
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_solver_class.neighbors.horizon
+    
+    print "strain_energy"
+    print pb_solver_class.strain_energy           
 
     strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
     print "epsilon_tensor"
     print strain_tensor
+    
+    strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
+    print "strain_longi", strain_longi
+    #print "Nodes positions = "
+    #print pb_solver_class.y
 
     if deck.material_type == "Elastic":
         stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
         print "stress_tensor"
         print stress_tensor
 
-    strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
-    print "strain_longi", strain_longi
-    #print "Nodes positions = "
-    #print pb_solver_class.y
     print "Duration:", (time.time() - t0)/60. , "minutes"
 
 def writeCSV(deck,problem):

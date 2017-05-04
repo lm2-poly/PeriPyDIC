@@ -232,7 +232,7 @@ class Elastic_material():
     # @param data_solver Data from the peridynamic problem/solving class
     def compute_strain_energy(self, deck, data_solver):
         ## Strain energy density at each node
-        self.strain_energy = sharedmem.empty((deck.num_nodes, 1),dtype=np.float64)
+        self.strain_energy = sharedmem.empty((deck.num_nodes),dtype=np.float64)
 
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)

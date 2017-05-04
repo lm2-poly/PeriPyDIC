@@ -32,6 +32,9 @@ class PD_problem():
 
         ## Extension state at each node between the node and its family
         self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
+        
+        ## Strain energy at each node between the node and its family
+        self.strain_energy = np.zeros( ( deck.num_nodes, deck.time_steps ),dtype=np.float64 )
 
         if deck.material_type == "Viscoelastic":
             ## Viscoelastic part of the extension state at each node between the node and its family
@@ -116,10 +119,9 @@ class PD_problem():
             from ..materials.elastic import Elastic_material
             ## Data from the material class
             self.mat_class = Elastic_material( deck, self, ysolver )
-            # Data from the material class
             self.update_force_data(self.mat_class, t_n)
-            # Data from the material class
             self.update_ext_state_data(self.mat_class, t_n)
+            self.update_strain_energy_data(self.mat_class, t_n)
 
         elif deck.material_type == "Viscoelastic":
             from ..materials.viscoelastic import Viscoelastic_material
@@ -293,6 +295,13 @@ class PD_problem():
     def update_ext_state_visco_data(self, mat_class, t_n):
         # Viscoelastic part of the extension state at each node between the node and its family
         self.ext_visco[:, :, :, t_n] = mat_class.e_visco
+        
+    ## Store the strain energy for each node between itself and its family
+    # @param mat_class Data from the material class
+    # @param t_n Id of the time step
+    def update_strain_energy_data(self, mat_class, t_n):
+        # Viscoelastic part of the extension state at each node between the node and its family
+        self.strain_energy[:, t_n] = mat_class.strain_energy
 
     ## Provide the strain between 2 nodes
     # @param deck The input deck
