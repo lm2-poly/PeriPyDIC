@@ -78,7 +78,7 @@ class DICreader2D():
                 self.strain[i][1] = self.data[i][7]
                 self.strain[i][2] = self.data[i][8]
 
-                self.volumes[i] = 0.1
+                self.volumes[i] = 1.0
 
         del self.data
         ## Nodes initial positions

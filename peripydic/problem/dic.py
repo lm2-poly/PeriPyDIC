@@ -22,14 +22,14 @@ class DIC_problem():
         self.weighted_function(deck)
 
         ## Actual position from DIC result
-        self.y = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float64)
+        self.y = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float32)
         self.y[:,:,0] = deck.geometry.nodes[:,:]
 
         ## Internal forces
-        self.force_int = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float64)
+        self.force_int = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float32)
 
         ## Extension state
-        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes,2),dtype=np.float64 )
+        self.ext = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors,2),dtype=np.float32 )
 
 
         if deck.material_type == "Elastic":
@@ -45,7 +45,7 @@ class DIC_problem():
     # @param deck Deck object containing data from the .yaml file
     def weighted_function(self, deck):
         ## Weighted volumes vector
-        self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
+        self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float32)
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
             for p in index_x_family:

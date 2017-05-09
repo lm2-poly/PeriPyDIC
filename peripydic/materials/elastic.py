@@ -7,7 +7,6 @@ from scipy import linalg
 from multiprocessing import Process, Lock
 import sharedmem
 from ..util import linalgebra
-import sys
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Elastic_material():
@@ -63,20 +62,22 @@ class Elastic_material():
 
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
+            n = 0
             for p in index_x_family:
                     Y = (y[p,:]) - y[i,:]
                     X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                    self.e[i,p] = linalgebra.norm(Y) - linalgebra.norm(X)
+                    self.e[i,n] = linalgebra.norm(Y) - linalgebra.norm(X)
 
                     if deck.dim == 1:
-                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 3:
-                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
-
+                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
+                    n += 1
+                
     ## Compute the dilatation and and also the scalar extension state for each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
@@ -85,7 +86,7 @@ class Elastic_material():
         ## Dilatation at each node
         self.dilatation = sharedmem.empty((deck.num_nodes),dtype=np.float64)
         ## Extension between Node "i" and Node "p" within its family
-        self.e = sharedmem.empty((deck.num_nodes, deck.num_nodes),dtype=np.float64)
+        self.e = sharedmem.empty((deck.num_nodes, data_solver.neighbors.max_neighbors),dtype=np.float64)
 
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
@@ -113,6 +114,7 @@ class Elastic_material():
     def compute_f_int_slice(self, deck, data_solver, y, start, end, data):
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
+            n = 0
             for p in index_x_family:
                 Y = y[p,:] - y[i,:]
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
@@ -124,7 +126,7 @@ class Elastic_material():
                     # PD material parameter
                     alpha = self.Young_Modulus / self.Weighted_Volume[i]
                     ## Scalar force state
-                    self.t = alpha * self.w * self.e[i,p]
+                    self.t = alpha * self.w * self.e[i,n]
 
                 if deck.dim == 2:
                     # PD material parameter
@@ -136,7 +138,7 @@ class Elastic_material():
                     alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar extension states
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
-                    e_d = self.e[i,p] - e_s
+                    e_d = self.e[i,n] - e_s
                     # Scalar force states
                     t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * self.w * e_s / 3.
                     t_d = alpha_d * self.w * e_d
@@ -148,7 +150,7 @@ class Elastic_material():
                     alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
                     # Scalar extension states
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
-                    e_d = self.e[i,p] - e_s
+                    e_d = self.e[i,n] - e_s
                     # Scalar force states
                     t_s = alpha_s * self.w * e_s
                     t_d = alpha_d * self.w * e_d
@@ -158,7 +160,7 @@ class Elastic_material():
                 data[i,:] += self.t * M * deck.geometry.volumes[p]
                 data[p,:] += -self.t * M * deck.geometry.volumes[i]
                 #lock.release()
-
+                n += 1
     ## Compute the global internal force density at each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
@@ -198,13 +200,14 @@ class Elastic_material():
     def compute_strain_energy_slice(self, deck, data_solver, start, end):
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
+            n = 0
             for p in index_x_family:
                 
                 if deck.dim == 1:
                     # PD material parameter
                     alpha = self.Young_Modulus / self.Weighted_Volume[i]
                     # Strain energy density
-                    self.strain_energy[i] += 0.5 * alpha * deck.influence_function * self.e[i,p]**2 * deck.geometry.volumes[p]
+                    self.strain_energy[i] += 0.5 * alpha * deck.influence_function * self.e[i,n]**2 * deck.geometry.volumes[p]
 
                 if deck.dim >= 2:
                     X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
@@ -223,10 +226,10 @@ class Elastic_material():
                         
                     # Scalar extension states
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
-                    e_d = self.e[i,p] - e_s
+                    e_d = self.e[i,n] - e_s
                     # Strain energy density                    
                     self.strain_energy[i] += 0.5 * deck.influence_function * (alpha_s * e_s**2 + alpha_d * e_d**2) * deck.geometry.volumes[p] 
-                                        
+                    n +=1                    
     ## Compute the strain energy density at each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class

@@ -31,14 +31,14 @@ class PD_problem():
         self.force_int = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
 
         ## Extension state at each node between the node and its family
-        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
+        self.ext = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors, deck.time_steps ),dtype=np.float64 )
         
         ## Strain energy at each node between the node and its family
         self.strain_energy = np.zeros( ( deck.num_nodes, deck.time_steps ),dtype=np.float64 )
 
         if deck.material_type == "Viscoelastic":
             ## Viscoelastic part of the extension state at each node between the node and its family
-            self.ext_visco = np.zeros( ( deck.num_nodes, deck.num_nodes, len(deck.relax_time), deck.time_steps ),dtype=np.float64 )
+            self.ext_visco = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors, len(deck.relax_time), deck.time_steps ),dtype=np.float64 )
 
         ## Compute the external force density "b" applied on each node
         self.compute_b(deck)
