@@ -4,9 +4,11 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 from scipy import linalg
-from multiprocessing import Process, Lock
+from multiprocessing import Process
 import sharedmem
 from ..util import linalgebra
+import warnings
+warnings.filterwarnings("error")
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Elastic_material():
@@ -123,7 +125,7 @@ class Elastic_material():
                 try:
                     M = Y / linalgebra.norm(Y)
                 except RuntimeWarning:
-                    print y[p,:] , y[i,:] , linalgebra.norm(Y)
+                    print y[p,:] , y[i,:] , linalgebra.norm(Y) , i , p
                     
                 
 
