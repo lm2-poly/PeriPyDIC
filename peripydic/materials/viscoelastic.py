@@ -65,20 +65,22 @@ class Viscoelastic_material():
     def compute_dilatation_slice(self, deck, data_solver, y, start, end):
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
+            n = 0
             for p in index_x_family:
                     Y = (y[p,:]) - y[i,:]
                     X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                    self.e[i,p] = linalgebra.norm(Y) - linalgebra.norm(X)
+                    self.e[i,n] = linalgebra.norm(Y) - linalgebra.norm(X)
 
                     if deck.dim == 1:
-                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d[0] * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d[0] * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
         
                     if deck.dim == 3:
-                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,p] * deck.geometry.volumes[p]
-
+                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
+                    
+                    n += 1
     ## Compute the dilatation and also the scalar extension state for each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
@@ -87,7 +89,7 @@ class Viscoelastic_material():
         ## Dilatation at each node
         self.dilatation = sharedmem.empty((deck.num_nodes),dtype=np.float64)
         ## Extension between Node "i" and Node "p" within its family
-        self.e = sharedmem.empty((deck.num_nodes, deck.num_nodes),dtype=np.float64)
+        self.e = sharedmem.empty((deck.num_nodes, data_solver.neighbors.max_neighbors),dtype=np.float64)
 
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
@@ -117,23 +119,26 @@ class Viscoelastic_material():
     def compute_dilatation_visco_slice(self, deck, data_solver, y, t_n, start, end):
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
+            n = 0
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 for k in range(1, len(self.Relax_Time)):
                     tmp_exp = np.exp((- deck.delta_t) / (self.Relax_Time[k]))
-                    delta_e = self.e[i, p] - data_solver.ext[i, p, t_n-1]
+                    delta_e = self.e[i, n] - data_solver.ext[i, p, t_n-1]
                     beta = 1.0 - (self.Relax_Time[k] * (1.0 - tmp_exp)) / deck.delta_t
-                    self.e_visco[i,p,k] = data_solver.ext[i, p, t_n-1] * (1.0 - tmp_exp) + data_solver.ext_visco[i, p, k, t_n-1] * tmp_exp + beta * delta_e
+                    self.e_visco[i,n,k] = data_solver.ext[i, p, t_n-1] * (1.0 - tmp_exp) + data_solver.ext_visco[i, p, k, t_n-1] * tmp_exp + beta * delta_e
 
                     if deck.dim == 1:
-                        self.dilatation_visco[i,k] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,p] - self.e_visco[i, p, k]) * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation_visco[i,k] += (2. / self.Weighted_Volume[i]) * self.factor2d[k] * self.w * linalgebra.norm(X) * (self.e[i,p] - self.e_visco[i, p, k]) * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (2. / self.Weighted_Volume[i]) * self.factor2d[k] * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * deck.geometry.volumes[p]
 
                     if deck.dim == 3:
-                        self.dilatation_visco[i,k] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,p] - self.e_visco[i, p, k]) * deck.geometry.volumes[p]
-
+                        self.dilatation_visco[i,k] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * deck.geometry.volumes[p]
+                    
+                    n +=1
+                    
     ## Compute the viscoelastic part of the scalar extension state
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
@@ -143,7 +148,7 @@ class Viscoelastic_material():
         ## Dilatation at each node
         self.dilatation_visco = sharedmem.empty((deck.num_nodes, len(self.Relax_Time)),dtype=np.float64)
         ## Extension between Node "i" and Node "p" within its family
-        self.e_visco = sharedmem.empty((deck.num_nodes, deck.num_nodes, len(self.Relax_Time)),dtype=np.float64)
+        self.e_visco = sharedmem.empty((deck.num_nodes, data_solver.neighbors.max_neighbors, len(self.Relax_Time)),dtype=np.float64)
 
         threads = deck.num_threads
         part = int(deck.num_nodes/threads)
@@ -173,37 +178,38 @@ class Viscoelastic_material():
         #print start , end
         for i in range(start, end):
             index_x_family = data_solver.neighbors.get_index_x_family(i)
+            n = 0
             for p in index_x_family:
                 Y = y[p,:] - y[i,:]
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
 
                 # Compute the direction vector between Node_p and Node_i
                 M = Y / linalgebra.norm(Y)
-
+                
                 if deck.dim == 1:
                     t_visco = 0.0
                     for k in range(1, len(self.Relax_Time)):
                         # PD viscoelastic material parameter
                         alpha_k = self.Relax_Modulus[k] / self.Weighted_Volume[i]
                         # Viscoelastic part of the scalar force state
-                        t_visco += alpha_k * self.w * (self.e[i,p] - self.e_visco[i,p,k])
+                        t_visco += alpha_k * self.w * (self.e[i,n] - self.e_visco[i,n,k])
                         
                     # PD elastic material parameter
                     alpha_0 = self.Relax_Modulus[0] / self.Weighted_Volume[i]
                     ## Scalar force state
-                    self.t = alpha_0 * self.w * self.e[i,p] + t_visco
+                    self.t = alpha_0 * self.w * self.e[i,n] + t_visco
 
                 if deck.dim == 2:
                     # Scalar extension states
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
-                    e_d = self.e[i,p] - e_s
+                    e_d = self.e[i,n] - e_s
                     
                     t_s_visco = 0.0
                     t_d_visco = 0.0
                     for k in range(1, len(self.Relax_Time)):
                         # Scalar visco extension states                        
                         e_s_visco = self.dilatation_visco[i,k] * linalgebra.norm(X) / 3.
-                        e_d_visco = self.e_visco[i,p,k] - e_s_visco                       
+                        e_d_visco = self.e_visco[i,n,k] - e_s_visco                       
                         # PD viscoelastic material parameter
                         if deck.type2d == "Plane_Stress": 
                             alpha_s_k = (9. / self.Weighted_Volume[i]) * (self.K[k] + ((self.Nu[k] + 1.)/(2. * self.Nu[k] - 1.))**2 * self.Mu[k] / 9.)
@@ -228,14 +234,14 @@ class Viscoelastic_material():
                 if deck.dim == 3:
                     # Scalar extension states 
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3. 
-                    e_d = self.e[i,p] - e_s
+                    e_d = self.e[i,n] - e_s
                     
                     t_s_visco = 0.0
                     t_d_visco = 0.0
                     for k in range(1, len(self.Relax_Time)):
                         # Scalar visco extension states 
                         e_s_visco = self.dilatation_visco[i,k] * linalgebra.norm(X) / 3.
-                        e_d_visco = self.e_visco[i,p,k] - e_s_visco
+                        e_d_visco = self.e_visco[i,n,k] - e_s_visco
                         # PD viscoelastic material parameter
                         alpha_s_k = (9. / self.Weighted_Volume[i]) * self.K[k]
                         alpha_d_k = (15. / self.Weighted_Volume[i]) * self.Mu[k]                      
@@ -255,6 +261,7 @@ class Viscoelastic_material():
                 data[i,:] += self.t * M * deck.geometry.volumes[p]
                 data[p,:] += -self.t * M * deck.geometry.volumes[i]
                 #lock.release()
+                n += 1
 
     ## Compute the global internal force density at each node
     # @param deck The input deck
