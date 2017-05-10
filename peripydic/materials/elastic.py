@@ -168,6 +168,7 @@ class Elastic_material():
                 data[p,:] += -self.t * M * self.Volume_Correction[i,n] * deck.geometry.volumes[i]
                 #lock.release()
                 n += 1
+                
     ## Compute the global internal force density at each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class
@@ -236,7 +237,8 @@ class Elastic_material():
                     e_d = self.e[i,n] - e_s
                     # Strain energy density                    
                     self.strain_energy[i] += 0.5 * deck.influence_function * (alpha_s * e_s**2 + alpha_d * e_d**2) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
-                    n +=1                    
+                n += 1
+                    
     ## Compute the strain energy density at each node
     # @param deck The input deck
     # @param data_solver Data from the peridynamic problem/solving class

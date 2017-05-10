@@ -177,7 +177,7 @@ class CCM_calcul():
     # @return 1 if x is a null-vector, otherwise 0
     def DiracDelta(self, x, i, q, m):        
         if linalg.norm(x) == 0.:
-            delta = 1. / self.node_volumes[q]
+            delta = 1. / (self.node_volumes[q] * self.Volume_Correction[i,m])
         else:
             delta = 0.
         return delta
