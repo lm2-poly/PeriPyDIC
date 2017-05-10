@@ -2,8 +2,9 @@
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
-from ..util import neighbor
 
+from ..util import neighbor
+from ..util import linalgebra
 import numpy as np
 
 ## Copmutes extension and force states out of displacement/nodes data obtained
@@ -18,8 +19,11 @@ class DIC_problem():
         ## NeighborSearch
         self.neighbors = neighbor.NeighborSearch(deck)
 
-        ## Compute the weighted volume for each node in a vector.
-        self.weighted_function(deck)
+        # Compute the volume correction factor for each node
+        self.compute_volume_correction(deck)
+
+        # Compute the weighted volume for each node
+        self.compute_weighted_volume(deck)
 
         ## Actual position from DIC result
         self.y = np.zeros((deck.num_nodes, deck.dim,2),dtype=np.float32)
@@ -41,16 +45,36 @@ class DIC_problem():
 
         self.update_pos(deck.geometry.act)
         self.strain_energy = mat_class.strain_energy
-    ## Computes the weights for each PD node
-    # @param deck Deck object containing data from the .yaml file
-    def weighted_function(self, deck):
-        ## Weighted volumes vector
-        self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float32)
+
+    ## Compute the volume correction factors
+    # @param deck The input deck
+    def compute_volume_correction(self,deck):
+        ## Volume correction factor for each node
+        self.volume_correction = np.ones( ( deck.num_nodes, self.neighbors.max_neighbors), dtype=np.float64 )
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
+            n = 0            
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                self.weighted_volume[i] += deck.influence_function * (np.linalg.norm(X))**2 * deck.geometry.volumes[p]
+                r = deck.delta_X / 2.0
+                if linalgebra.norm(X) > self.horizon - r:
+                    self.volume_correction[i,n] = (self.horizon + r - linalgebra.norm(X)) / (deck.delta_X)
+                else:
+                    pass
+                n += 1
+
+    ## Compute the weighted volume for each node
+    # @param deck The input deck
+    def compute_weighted_volume(self, deck):
+        ## Weighted volume for each node
+        self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
+        for i in range(0, deck.num_nodes):
+            index_x_family = self.neighbors.get_index_x_family(i)
+            n = 0            
+            for p in index_x_family:
+                X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
+                self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
+                n += 1
 
     ## Records the force vector at each time step
     # @param mat_class Material class object for the elastic/viscoelastic material models
