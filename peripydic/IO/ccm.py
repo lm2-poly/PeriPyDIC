@@ -45,6 +45,9 @@ class CCM_calcul():
         ## Weighted volume
         self.Weighted_Volume = data_solver.weighted_volume
         
+        ## Volume correction factor
+        self.Volume_Correction = data_solver.volume_correction
+        
         ## Material type
         self.material_type = deck.material_type
 
@@ -124,9 +127,11 @@ class CCM_calcul():
     def K_shape_tensor(self, data_solver, i):
         K = np.zeros((self.dim, self.dim),dtype=np.float64)
         index_x_family = data_solver.neighbors.get_index_x_family(i)
+        n = 0        
         for p in index_x_family:
             X = self.X_vector_state(data_solver, i, p)
-            K += self.w * np.dot(X,X.T) * self.node_volumes[p]
+            K += self.w * np.dot(X,X.T) * self.Volume_Correction[i,n] * self.node_volumes[p]
+            n += 1
         return K
 
     ## Provide the deformation gradient tensor related to Node "i"
@@ -137,10 +142,12 @@ class CCM_calcul():
     def deformation_gradient(self, data_solver, i, t_n):
         tmp = np.zeros((self.dim, self.dim),dtype=np.float64)       
         index_x_family = data_solver.neighbors.get_index_x_family(i)
+        n = 0        
         for p in index_x_family:
             Y = self.Y_vector_state(data_solver, i, p, t_n)            
             X = self.X_vector_state(data_solver, i, p)
-            tmp += self.w * np.dot(Y,X.T) * self.node_volumes[p]
+            tmp += self.w * np.dot(Y,X.T) * self.Volume_Correction[i,n] * self.node_volumes[p]
+            n += 1
         deformation = np.dot(tmp, linalg.inv(self.K_shape_tensor(data_solver, i)))
         return deformation
         
@@ -168,7 +175,7 @@ class CCM_calcul():
     ## Provide the image of x under the Dirac Delta Function
     # @param x Vector x
     # @return 1 if x is a null-vector, otherwise 0
-    def DiracDelta(self, x, q):        
+    def DiracDelta(self, x, i, q, m):        
         if linalg.norm(x) == 0.:
             delta = 1. / self.node_volumes[q]
         else:
@@ -182,7 +189,7 @@ class CCM_calcul():
     # @param q Id of Node "q" with Node "i" family
     # @param t_n Id of the time step
     # @return Shape tensor K
-    def K_modulus_tensor(self, data_solver, i , p, q):
+    def K_modulus_tensor(self, data_solver, i , p, q, m):
         Xp = self.X_vector_state(data_solver, i, p)
         M = Xp / linalg.norm(Xp)
         Xq = self.X_vector_state(data_solver, i, q)
@@ -191,7 +198,7 @@ class CCM_calcul():
             if self.dim == 1:
                 # PD material parameter
                 alpha = self.Young_Modulus / self.Weighted_Volume[i]
-                K = alpha * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
+                K = alpha * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
             
             if self.dim == 2:
                 # PD material parameter
@@ -201,13 +208,13 @@ class CCM_calcul():
                 #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)                                       
                 alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                 alpha_sb = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) /3.
-                K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q) 
+                K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m) 
                 
             if self.dim == 3:
                 # PD material parameter
                 alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                 alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu            
-                K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, q)
+                K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
 
         return K
         
@@ -220,11 +227,15 @@ class CCM_calcul():
         #force = np.zeros((self.dim, 1),dtype=np.float64)
         stress = np.zeros((self.dim, self.dim),dtype=np.float64)
         index_x_family = data_solver.neighbors.get_index_x_family(i)
+        n = 0        
         for p in index_x_family:
             Xp = self.X_vector_state(data_solver, i, p)
+            m = 0            
             for q in index_x_family:
                 Xq = self.X_vector_state(data_solver, i, q)               
-                stress += np.dot(np.dot(self.K_modulus_tensor(data_solver, i , p, q), np.dot(self.strain_tensor(data_solver, i, t_n), Xq)), Xp.T) * self.node_volumes[q] * self.node_volumes[p]
+                stress += np.dot(np.dot(self.K_modulus_tensor(data_solver, i , p, q, m), np.dot(self.strain_tensor(data_solver, i, t_n), Xq)), Xp.T) * self.Volume_Correction[i,m] * self.node_volumes[q] * self.Volume_Correction[i,n] * self.node_volumes[p]
+                m += 1
+            n += 1
         return stress
 
     ## Compute the global stress tensor storing the strain tensor for each node at each time step
