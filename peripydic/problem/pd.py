@@ -9,6 +9,7 @@ from ..util import neighbor
 from scipy.sparse import linalg
 from scipy import sparse
 from ..util import linalgebra
+import sys
 
 
 logger = logging.getLogger(__name__)
@@ -24,27 +25,31 @@ class PD_problem():
         self.neighbors = neighbor.NeighborSearch(deck)
 
         ## Nodes' positions stored for each time step
-        self.y = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
+        self.y = np.zeros((deck.num_nodes, deck.dim, deck.time_steps), dtype=np.float64)
         self.y[:,:,0] = deck.geometry.nodes[:,:]
 
         ## Global internal force density array storing the force density attached to each node
-        self.force_int = np.zeros((deck.num_nodes, deck.dim, deck.time_steps),dtype=np.float64)
+        self.force_int = np.zeros((deck.num_nodes, deck.dim, deck.time_steps), dtype=np.float64)
 
         ## Extension state at each node between the node and its family
-        self.ext = np.zeros( ( deck.num_nodes, deck.num_nodes, deck.time_steps ),dtype=np.float64 )
+        self.ext = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors, deck.time_steps ), dtype=np.float64 )
         
         ## Strain energy at each node between the node and its family
-        self.strain_energy = np.zeros( ( deck.num_nodes, deck.time_steps ),dtype=np.float64 )
+        self.strain_energy = np.zeros( ( deck.num_nodes, deck.time_steps ), dtype=np.float64 )
 
         if deck.material_type == "Viscoelastic":
             ## Viscoelastic part of the extension state at each node between the node and its family
-            self.ext_visco = np.zeros( ( deck.num_nodes, deck.num_nodes, len(deck.relax_time), deck.time_steps ),dtype=np.float64 )
+            self.ext_visco = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors, len(deck.relax_time), deck.time_steps ), dtype=np.float64 )
 
         ## Compute the external force density "b" applied on each node
         self.compute_b(deck)
 
+        # Compute the volume correction factor for each node
+        self.compute_volume_correction(deck)
+
         # Compute the weighted volume for each node
         self.compute_weighted_volume(deck)
+        
 
     ## Compute the external force density "b" applied on each node
     # @param deck The input deck
@@ -97,6 +102,23 @@ class PD_problem():
         else:
             logger.error("Error in problem.py: Shape of BC unknown, please use Ramp.")
 
+    ## Compute the volume correction factors
+    # @param deck The input deck
+    def compute_volume_correction(self,deck):
+        ## Volume correction factor for each node
+        self.volume_correction = np.ones( ( deck.num_nodes, self.neighbors.max_neighbors), dtype=np.float64 )
+        for i in range(0, deck.num_nodes):
+            index_x_family = self.neighbors.get_index_x_family(i)
+            n = 0            
+            for p in index_x_family:
+                X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
+                r = deck.delta_X / 2.0
+                if linalgebra.norm(X) > self.neighbors.horizon - r:
+                    self.volume_correction[i,n] = (self.neighbors.horizon + r - linalgebra.norm(X)) / (deck.delta_X)
+                else:
+                    pass
+                n += 1
+
     ## Compute the weighted volume for each node
     # @param deck The input deck
     def compute_weighted_volume(self, deck):
@@ -104,9 +126,11 @@ class PD_problem():
         self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
+            n = 0            
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * deck.geometry.volumes[p]
+                self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
+                n += 1
 
     ## Provide the internal force density for each node for a given time step t_n
     # @param deck The input deck

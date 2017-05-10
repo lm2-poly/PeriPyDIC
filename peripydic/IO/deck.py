@@ -276,6 +276,35 @@ class DIC_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
+
+			if not "Discretization" in self.doc:
+                            print "Error: Specify a Discretization tag in your yaml"
+                            sys.exit(1)
+                        else:
+                            ## Safety factor for the computation of the radius
+                            self.safety_factor = 1.001
+                            if not "Horizon_Factor_m_value" in self.doc["Discretization"]:
+                                print "Error: No Horizon_Factor_m_value tag found"
+                                sys.exit(1)
+                            else:
+                                ## "m" value of the horizon factor
+                                self.horizon_factor_m_value = self.doc["Discretization"]["Horizon_Factor_m_value"]
+
+                            if not "Influence_Function" in self.doc["Discretization"]:
+                                print "Error: No Influence_Function tag found"
+                                sys.exit(1)
+                            else:
+                                ## Influence function
+                                self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
+                            if "Saftety_Factor" in self.doc["Discretization"]:
+                                self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
+			    if not "Volume" in self.doc["Discretization"]:
+				print "Error: No Volume tag found in Discretization"
+				sys.exit(1)
+			    else:
+				## Volume of a DIC node
+				self.dic_volume = float(self.doc["Discretization"]["Volume"])
+
                         if not "Data" in self.doc:
                             print "Error: Specify a Data tag in your yaml"
                             sys.exit(1)
@@ -325,27 +354,6 @@ class DIC_deck():
                                     ## Minimal nodal spacing
                                     self.delta_X = self.geometry.delta_x
 
-                        if not "Discretization" in self.doc:
-                            print "Error: Specify a Discretization tag in your yaml"
-                            sys.exit(1)
-                        else:
-                            ## Safety factor for the computation of the radius
-                            self.safety_factor = 1.001
-                            if not "Horizon_Factor_m_value" in self.doc["Discretization"]:
-                                print "Error: No Horizon_Factor_m_value tag found"
-                                sys.exit(1)
-                            else:
-                                ## "m" value of the horizon factor
-                                self.horizon_factor_m_value = self.doc["Discretization"]["Horizon_Factor_m_value"]
-
-                            if not "Influence_Function" in self.doc["Discretization"]:
-                                print "Error: No Influence_Function tag found"
-                                sys.exit(1)
-                            else:
-                                ## Influence function
-                                self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
-                            if "Saftety_Factor" in self.doc["Discretization"]:
-                                self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
                         ## Amount of time steps
                         self.time_steps = 2
                         ## Number of threads

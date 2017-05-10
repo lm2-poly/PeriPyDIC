@@ -13,8 +13,10 @@ class NeighborSearch():
     def __init__(self,deck):
         ## Safety factor for the search of the neighborhood
         self.safety_factor = deck.safety_factor
+        ## Maximal amount of neighbors
+        self.max_neighbors = 0
         ## Horizon of the neighborhood
-        self.horizon = deck.horizon_factor_m_value*deck.delta_X*self.safety_factor
+        self.horizon = deck.horizon_factor_m_value * deck.delta_X * self.safety_factor
         self.findNeighbors(deck)
 
     ## Returns the family of node "i"
@@ -32,4 +34,7 @@ class NeighborSearch():
         self.family = []
         for i in range(0,len(ids)):
             self.family.append(np.array(filter(lambda x: x != i, np.array(filter(lambda x: x < deck.num_nodes, ids[i])))))
+            tmp = len(self.family[i])
+            if tmp > self.max_neighbors:
+                self.max_neighbors = tmp
         del d , ids

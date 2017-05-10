@@ -67,7 +67,7 @@ Output:
         Slice: 1
 Solver:
     Max_Iteration: 1000
-    Tolerance: 1.0e-3
+    Tolerance: 1.0e-2
     Jacobian_Perturbation: 1.0e-3
 Parallel:
     Threads: 3

@@ -20,11 +20,10 @@ class DICreader2D():
         self.dim = deck.dim
         ## Temporary variable internal to this class
         self.data = []
-
         self.sigma_column = deck.sigma_column
 
         self.read(deck.filepath + "/" + deck.filename)
-        self.extractData()
+        self.extractData(deck)
         self.determineUnitHorizon()
 
     ## Read the values provided by the dic and stores it to the data array
@@ -48,7 +47,7 @@ class DICreader2D():
     ## Stores the data extracted from the CSV file in objects which can be
     # manipulated by other modules
     # @param self Object pointer
-    def extractData(self):
+    def extractData(self,deck):
         ## Vector containing x nodes from DIC
         self.x = np.zeros((self.length))
         dx = np.zeros((self.length))
@@ -78,7 +77,7 @@ class DICreader2D():
                 self.strain[i][1] = self.data[i][7]
                 self.strain[i][2] = self.data[i][8]
 
-                self.volumes[i] = 0.1
+                self.volumes[i] = deck.dic_volume
 
         del self.data
         ## Nodes initial positions
