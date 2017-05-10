@@ -41,9 +41,6 @@ class PD_problem():
             ## Viscoelastic part of the extension state at each node between the node and its family
             self.ext_visco = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors, len(deck.relax_time), deck.time_steps ), dtype=np.float64 )
 
-        # Horizon of the neighborhood
-        self.horizon = deck.horizon_factor_m_value * deck.delta_X * deck.safety_factor
-
         ## Compute the external force density "b" applied on each node
         self.compute_b(deck)
 
@@ -116,8 +113,8 @@ class PD_problem():
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 r = deck.delta_X / 2.0
-                if linalgebra.norm(X) > self.horizon - r:
-                    self.volume_correction[i,n] = (self.horizon + r - linalgebra.norm(X)) / (deck.delta_X)
+                if linalgebra.norm(X) > self.neighbors.horizon - r:
+                    self.volume_correction[i,n] = (self.neighbors.horizon + r - linalgebra.norm(X)) / (deck.delta_X)
                 else:
                     pass
                 n += 1

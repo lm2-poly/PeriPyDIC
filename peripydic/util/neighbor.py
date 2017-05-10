@@ -16,7 +16,7 @@ class NeighborSearch():
         ## Maximal amount of neighbors
         self.max_neighbors = 0
         ## Horizon of the neighborhood
-        self.horizon = deck.horizon_factor_m_value*deck.delta_X*self.safety_factor
+        self.horizon = deck.horizon_factor_m_value * deck.delta_X * self.safety_factor
         self.findNeighbors(deck)
 
     ## Returns the family of node "i"
