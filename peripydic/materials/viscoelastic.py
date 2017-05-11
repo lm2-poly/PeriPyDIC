@@ -7,7 +7,8 @@ from scipy import linalg
 from multiprocessing import Process, Lock
 import sharedmem
 from ..util import linalgebra
-import sys
+#import warnings
+#warnings.filterwarnings("error")
 
 ## Class to compute the global internal volumic force at each node of an elastic material using its material properties
 class Viscoelastic_material():
@@ -24,6 +25,9 @@ class Viscoelastic_material():
 
         ## Weighted volume
         self.Weighted_Volume = data_solver.weighted_volume
+        
+        ## Volume correction factor
+        self.Volume_Correction = data_solver.volume_correction
 
         if deck.dim == 1:
             ## Relaxation modulus of the material
@@ -73,13 +77,13 @@ class Viscoelastic_material():
                     self.e[i,n] = linalgebra.norm(Y) - linalgebra.norm(X)
 
                     if deck.dim == 1:
-                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d[0] * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d[0] * self.w * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
         
                     if deck.dim == 3:
-                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * deck.geometry.volumes[p]                    
+                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
                     n += 1
 
     ## Compute the dilatation and also the scalar extension state for each node
@@ -131,13 +135,13 @@ class Viscoelastic_material():
                     self.e_visco[i,n,k] = data_solver.ext[i, n, t_n-1] * (1.0 - tmp_exp) + data_solver.ext_visco[i, n, k, t_n-1] * tmp_exp + beta * delta_e
 
                     if deck.dim == 1:
-                        self.dilatation_visco[i,k] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (1. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation_visco[i,k] += (2. / self.Weighted_Volume[i]) * self.factor2d[k] * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (2. / self.Weighted_Volume[i]) * self.factor2d[k] * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 3:
-                        self.dilatation_visco[i,k] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (3. / self.Weighted_Volume[i]) * self.w * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
                 n +=1
                     
     ## Compute the viscoelastic part of the scalar extension state
@@ -259,8 +263,8 @@ class Viscoelastic_material():
                     self.t = t_s + t_d                    
 
                 #lock.acquire()
-                data[i,:] += self.t * M * deck.geometry.volumes[p]
-                data[p,:] += -self.t * M * deck.geometry.volumes[i]
+                data[i,:] += self.t * M * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                data[p,:] += -self.t * M * self.Volume_Correction[i,n] * deck.geometry.volumes[i]
                 #lock.release()
                 n += 1
 

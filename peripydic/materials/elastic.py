@@ -4,7 +4,7 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 from scipy import linalg
-from multiprocessing import Process
+from multiprocessing import Process, Lock
 import sharedmem
 from ..util import linalgebra
 #import warnings

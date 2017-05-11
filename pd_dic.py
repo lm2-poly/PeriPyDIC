@@ -71,10 +71,7 @@ def simulation(deck):
 
     print "delta_x =" , deck.delta_X
     print "Horizon =" , pb_solver_class.neighbors.horizon
-    
-    print "strain_energy"
-    print pb_solver_class.strain_energy           
-
+              
     strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
     print "epsilon_tensor"
     print strain_tensor
@@ -88,6 +85,8 @@ def simulation(deck):
         stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
         print "stress_tensor"
         print stress_tensor
+        print "strain_energy"
+        print pb_solver_class.strain_energy 
 
     print "Duration:", (time.time() - t0)/60. , "minutes"
 

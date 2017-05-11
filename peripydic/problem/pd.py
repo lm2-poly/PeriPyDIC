@@ -46,6 +46,7 @@ class PD_problem():
 
         # Compute the volume correction factor for each node
         self.compute_volume_correction(deck)
+        print self.volume_correction
 
         # Compute the weighted volume for each node
         self.compute_weighted_volume(deck)
