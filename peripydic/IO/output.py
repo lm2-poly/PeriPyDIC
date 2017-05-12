@@ -44,4 +44,4 @@ class OutputCSV():
                             s.append(problem.y[i][2][t])
                         spamwriter.writerow(s)
                         s = [t]
-                    
+

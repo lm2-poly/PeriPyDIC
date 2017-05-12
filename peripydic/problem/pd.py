@@ -33,7 +33,7 @@ class PD_problem():
 
         ## Extension state at each node between the node and its family
         self.ext = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors, deck.time_steps ), dtype=np.float64 )
-        
+
         ## Strain energy at each node between the node and its family
         self.strain_energy = np.zeros( ( deck.num_nodes, deck.time_steps ), dtype=np.float64 )
 
@@ -50,7 +50,7 @@ class PD_problem():
 
         # Compute the weighted volume for each node
         self.compute_weighted_volume(deck)
-        
+
 
     ## Compute the external force density "b" applied on each node
     # @param deck The input deck
@@ -110,7 +110,7 @@ class PD_problem():
         self.volume_correction = np.ones( ( deck.num_nodes, self.neighbors.max_neighbors), dtype=np.float64 )
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
-            n = 0            
+            n = 0
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 r = deck.delta_X / 2.0
@@ -127,7 +127,7 @@ class PD_problem():
         self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
-            n = 0            
+            n = 0
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
@@ -320,7 +320,7 @@ class PD_problem():
     def update_ext_state_visco_data(self, mat_class, t_n):
         # Viscoelastic part of the extension state at each node between the node and its family
         self.ext_visco[:, :, :, t_n] = mat_class.e_visco
-        
+
     ## Store the strain energy for each node between itself and its family
     # @param mat_class Data from the material class
     # @param t_n Id of the time step

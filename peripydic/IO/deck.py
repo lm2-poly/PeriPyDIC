@@ -40,14 +40,14 @@ class PD_deck():
                             sys.exit(1)
                         else:
                             ## Dimension of the problem
-                            self.dim = int(self.doc["Discretization"]["Dim"])                            
-                            if self.dim == 2:                                    
+                            self.dim = int(self.doc["Discretization"]["Dim"])
+                            if self.dim == 2:
                                 if not "Type" in self.doc["Discretization"]:
                                     print "Error: No Type tag found for 2D problem. Choose Plane_Stress or Plane_Strain"
                                     sys.exit(1)
                                 else:
                                     ## Type of 2D problem
-                                    self.type2d = self.doc["Discretization"]["Type"]               
+                                    self.type2d = self.doc["Discretization"]["Type"]
                         if not "Final_Time" in self.doc["Discretization"]:
                             print "Error: No Final_Time tag found"
                             sys.exit(1)
@@ -315,13 +315,13 @@ class DIC_deck():
                             else:
                                 ## The dimension of the input data
                                 self.dim = self.doc["Data"]["Dimension"]
-                                if self.dim == 2:                                    
+                                if self.dim == 2:
                                     if not "Type" in self.doc["Data"]:
                                         print "Error: No Type tag found for 2D problem. Choose Plane_Stress or Plane_Strain"
                                         sys.exit(1)
                                     else:
                                         ## Type of 2D problem
-                                        self.type2d = self.doc["Data"]["Type"]               
+                                        self.type2d = self.doc["Data"]["Type"]
 
                             if not "Sigma" in self.doc["Data"]:
                                 print "Error: No Sigma (column of confidence in CSV file) tag found"

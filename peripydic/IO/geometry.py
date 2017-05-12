@@ -10,12 +10,12 @@ import sys
 
 ## Class handeling the discrete nodes
 class Geometry():
-  
+
     ## Read the positions, volume, and density of the nodes from the inFile.
     # @param dim Dimension of the nodes
     # @param inFile CSV file with the geometry
     def readNodes(self,dim,inFile):
-        
+
         if not os.path.exists(inFile):
                 print "Error: Could not find " + inFile
                 sys.exit(1)
@@ -31,7 +31,7 @@ class Geometry():
 
             ## Amount of nodes
             self.amount = length
-            ## Volume related to each node            
+            ## Volume related to each node
             self.volumes = np.empty(length,dtype=np.float64)
 
             if dim >= 1:
@@ -55,8 +55,8 @@ class Geometry():
                 i +=1
 
             ## Nodes of the discretization
-            self.nodes = np.empty((len(pos_x),dim),dtype=np.float64)            
-            if dim == 1:                
+            self.nodes = np.empty((len(pos_x),dim),dtype=np.float64)
+            if dim == 1:
                 self.nodes[:,0] = pos_x
                 del pos_x
             if dim == 2:

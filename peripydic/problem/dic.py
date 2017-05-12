@@ -41,7 +41,7 @@ class DIC_problem():
             mat_class = Elastic_material( deck, self, deck.geometry.act )
             self.update_force_data(mat_class)
             self.update_ext_state_data(mat_class)
-            
+
 
         self.update_pos(deck.geometry.act)
         self.strain_energy = mat_class.strain_energy
@@ -53,7 +53,7 @@ class DIC_problem():
         self.volume_correction = np.ones( ( deck.num_nodes, self.neighbors.max_neighbors), dtype=np.float64 )
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
-            n = 0            
+            n = 0
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 r = deck.delta_X / 2.0
@@ -70,7 +70,7 @@ class DIC_problem():
         self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
         for i in range(0, deck.num_nodes):
             index_x_family = self.neighbors.get_index_x_family(i)
-            n = 0            
+            n = 0
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
                 self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
