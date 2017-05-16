@@ -55,18 +55,14 @@ class Energy_problem():
                 self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
                 n += 1    
         
-    def jacobian_matrix(self, deck, y, perturbation_factor):
-        eps = perturbation_factor 
+    def jacobian_matrix(self, deck, y, p):
+        eps = deck.solver_perturbation
         jacobian = np.zeros((deck.compare_length , deck.dim),dtype=np.float64)
-        
-        if deck.dim == 1:
-            p = np.zeros(1)
-            p[0] = deck.young_modulus
-            
-        
+        #print p
         index = 0
+        
         for i in deck.nodes_compare:
-            for j in range(0,len(p)):
+            for j in range(0,len(p.shape)):
                 
                
                 if deck.material_type == "Elastic":
@@ -85,27 +81,36 @@ class Energy_problem():
                         index +=1
         return jacobian
     
-    def newton_step(self, deck, y):
+    def newton_step(self, deck, y,p):
         
-        jacobian = self.jacobian_matrix(deck, y, deck.solver_perturbation)
+        jacobian = self.jacobian_matrix(deck, y,p)
       
         S = linalg.pinv(jacobian)
        
-        deck.young_modulus = np.dot(deck.measured_energy - jacobian,S)[0]
+        #print jacobian , S
+        #sys.exit()
+        #p[0] = np.dot(deck.measured_energy - jacobian,S)[0]
       
         from ..materials.elastic import Elastic_material
         mat_class = Elastic_material( deck, self, y )
         
+        p[0] = np.dot(deck.measured_energy - mat_class.strain_energy[18],S)[0]
         return abs(deck.measured_energy - mat_class.strain_energy[18])
     
     def solver(self,deck):
         
+        
+        if deck.dim == 1:
+            p = np.zeros((deck.compare_length))
+            p.fill(deck.young_modulus)
+            
         res = float('inf')
         iteration = 1
-        print deck.young_modulus
+        #print p , len(p)
         while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :
             
-            res = self.newton_step(deck, deck.geometry.act)
-            print iteration , res , deck.young_modulus
+            res = self.newton_step(deck, deck.geometry.act,p)
+            print iteration , res , p
+            iteration += 1
         
         
