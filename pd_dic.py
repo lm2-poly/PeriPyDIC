@@ -16,7 +16,7 @@ def main(argv):
     Main
     """
     helptext = sys.argv[0] + " -i input.yaml -t type"
-    types = ['pd', 'dic']
+    types = ['pd', 'dic' , 'energy']
 
     if len(sys.argv) != 5:
         print helptext
@@ -50,13 +50,21 @@ def main(argv):
     if typeIn == types[1]:
         deck = IO.deck.DIC_deck(inputFile)
         dic(deck)
+        
+    if typeIn == types[2]:
+        deck = IO.deck.DIC_deck(inputFile)
+        energy(deck)
+
+def energy(deck):
+    energy_solver_class = Energy_problem(deck)
+    energy_solver_class.solver(deck)
 
 def dic(deck):
-    pb_solver_class = DIC_problem(deck)
-    ccm_class = IO.ccm.CCM_calcul(deck, pb_solver_class)
+    dic_solver_class = DIC_problem(deck)
+    ccm_class = IO.ccm.CCM_calcul(deck, dic_solver_class)
 
     if deck.vtk_writer.vtk_enabled == True:
-        deck.vtk_writer.write_data(deck,pb_solver_class,ccm_class)
+        deck.vtk_writer.write_data(deck,dic_solver_class,ccm_class)
 
 def simulation(deck):
     t0 = time.time()

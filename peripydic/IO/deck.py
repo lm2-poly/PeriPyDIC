@@ -277,7 +277,7 @@ class DIC_deck():
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
 
-			if not "Discretization" in self.doc:
+                        if not "Discretization" in self.doc:
                             print "Error: Specify a Discretization tag in your yaml"
                             sys.exit(1)
                         else:
@@ -298,12 +298,12 @@ class DIC_deck():
                                 self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
                             if "Saftety_Factor" in self.doc["Discretization"]:
                                 self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
-			    if not "Volume" in self.doc["Discretization"]:
-				print "Error: No Volume tag found in Discretization"
-				sys.exit(1)
-			    else:
-				## Volume of a DIC node
-				self.dic_volume = float(self.doc["Discretization"]["Volume"])
+                            if not "Volume" in self.doc["Discretization"]:
+                                print "Error: No Volume tag found in Discretization"
+                                sys.exit(1)
+                            else:
+                                ## Volume of a DIC node
+                                self.dic_volume = float(self.doc["Discretization"]["Volume"])
 
                         if not "Data" in self.doc:
                             print "Error: Specify a Data tag in your yaml"
@@ -374,3 +374,38 @@ class DIC_deck():
                         if "Parallel" in self.doc:
                             if "Threads" in self.doc["Parallel"]:
                                 self.num_threads = int(self.doc["Parallel"]["Threads"])
+                                
+                        if "Energy" in self.doc:
+                            if not "Measured Energy" in self.doc["Energy"]:
+                                print "Error: Measured Energy tag found in Energy"
+                                sys.exit(1)
+                            else:
+                                ## Measured energy from DIC
+                                self.measured_energy = float(self.doc["Energy"]["Measured Energy"])
+                            if not "Nodes" in self.doc["Energy"]:
+                                print "Error: No Nodes tag found in Energy"
+                                sys.exit(1)
+                            else:
+                                ## Nodes to comapre the energy with
+                                self.nodes_compare = np.asarray(self.doc["Energy"]["Nodes"], dtype=np.int)
+                                self.compare_length = len(self.nodes_compare)
+                                
+                        if "Solver" in  self.doc:
+                            if not "Max_Iteration" in self.doc["Solver"]:
+                                print "Error: No Max_Iteration tag in Solver found"
+                                sys.exit(1)
+                            else:
+                                ## Maximum number iteration
+                                self.solver_max_it = self.doc["Solver"]["Max_Iteration"]
+                            if not "Tolerance" in self.doc["Solver"]:
+                                print "Error: No Tolerance tag in Solver found"
+                                sys.exit(1)
+                            else:
+                                ## Absolute tolerance of the solver
+                                self.solver_tolerance = float(self.doc["Solver"]["Tolerance"])
+                            if not "Jacobian_Perturbation" in self.doc["Solver"]:
+                                print "Error: No Jacobian_Perturbation tag in Solver found"
+                                sys.exit(1)
+                            else:
+                                ## Perturbation factor for the Jacobian matrix
+                                self.solver_perturbation = float(self.doc["Solver"]["Jacobian_Perturbation"])

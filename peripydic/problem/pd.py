@@ -214,11 +214,11 @@ class PD_problem():
         eps = perturbation_factor * deck.delta_X
         jacobian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim),dtype=np.float64)
 
-        ids = []
-        for con in deck.conditions:
-            if con.type == "Displacement":
-                for i in con.id:
-                    ids.append(i)
+        #ids = []
+        #for con in deck.conditions:
+        #    if con.type == "Displacement":
+        #        for i in con.id:
+        #            ids.append(i)
 
         for i in range(0, deck.num_nodes):
             traversal_list = np.append([i],self.neighbors.get_index_x_family(i))
