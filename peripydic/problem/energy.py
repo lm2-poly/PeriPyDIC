@@ -9,6 +9,8 @@ from scipy import linalg
 from ..util import neighbor
 from ..util import linalgebra
 import sys
+from peripydic.IO import deck
+from peripydic.util import linalgebra
 
 class Energy_problem():
     
@@ -64,18 +66,14 @@ class Energy_problem():
         for i in deck.nodes_compare:
             for j in range(0,len(p.shape)):
                 
-               
                 if deck.material_type == "Elastic":
                     if deck.dim == 1:
                         from ..materials.elastic import Elastic_material
-                        deck.young_modulus = p[0] + eps
+                        deck.young_modulus = p[j] + eps
                         mat_class_p = Elastic_material( deck, self, y )
-                        #print deck.young_modulus , mat_class_p.strain_energy[i]
-                        
-                        
-                        deck.young_modulus = p[0] - eps
+
+                        deck.young_modulus = p[j] - eps
                         mat_class_m = Elastic_material( deck, self, y )
-                        #print deck.young_modulus , mat_class_m.strain_energy[i]
                         jacobian[index][j] = (mat_class_p.strain_energy[i] - mat_class_m.strain_energy[i]) / (2. * eps)
                         
                         index +=1
@@ -86,31 +84,39 @@ class Energy_problem():
         jacobian = self.jacobian_matrix(deck, y,p)
       
         S = linalg.pinv(jacobian)
-       
-        #print jacobian , S
-        #sys.exit()
-        #p[0] = np.dot(deck.measured_energy - jacobian,S)[0]
-      
-        from ..materials.elastic import Elastic_material
-        mat_class = Elastic_material( deck, self, y )
         
-        p[0] = np.dot(deck.measured_energy - mat_class.strain_energy[18],S)[0]
-        return abs(deck.measured_energy - mat_class.strain_energy[18])
+        energy = np.zeros(deck.compare_length)
+        
+        for i in range(0,len(energy)):
+            energy[i] = deck.measured_energy - jacobian[i]
+        
+     
+        p[0] =  np.dot(S,energy)[0]
+       
+        for i in range(0,len(energy)):
+            from ..materials.elastic import Elastic_material
+            deck.young_modulus = p[0]
+            mat_class = Elastic_material( deck, self, y )
+            energy[i] = deck.measured_energy - mat_class.strain_energy[deck.nodes_compare[i]]
+           
+        return linalgebra.norm(energy) 
     
     def solver(self,deck):
         
         
         if deck.dim == 1:
-            p = np.zeros((deck.compare_length))
+            p = np.zeros((1))
             p.fill(deck.young_modulus)
             
         res = float('inf')
         iteration = 1
-        #print p , len(p)
+      
         while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :
             
             res = self.newton_step(deck, deck.geometry.act,p)
-            print iteration , res , p
+            print iteration , res 
             iteration += 1
+            
+        print p
         
         
