@@ -1,0 +1,34 @@
+Material:
+    Type: Elastic
+    Young_Modulus: 1000.
+Data:
+    Dimension: 1
+    Sigma: 9
+    File:
+        Name: 1D_DIC_inverse.csv
+        Path: ./
+Discretization:
+    Horizon_Factor_m_value: 1.0
+    Influence_Function: 1.0
+    Saftety_Factor: 1.001
+    Volume: 0.5
+Output:
+    VTK:
+        Path: ./outDIC/
+        Type:
+            - Displacement
+            - Neighbors
+            - Strain
+Solver:
+    Max_Iteration: 5
+    Tolerance: 1.0e-2
+    Jacobian_Perturbation: 100
+Parallel:
+    Threads: 3
+Energy:
+    Nodes:
+        - 15
+        - 16
+        - 18
+        - 17
+    Measured Energy: 0.2
