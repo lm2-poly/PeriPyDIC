@@ -10,7 +10,6 @@ from ..util import neighbor
 from ..util import linalgebra
 import sys
 from peripydic.IO import deck
-from peripydic.util import linalgebra
 
 class Energy_problem():
     
@@ -85,17 +84,28 @@ class Energy_problem():
       
         S = linalg.pinv(jacobian)
         
-        energy = np.zeros(deck.compare_length)
+        energy = np.zeros((deck.compare_length,deck.dim))
         
         for i in range(0,len(energy)):
-            energy[i] = deck.measured_energy - jacobian[i]
+            for j in range(0,deck.dim):
+                energy[i][j] = deck.measured_energy - jacobian[i][j]
         
      
-        p[0] =  np.dot(S,energy)[0]
+        if deck.dim == 1:
+            p[0] =  np.dot(S,energy)[0]
+        if deck.dim == 2:
+            res = np.dot(S,energy)
+            p[0] = res[0]
+            p[1] = res[1]
        
         for i in range(0,len(energy)):
             from ..materials.elastic import Elastic_material
-            deck.young_modulus = p[0]
+            if deck.dim == 1:
+                deck.young_modulus = p[0]
+            if deck.dim == 2:
+                deck.bulk_modulus = p[0]
+                deck.shear_modulus = p[1]
+                
             mat_class = Elastic_material( deck, self, y )
             energy[i] = deck.measured_energy - mat_class.strain_energy[deck.nodes_compare[i]]
            
@@ -108,6 +118,12 @@ class Energy_problem():
             p = np.zeros((1))
             p.fill(deck.young_modulus)
             
+        if deck.dim == 2:
+            p = np.zeros((2))
+            p[0] = deck.bulk_modulus
+            p[1] = deck.shear_modulus
+            
+        
         res = float('inf')
         iteration = 1
       
