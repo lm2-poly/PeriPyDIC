@@ -110,7 +110,7 @@ class Energy_problem(abstractions.Problem):
                 
             mat_class = Elastic_material( deck, self, y )
             energy[i] = deck.measured_energy - mat_class.strain_energy[deck.nodes_compare[i]]
-        print energy , p , (3.* p[0] - 2. * p[1]) / (2.*(3.*p[0]+p[1]))   
+       
         
         #ratio = (3.* p[0] - 2. * p[1]) / (2.*(3.*p[0]+p[1]))
          
