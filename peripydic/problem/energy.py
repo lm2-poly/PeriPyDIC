@@ -65,17 +65,16 @@ class Energy_problem(abstractions.Problem):
                             
                         if j == 1:
                             deck.bulk_modulus = p[0]
-                            deck.shear_modulus = p[1] + eps
+                            deck.shear_modulus = p[1] + eps 
                             mat_class_p = Elastic_material( deck, self, y )
                             
                             deck.bulk_modulus = p[0] 
-                            deck.shear_modulus = p[1] - eps
+                            deck.shear_modulus = p[1] - eps 
                             mat_class_m = Elastic_material( deck, self, y )
                             
                             jacobian[index][j] = (mat_class_p.strain_energy[i] - mat_class_m.strain_energy[i]) / (2. * eps)
                             
-                            
-                        
+ 
             index +=1
         return jacobian
     
@@ -111,7 +110,10 @@ class Energy_problem(abstractions.Problem):
                 
             mat_class = Elastic_material( deck, self, y )
             energy[i] = deck.measured_energy - mat_class.strain_energy[deck.nodes_compare[i]]
-        print energy , p   
+        print energy , p , (3.* p[0] - 2. * p[1]) / (2.*(3.*p[0]+p[1]))   
+        
+        #ratio = (3.* p[0] - 2. * p[1]) / (2.*(3.*p[0]+p[1]))
+         
         return linalgebra.norm(energy) 
     
     def solver(self,deck):
