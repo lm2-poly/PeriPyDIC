@@ -9,13 +9,14 @@ from ..util import neighbor
 from scipy.sparse import linalg
 from scipy import sparse
 from ..util import linalgebra
-import sys
+from ..util import abstractions
+
 
 
 logger = logging.getLogger(__name__)
 
-## Class to define the peridynamic problem, i.e. applying boundaries conditions to the geomety and solve the problem
-class PD_problem():
+## Class to define the peridynamic problem, i.e. applying boundaries conditions to the geometry and solve the problem
+class PD_problem(abstractions.Problem):
 
     ## Constructor
     # @param deck The input deck
@@ -103,35 +104,6 @@ class PD_problem():
         else:
             logger.error("Error in problem.py: Shape of BC unknown, please use Ramp.")
 
-    ## Compute the volume correction factors
-    # @param deck The input deck
-    def compute_volume_correction(self,deck):
-        ## Volume correction factor for each node
-        self.volume_correction = np.ones( ( deck.num_nodes, self.neighbors.max_neighbors), dtype=np.float64 )
-        for i in range(0, deck.num_nodes):
-            index_x_family = self.neighbors.get_index_x_family(i)
-            n = 0
-            for p in index_x_family:
-                X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                r = deck.delta_X / 2.0
-                if linalgebra.norm(X) > self.neighbors.horizon - r:
-                    self.volume_correction[i,n] = (self.neighbors.horizon + r - linalgebra.norm(X)) / (deck.delta_X)
-                else:
-                    pass
-                n += 1
-
-    ## Compute the weighted volume for each node
-    # @param deck The input deck
-    def compute_weighted_volume(self, deck):
-        ## Weighted volume for each node
-        self.weighted_volume = np.zeros((deck.num_nodes),dtype=np.float64)
-        for i in range(0, deck.num_nodes):
-            index_x_family = self.neighbors.get_index_x_family(i)
-            n = 0
-            for p in index_x_family:
-                X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
-                n += 1
 
     ## Provide the internal force density for each node for a given time step t_n
     # @param deck The input deck
@@ -214,11 +186,11 @@ class PD_problem():
         eps = perturbation_factor * deck.delta_X
         jacobian = np.zeros((deck.num_nodes * deck.dim , deck.num_nodes * deck.dim),dtype=np.float64)
 
-        ids = []
-        for con in deck.conditions:
-            if con.type == "Displacement":
-                for i in con.id:
-                    ids.append(i)
+        #ids = []
+        #for con in deck.conditions:
+        #    if con.type == "Displacement":
+        #        for i in con.id:
+        #            ids.append(i)
 
         for i in range(0, deck.num_nodes):
             traversal_list = np.append([i],self.neighbors.get_index_x_family(i))

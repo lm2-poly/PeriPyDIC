@@ -1,0 +1,33 @@
+Material:
+    Type: Elastic
+    Bulk_Modulus: 3333.333333333333
+    Shear_Modulus: 1538.4615
+Data:
+    Dimension: 2
+    Type: Plane_Stress
+    Sigma: 9
+    File:
+        Name: 2D_DIC_inverse.csv
+        Path: ./
+Discretization:
+    Horizon_Factor_m_value: 10.0
+    Influence_Function: 1.0
+    Saftety_Factor: 1.001
+    Volume: 1
+Output:
+    VTK:
+        Path: ./outDIC/
+        Type:
+            - Displacement
+            - Neighbors
+            - Strain
+Solver:
+    Max_Iteration: 50
+    Tolerance: 1.0e-4
+    Jacobian_Perturbation: 10
+Parallel:
+    Threads: 3
+Energy:
+    Nodes:
+        - 795
+    Measured Energy: 2.0

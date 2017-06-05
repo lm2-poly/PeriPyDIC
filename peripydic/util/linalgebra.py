@@ -8,6 +8,15 @@ def norm(a):
 
         if a.shape[0] ==  2:
             return sqrt(a[0]*a[0]+a[1]*a[1])
+        
+        if a.shape[0] == 3:
+            return sqrt(a[0]*a[0]+a[1]*a[1]*a[2]*a[2])
+        
+        else:
+            tmp = 0.
+            for i in range(0,a.shape[0]):
+                tmp += a[i]*a[i]
+            return sqrt(tmp)
 
     if len(a.shape) == 2:
         if a.shape[1] ==  2:
