@@ -274,6 +274,21 @@ class vtk_writer():
                             array.SetComponentName(1,"error_yy")
                             array.SetComponentName(2,"error_xy")
                         dataOut.AddArray(array)
+                        
+                    if out_type == "Strain_Energy":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Strain_Energy")
+                        array.SetNumberOfComponents(1)
+                        array.SetNumberOfTuples(num_nodes)
+                        
+                        strain_energy = problem.strain_energy
+                        
+                        for i in range(num_nodes):
+                            array.SetTuple1(i,strain_energy[i])
+                        
+                        dataOut.AddArray(array)   
+                        
+                        
 
                 writer.SetInputData(grid)
 
