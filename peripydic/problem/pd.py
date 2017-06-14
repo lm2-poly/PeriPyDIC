@@ -3,7 +3,6 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 
-import logging
 import numpy as np
 from ..util import neighbor
 from scipy.sparse import linalg
@@ -11,9 +10,6 @@ from scipy import sparse
 from ..util import linalgebra
 from ..util import abstractions
 
-
-
-logger = logging.getLogger(__name__)
 
 ## Class to define the peridynamic problem, i.e. applying boundaries conditions to the geometry and solve the problem
 class PD_problem(abstractions.Problem):
@@ -47,7 +43,6 @@ class PD_problem(abstractions.Problem):
 
         # Compute the volume correction factor for each node
         self.compute_volume_correction(deck)
-        print self.volume_correction
 
         # Compute the weighted volume for each node
         self.compute_weighted_volume(deck)
@@ -101,9 +96,6 @@ class PD_problem(abstractions.Problem):
             else:
                 result = 0
                 return result
-        else:
-            logger.error("Error in problem.py: Shape of BC unknown, please use Ramp.")
-
 
     ## Provide the internal force density for each node for a given time step t_n
     # @param deck The input deck

@@ -124,10 +124,7 @@ class Elastic_material():
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
 
                 # Compute the direction vector between Node_p and Node_i
-                #try:
                 M = Y / linalgebra.norm(Y)
-                #except RuntimeWarning:
-                #print y[p,:] , y[i,:] , linalgebra.norm(Y) , i , p
 
                 if deck.dim == 1:
                     # PD material parameter
