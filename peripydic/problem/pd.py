@@ -118,9 +118,7 @@ class PD_problem(abstractions.Problem):
             self.update_force_data(self.mat_class, t_n)
             self.update_ext_state_data(self.mat_class, t_n)
             self.update_ext_state_visco_data(self.mat_class, t_n)
-        else:
-            logger.error("Error in problem.py: Material type unknown, please use Elastic or Viscoelastic.")
-
+       
         force = self.mat_class.f_int
         #internal_force = np.reshape(internal_force, (deck.num_nodes * deck.dim,-1) )
         return force
