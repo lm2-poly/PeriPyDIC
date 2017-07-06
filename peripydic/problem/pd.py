@@ -191,6 +191,8 @@ class PD_problem(abstractions.Problem):
                     force_int_p = self.internal_force(deck, ysolver + eps_vector, t_n)[i,:]
                     force_int_m = self.internal_force(deck, ysolver - eps_vector, t_n)[i,:]
                     force_int_diff = (force_int_p - force_int_m)
+                    del force_int_p;
+                    del force_int_m;
                     for s in range(0, deck.dim):
                         if r==s:
                             jacobian[i*deck.dim+r,j*deck.dim+s] = force_int_diff[r] / (2.*eps)

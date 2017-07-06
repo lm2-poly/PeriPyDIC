@@ -3,7 +3,7 @@ Discretization:
     Type: Plane_Stress
     Final_Time: 1.0
     Time_Steps: 1
-    Horizon_Factor_m_value: 1.5
+    Horizon_Factor_m_value: 2.0
     Influence_Function: 1.0
     File: 
         Name: geometry_2D_test.csv
