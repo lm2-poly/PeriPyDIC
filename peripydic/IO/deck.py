@@ -297,7 +297,7 @@ class DIC_deck():
                                 ## Influence function
                                 self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
                             if "Saftety_Factor" in self.doc["Discretization"]:
-                                self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
+                                self.safety_factor = float(self.doc["Discretization"]["Safety_Factor"])
                             if not "Volume" in self.doc["Discretization"]:
                                 print "Error: No Volume tag found in Discretization"
                                 sys.exit(1)

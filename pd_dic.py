@@ -61,10 +61,10 @@ def energy(deck):
 
 def dic(deck):
     dic_solver_class = DIC_problem(deck)
-    ccm_class = IO.ccm.CCM_calcul(deck, dic_solver_class)
+    #ccm_class = IO.ccm.CCM_calcul(deck, dic_solver_class)
 
     if deck.vtk_writer.vtk_enabled == True:
-        deck.vtk_writer.write_data(deck,dic_solver_class,ccm_class)
+        deck.vtk_writer.write_data(deck,dic_solver_class,None)
 
 def simulation(deck):
     t0 = time.time()

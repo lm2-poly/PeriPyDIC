@@ -117,7 +117,7 @@ class vtk_writer():
 
                     if out_type == "Volume_Force":
 
-                        force = problem.b
+                        force = problem.force_int
                         for con in deck.conditions:
                             if con.type == "Force":
                                 result_x = 0.
