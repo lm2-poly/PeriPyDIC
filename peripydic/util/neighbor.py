@@ -4,6 +4,9 @@
 #@author: patrick.diehl@polymtl.ca
 import numpy as np
 import scipy.spatial
+import sys 
+
+sys.setrecursionlimit(100000)
 
 ## Class for handling the neighborhood
 class NeighborSearch():
