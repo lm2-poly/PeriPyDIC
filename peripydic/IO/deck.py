@@ -165,7 +165,8 @@ class PD_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
-
+                        ## List of all outputs specified in the configuration file
+                        self.outputs = []
                         if "Output" in self.doc:
                             if  "CSV" in self.doc["Output"]:
                                 if not "Type" in self.doc["Output"]["CSV"]:
@@ -175,8 +176,6 @@ class PD_deck():
                                     print "Error: No File tag found"
                                     sys.exit(1)
                                 else:
-                                    ## List of all outputs specified in the configuration file
-                                    self.outputs = []
                                     for i in range(0,len(self.doc["Output"]["CSV"]["File"])):
                                         self.outputs.append(output.OutputCSV("CSV",self.doc["Output"]["CSV"]["Type"][i],self.doc["Output"]["CSV"]["File"][i]))
                             if "VTK" in self.doc["Output"]:
