@@ -250,8 +250,9 @@ class PD_problem(abstractions.Problem):
             residual = self.residual_vector(deck, ysolver, t_n)
 
             res = linalgebra.norm(residual)
+           
             while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :
-                print "iteration", iteration
+                print "iteration", iteration , res
                 if iteration == deck.solver_max_it:
                     print "Warning: Solver reached limit of " + str(deck.solver_max_it) + " iterations"
                 delta_y = self.newton_step(deck, ysolver, t_n, deck.solver_perturbation, residual)
