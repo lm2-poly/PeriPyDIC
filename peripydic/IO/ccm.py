@@ -5,6 +5,7 @@
 import numpy as np
 from scipy import linalg
 np.set_printoptions(precision=8, threshold='nan')
+from ..util import functions
 import sys
 
 ## Class to compute the well-known strain and stress tensors defined in the classical continuum mechanics
@@ -38,9 +39,6 @@ class CCM_calcul():
 
         ## Volume related to each node
         self.node_volumes = deck.geometry.volumes
-
-        ## Influence function
-        self.w = deck.influence_function
 
         ## Weighted volume
         self.Weighted_Volume = data_solver.weighted_volume
@@ -90,14 +88,14 @@ class CCM_calcul():
                         self.factor2d = 1
 
         ## Compute the global strain tensor storing the strain tensor for each node at each time step
-        self.compute_global_strain_tensor(data_solver)
+        self.compute_global_strain_tensor(deck,data_solver)
 
         ## Compute the displacement for each node at each time step
         #self.compute_u_displacement()
 
         ## Compute the global stress tensor storing the strain tensor for each node at each time step
         if self.material_type == "Elastic":
-            self.compute_global_stress_tensor(data_solver)
+            self.compute_global_stress_tensor(deck,data_solver)
 
     ## Provide the image of (xi - xp) under the reference position vector state X
     # @param data_solver Data from the peridynamic problem/solving class
@@ -124,13 +122,13 @@ class CCM_calcul():
     # @param data_solver Data from the peridynamic problem/solving class
     # @param i Id of Node "i"
     # @return Shape tensor K
-    def K_shape_tensor(self, data_solver, i):
+    def K_shape_tensor(self, deck, data_solver, i):
         K = np.zeros((self.dim, self.dim),dtype=np.float64)
         index_x_family = data_solver.neighbors.get_index_x_family(i)
         n = 0
         for p in index_x_family:
             X = self.X_vector_state(data_solver, i, p)
-            K += self.w * np.dot(X,X.T) * self.Volume_Correction[i,n] * self.node_volumes[p]
+            K += functions.w(deck, X, deck.influence_function) * np.dot(X,X.T) * self.Volume_Correction[i,n] * self.node_volumes[p]
             n += 1
         return K
 
@@ -139,16 +137,16 @@ class CCM_calcul():
     # @param i Id of Node "i"
     # @param t_n Id of the time step
     # @return Deformation gradient tensor related to Node "i"
-    def deformation_gradient(self, data_solver, i, t_n):
+    def deformation_gradient(self, deck, data_solver, i, t_n):
         tmp = np.zeros((self.dim, self.dim),dtype=np.float64)
         index_x_family = data_solver.neighbors.get_index_x_family(i)
         n = 0
         for p in index_x_family:
             Y = self.Y_vector_state(data_solver, i, p, t_n)
             X = self.X_vector_state(data_solver, i, p)
-            tmp += self.w * np.dot(Y,X.T) * self.Volume_Correction[i,n] * self.node_volumes[p]
+            tmp += functions.w(deck, X, deck.influence_function) * np.dot(Y,X.T) * self.Volume_Correction[i,n] * self.node_volumes[p]
             n += 1
-        deformation = np.dot(tmp, linalg.inv(self.K_shape_tensor(data_solver, i)))
+        deformation = np.dot(tmp, linalg.inv(self.K_shape_tensor(deck,data_solver, i)))
         return deformation
 
     ## Provide the strain tensor related to Node "i"
@@ -156,21 +154,21 @@ class CCM_calcul():
     # @param i Id of Node "i"
     # @param t_n Id of the time step
     # @return strain tensor related do Node "i"
-    def strain_tensor(self, data_solver, i, t_n):
-        F = self.deformation_gradient(data_solver, i, t_n)
+    def strain_tensor(self, deck, data_solver, i, t_n):
+        F = self.deformation_gradient(deck,data_solver, i, t_n)
         strain = (F + F.T)/2 - np.identity(self.dim, dtype=np.float64)
         return strain
 
     ## Compute the global strain tensor storing the strain tensor for each node at each time step
     # @param data_solver Data from the peridynamic problem/solving class
-    def compute_global_strain_tensor(self, data_solver):
+    def compute_global_strain_tensor(self, deck, data_solver):
         ## Golbal strain tensor storing the strain tensor for each node at each time step
         self.global_strain = np.zeros((self.num_nodes*self.dim, self.dim, self.time_steps),dtype=np.float64)
         for t_n in range(1, self.time_steps):
             for i in range(0, self.num_nodes):
                 for j in range(0, self.dim):
                     for r in range(0, self.dim):
-                        self.global_strain[i*self.dim+r,j,t_n] = self.strain_tensor(data_solver, i, t_n)[r,j]
+                        self.global_strain[i*self.dim+r,j,t_n] = self.strain_tensor(deck,data_solver, i, t_n)[r,j]
 
     ## Provide the image of x under the Dirac Delta Function
     # @param x Vector x
@@ -189,16 +187,17 @@ class CCM_calcul():
     # @param q Id of Node "q" with Node "i" family
     # @param t_n Id of the time step
     # @return Shape tensor K
-    def K_modulus_tensor(self, data_solver, i , p, q, m):
+    def K_modulus_tensor(self, deck, data_solver, i , p, q, m):
         Xp = self.X_vector_state(data_solver, i, p)
         M = Xp / linalg.norm(Xp)
         Xq = self.X_vector_state(data_solver, i, q)
-
+        xp = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
+        xq = deck.geometry.nodes[q,:] - deck.geometry.nodes[i,:]
         if self.material_type == "Elastic":
             if self.dim == 1:
                 # PD material parameter
                 alpha = self.Young_Modulus / self.Weighted_Volume[i]
-                K = alpha * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
+                K = alpha * functions.w(deck, xp, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
 
             if self.dim == 2:
                 # PD material parameter
@@ -208,13 +207,13 @@ class CCM_calcul():
                 #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)
                 alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                 alpha_sb = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) /3.
-                K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
+                K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * functions.w(deck, xp, deck.influence_function) * functions.w(deck, xq, deck.influence_function) * np.dot(Xp,Xq.T) + alpha_d * functions.w(deck, xp, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
 
             if self.dim == 3:
                 # PD material parameter
                 alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                 alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
-                K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * self.w * self.w * np.dot(Xp,Xq.T) + alpha_d * self.w * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
+                K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * functions.w(deck, xp, deck.influence_function) * functions.w(deck, xq, deck.influence_function) * np.dot(Xp,Xq.T) + alpha_d * functions.w(deck, xp, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
 
         return K
 
@@ -223,7 +222,7 @@ class CCM_calcul():
     # @param i Id of Node "i"
     # @param t_n Id of the time step
     # @return stress tensor related do Node "i"
-    def stress_tensor(self, data_solver, i, t_n):
+    def stress_tensor(self, deck, data_solver, i, t_n):
         #force = np.zeros((self.dim, 1),dtype=np.float64)
         stress = np.zeros((self.dim, self.dim),dtype=np.float64)
         index_x_family = data_solver.neighbors.get_index_x_family(i)
@@ -233,21 +232,21 @@ class CCM_calcul():
             m = 0
             for q in index_x_family:
                 Xq = self.X_vector_state(data_solver, i, q)
-                stress += np.dot(np.dot(self.K_modulus_tensor(data_solver, i , p, q, m), np.dot(self.strain_tensor(data_solver, i, t_n), Xq)), Xp.T) * self.Volume_Correction[i,m] * self.node_volumes[q] * self.Volume_Correction[i,n] * self.node_volumes[p]
+                stress += np.dot(np.dot(self.K_modulus_tensor(deck,data_solver, i , p, q, m), np.dot(self.strain_tensor(deck,data_solver, i, t_n), Xq)), Xp.T) * self.Volume_Correction[i,m] * self.node_volumes[q] * self.Volume_Correction[i,n] * self.node_volumes[p]
                 m += 1
             n += 1
         return stress
 
     ## Compute the global stress tensor storing the strain tensor for each node at each time step
     # @param data_solver Data from the peridynamic problem/solving class
-    def compute_global_stress_tensor(self, data_solver):
+    def compute_global_stress_tensor(self, deck, data_solver):
         ## Golbal strain tensor storing the strain tensor for each node at each time step
         self.global_stress = np.zeros((self.num_nodes*self.dim, self.dim, self.time_steps),dtype=np.float64)
         for t_n in range(1, self.time_steps):
             for i in range(0, self.num_nodes):
                 for j in range(0, self.dim):
                     for r in range(0, self.dim):
-                        self.global_stress[i*self.dim+r,j,t_n] = self.stress_tensor(data_solver, i, t_n)[r,j]
+                        self.global_stress[i*self.dim+r,j,t_n] = self.stress_tensor(deck,data_solver, i, t_n)[r,j]
 
     ## Compute the displacement for each node at each time step
     def compute_u_displacement(self):

@@ -5,6 +5,7 @@
 
 from ..util import linalgebra
 import numpy as np
+from ..util import functions
 
 
 ## Abstract class of the problem classes, which contains common methods 
@@ -36,5 +37,5 @@ class Problem():
             n = 0
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                self.weighted_volume[i] += deck.influence_function * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
+                self.weighted_volume[i] += functions.w(deck, X, deck.influence_function) * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
                 n += 1    
