@@ -168,9 +168,10 @@ class CCM_calcul():
         self.global_strain = np.zeros((self.num_nodes*self.dim, self.dim, self.time_steps),dtype=np.float64)
         for t_n in range(1, self.time_steps):
             for i in range(0, self.num_nodes):
+                tmp = self.strain_tensor(deck,data_solver, i, t_n)
                 for j in range(0, self.dim):
                     for r in range(0, self.dim):
-                        self.global_strain[i*self.dim+r,j,t_n] = self.strain_tensor(deck,data_solver, i, t_n)[r,j]
+                        self.global_strain[i*self.dim+r,j,t_n] = tmp[r,j]
 
     ## Provide the image of x under the Dirac Delta Function
     # @param x Vector x
@@ -247,9 +248,10 @@ class CCM_calcul():
         self.global_stress = np.zeros((self.num_nodes*self.dim, self.dim, self.time_steps),dtype=np.float64)
         for t_n in range(1, self.time_steps):
             for i in range(0, self.num_nodes):
+                tmp = self.stress_tensor(deck,data_solver, i, t_n)
                 for j in range(0, self.dim):
                     for r in range(0, self.dim):
-                        self.global_stress[i*self.dim+r,j,t_n] = self.stress_tensor(deck,data_solver, i, t_n)[r,j]
+                        self.global_stress[i*self.dim+r,j,t_n] = tmp[r,j]
 
     ## Compute the displacement for each node at each time step
     def compute_u_displacement(self):
