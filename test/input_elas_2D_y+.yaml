@@ -6,7 +6,7 @@ Discretization:
     Horizon_Factor_m_value: 3.0
     Influence_Function: 1.0
     File: 
-        Name: geometry_2D_test.csv
+        Name: geometry_2D.csv
 Material:
     Type: Elastic
     Bulk_Modulus: 3333.3333
@@ -22,13 +22,13 @@ Boundary:
             - 0.0
             - 0.0
         Direction:
-            - 1
+            - 2
             - 1
             - 2
         File: 
-            - force_condition_2D_test.csv
-            - displ_condition_2D_test.csv
-            - displ_condition_2D_test.csv
+            - force_condition_2D_y+.csv
+            - displ_condition_2D_y+.csv
+            - displ_condition_2D_y+.csv
         Shape:
             - Ramp
             - Fixed
@@ -39,21 +39,6 @@ Boundary:
             - 1.0
             - 1.0
             - 1.0
-Output:
-    CSV:
-        Type:
-            - Position
-        File:
-            - nodes_positions_m_3_dx_0_5.csv
-    VTK:
-        Path: ./out2/
-        Type:
-            - Displacement
-            - Neighbors
-            - Force
-            - Conditions
-            - Strain
-        Slice: 1
 Solver:
     Max_Iteration: 1000
     Tolerance: 1.0e-3
