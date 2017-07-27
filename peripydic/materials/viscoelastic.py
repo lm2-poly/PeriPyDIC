@@ -75,13 +75,13 @@ class Viscoelastic_material():
                     self.e[i,n] = linalgebra.norm(Y) - linalgebra.norm(X)
 
                     if deck.dim == 1:
-                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (1. / self.Weighted_Volume[i]) * functions.w( data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d[0] * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d[0] * functions.w( data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 3:
-                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                        self.dilatation[i] += (3. / self.Weighted_Volume[i]) * functions.w( data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
                     n += 1
 
     ## Compute the dilatation and also the scalar extension state for each node
@@ -133,13 +133,13 @@ class Viscoelastic_material():
                     self.e_visco[i,n,k] = data_solver.ext[i, n, t_n-1] * (1.0 - tmp_exp) + data_solver.ext_visco[i, n, k, t_n-1] * tmp_exp + beta * delta_e
 
                     if deck.dim == 1:
-                        self.dilatation_visco[i,k] += (1. / self.Weighted_Volume[i]) * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (1. / self.Weighted_Volume[i]) * functions.w( data_solver, X, deck.influence_function) * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 2:
-                        self.dilatation_visco[i,k] += (2. / self.Weighted_Volume[i]) * self.factor2d[k] * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (2. / self.Weighted_Volume[i]) * self.factor2d[k] * functions.w( data_solver, X, deck.influence_function) * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                     if deck.dim == 3:
-                        self.dilatation_visco[i,k] += (3. / self.Weighted_Volume[i]) * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                        self.dilatation_visco[i,k] += (3. / self.Weighted_Volume[i]) * functions.w( data_solver, X, deck.influence_function) * linalgebra.norm(X) * (self.e[i,n] - self.e_visco[i, n, k]) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
                 n +=1
 
     ## Compute the viscoelastic part of the scalar extension state
@@ -195,12 +195,12 @@ class Viscoelastic_material():
                         # PD viscoelastic material parameter
                         alpha_k = self.Relax_Modulus[k] / self.Weighted_Volume[i]
                         # Viscoelastic part of the scalar force state
-                        t_visco += alpha_k * functions.w(deck, X, deck.influence_function) * (self.e[i,n] - self.e_visco[i,n,k])
+                        t_visco += alpha_k * functions.w( data_solver, X, deck.influence_function) * (self.e[i,n] - self.e_visco[i,n,k])
 
                     # PD elastic material parameter
                     alpha_0 = self.Relax_Modulus[0] / self.Weighted_Volume[i]
                     ## Scalar force state
-                    self.t = alpha_0 * functions.w(deck, X, deck.influence_function) * self.e[i,n] + t_visco
+                    self.t = alpha_0 * functions.w( data_solver, X, deck.influence_function) * self.e[i,n] + t_visco
 
                 if deck.dim == 2:
                     # Scalar extension states
@@ -220,8 +220,8 @@ class Viscoelastic_material():
                             alpha_s_k = (9. / self.Weighted_Volume[i]) * (self.K[k] + self.Mu[k] / 9.)
                         alpha_d_k = (8. / self.Weighted_Volume[i]) * self.Mu[k]
                         # Viscoelastic parts of the scalar force state
-                        t_s_visco += (2. * self.factor2d[k] * alpha_s_k - (3. - 2. * self.factor2d[k]) * alpha_d_k) * functions.w(deck, X, deck.influence_function) * (e_s - e_s_visco) / 3.
-                        t_d_visco += alpha_d_k * functions.w(deck, X, deck.influence_function) * (e_d - e_d_visco)
+                        t_s_visco += (2. * self.factor2d[k] * alpha_s_k - (3. - 2. * self.factor2d[k]) * alpha_d_k) * functions.w( data_solver, X, deck.influence_function) * (e_s - e_s_visco) / 3.
+                        t_d_visco += alpha_d_k * functions.w( data_solver, X, deck.influence_function) * (e_d - e_d_visco)
 
                     # PD elastic material parameter
                     if deck.type2d == "Plane_Stress":
@@ -230,8 +230,8 @@ class Viscoelastic_material():
                         alpha_s_0 = (9. / self.Weighted_Volume[i]) * (self.K[0] + self.Mu[0] / 9.)
                     alpha_d_0 = (8. / self.Weighted_Volume[i]) * self.Mu[0]
                     # Scalar force states
-                    t_s = (2. * self.factor2d[0] * alpha_s_0 - (3. - 2. * self.factor2d[0]) * alpha_d_0) * functions.w(deck, X, deck.influence_function) * e_s / 3. + t_s_visco
-                    t_d = alpha_d_0 * functions.w(deck, X, deck.influence_function) * e_d + t_d_visco
+                    t_s = (2. * self.factor2d[0] * alpha_s_0 - (3. - 2. * self.factor2d[0]) * alpha_d_0) * functions.w( data_solver, X, deck.influence_function) * e_s / 3. + t_s_visco
+                    t_d = alpha_d_0 * functions.w( data_solver, X, deck.influence_function) * e_d + t_d_visco
                     self.t = t_s + t_d
 
                 if deck.dim == 3:
@@ -249,15 +249,15 @@ class Viscoelastic_material():
                         alpha_s_k = (9. / self.Weighted_Volume[i]) * self.K[k]
                         alpha_d_k = (15. / self.Weighted_Volume[i]) * self.Mu[k]
                         # Viscoelastic parts of the scalar force state
-                        t_s_visco += alpha_s_k * functions.w(deck, X, deck.influence_function) * (e_s - e_s_visco)
-                        t_d_visco += alpha_d_k * functions.w(deck, X, deck.influence_function) * (e_d - e_d_visco)
+                        t_s_visco += alpha_s_k * functions.w( data_solver, X, deck.influence_function) * (e_s - e_s_visco)
+                        t_d_visco += alpha_d_k * functions.w( data_solver, X, deck.influence_function) * (e_d - e_d_visco)
 
                     # PD elastic material parameter
                     alpha_s_0 = (9. / self.Weighted_Volume[i]) * self.K[0]
                     alpha_d_0 = (15. / self.Weighted_Volume[i]) * self.Mu[0]
                     # Scalar force states
-                    t_s = alpha_s_0 * functions.w(deck, X, deck.influence_function) * e_s + t_s_visco
-                    t_d = alpha_d_0 * functions.w(deck, X, deck.influence_function) * e_d + t_d_visco
+                    t_s = alpha_s_0 * functions.w( data_solver, X, deck.influence_function) * e_s + t_s_visco
+                    t_d = alpha_d_0 * functions.w( data_solver, X, deck.influence_function) * e_d + t_d_visco
                     self.t = t_s + t_d
 
                 #lock.acquire()

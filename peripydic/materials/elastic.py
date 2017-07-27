@@ -70,13 +70,13 @@ class Elastic_material():
                 self.e[i,n] = linalgebra.norm(Y) - linalgebra.norm(X)
 
                 if deck.dim == 1:
-                    self.dilatation[i] += (1. / self.Weighted_Volume[i]) * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                    self.dilatation[i] += (1. / self.Weighted_Volume[i]) * functions.w(data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                 if deck.dim == 2:
-                    self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                    self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * functions.w(data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                 if deck.dim == 3:
-                    self.dilatation[i] += (3. / self.Weighted_Volume[i]) * functions.w(deck, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                    self.dilatation[i] += (3. / self.Weighted_Volume[i]) * functions.w(data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
                 n += 1
 
     ## Compute the dilatation and and also the scalar extension state for each node
@@ -127,7 +127,7 @@ class Elastic_material():
                     # PD material parameter
                     alpha = self.Young_Modulus / self.Weighted_Volume[i]
                     ## Scalar force state
-                    self.t = alpha * functions.w(deck, X, deck.influence_function) * self.e[i,n]
+                    self.t = alpha * functions.w(data_solver, X, deck.influence_function) * self.e[i,n]
 
                 if deck.dim == 2:
                     # PD material parameter
@@ -141,8 +141,8 @@ class Elastic_material():
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i,n] - e_s
                     # Scalar force states
-                    t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * functions.w(deck, X, deck.influence_function) * e_s / 3.
-                    t_d = alpha_d * functions.w(deck, X, deck.influence_function) * e_d
+                    t_s = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) * functions.w(data_solver, X, deck.influence_function) * e_s / 3.
+                    t_d = alpha_d * functions.w(data_solver, X, deck.influence_function) * e_d
                     self.t = t_s + t_d
 
                 if deck.dim == 3:
@@ -153,8 +153,8 @@ class Elastic_material():
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i,n] - e_s
                     # Scalar force states
-                    t_s = alpha_s * functions.w(deck, X, deck.influence_function) * e_s
-                    t_d = alpha_d * functions.w(deck, X, deck.influence_function) * e_d
+                    t_s = alpha_s * functions.w(data_solver, X, deck.influence_function) * e_s
+                    t_d = alpha_d * functions.w(data_solver, X, deck.influence_function) * e_d
                     self.t = t_s + t_d
 
                 #lock.acquire()
@@ -209,7 +209,7 @@ class Elastic_material():
                     # PD material parameter
                     alpha = self.Young_Modulus / self.Weighted_Volume[i]
                     # Strain energy density
-                    self.strain_energy[i] += 0.5 * alpha * functions.w(deck, X, deck.influence_function) * self.e[i,n]**2 * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                    self.strain_energy[i] += 0.5 * alpha * functions.w(data_solver, X, deck.influence_function) * self.e[i,n]**2 * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                 if deck.dim >= 2:
                     X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
@@ -230,7 +230,7 @@ class Elastic_material():
                     e_s = self.dilatation[i] * linalgebra.norm(X) / 3.
                     e_d = self.e[i,n] - e_s
                     # Strain energy density
-                    self.strain_energy[i] += 0.5 * functions.w(deck, X, deck.influence_function) * (alpha_s * e_s**2 + alpha_d * e_d**2) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
+                    self.strain_energy[i] += 0.5 * functions.w(data_solver, X, deck.influence_function) * (alpha_s * e_s**2 + alpha_d * e_d**2) * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
                 n += 1
 
     ## Compute the strain energy density at each node
