@@ -3,7 +3,7 @@ Discretization:
     Final_Time: 1.0
     Time_Steps: 1
     Horizon_Factor_m_value: 1.0
-    Influence_Function: 1.0
+    Influence_Function: ONE
     File: 
         Name: geometry_1D.csv
 Material:
