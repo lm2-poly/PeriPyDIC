@@ -294,7 +294,7 @@ class DIC_deck():
                                 sys.exit(1)
                             else:
                                 ## Influence function
-                                self.influence_function = float(self.doc["Discretization"]["Influence_Function"])
+                                self.influence_function = self.doc["Discretization"]["Influence_Function"]
                             if "Saftety_Factor" in self.doc["Discretization"]:
                                 self.safety_factor = float(self.doc["Discretization"]["Safety_Factor"])
                             if not "Volume" in self.doc["Discretization"]:

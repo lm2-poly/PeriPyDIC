@@ -194,14 +194,13 @@ class CCM_calcul():
         Xp = self.X_vector_state(data_solver, i, p)
         M = Xp / linalg.norm(Xp)
         Xq = self.X_vector_state(data_solver, i, q)
-        X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-        #xp = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-        #xq = deck.geometry.nodes[q,:] - deck.geometry.nodes[i,:]
+        xp = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
+        xq = deck.geometry.nodes[q,:] - deck.geometry.nodes[i,:]
         if self.material_type == "Elastic":
             if self.dim == 1:
                 # PD material parameter
                 alpha = self.Young_Modulus / self.Weighted_Volume[i]
-                K = alpha * functions.w(data_solver, X, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
+                K = alpha * functions.w(data_solver, xp, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
 
             if self.dim == 2:
                 # PD material parameter
@@ -211,13 +210,13 @@ class CCM_calcul():
                 #alpha_s = (9. / self.Weighted_Volume[i]) * (self.K + self.Mu / 9.)
                 alpha_d = (8. / self.Weighted_Volume[i]) * self.Mu
                 alpha_sb = (2. * self.factor2d * alpha_s - (3. - 2. * self.factor2d) * alpha_d) /3.
-                K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * functions.w(data_solver, X, deck.influence_function) * functions.w(data_solver, X, deck.influence_function) * np.dot(Xp,Xq.T) + alpha_d * functions.w(data_solver, X, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
+                K = ((alpha_sb - alpha_d) / self.Weighted_Volume[i]) * functions.w(data_solver, xp, deck.influence_function) * functions.w(data_solver, xq, deck.influence_function) * np.dot(Xp,Xq.T) + alpha_d * functions.w(data_solver, xp, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
 
             if self.dim == 3:
                 # PD material parameter
                 alpha_s = (9. / self.Weighted_Volume[i]) * self.K
                 alpha_d = (15. / self.Weighted_Volume[i]) * self.Mu
-                K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * functions.w(data_solver, X, deck.influence_function) * functions.w(data_solver, X, deck.influence_function) * np.dot(Xp,Xq.T) + alpha_d * functions.w(data_solver, X, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
+                K = ((alpha_s - alpha_d) / self.Weighted_Volume[i]) * functions.w(data_solver, xp, deck.influence_function) * functions.w(data_solver, xq, deck.influence_function) * np.dot(Xp,Xq.T) + alpha_d * functions.w(data_solver, xp, deck.influence_function) * np.dot(M,M.T) * self.DiracDelta(Xq - Xp, i, q, m)
 
         return K
 
