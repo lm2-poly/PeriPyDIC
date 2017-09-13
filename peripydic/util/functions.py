@@ -7,6 +7,8 @@ def w(problem,X,type):
         return 1.
     if type == "EXP":
         len =  linalgebra.norm(X)
-        return np.exp(- (len*len) / problem.neighbors.horizon)
+        return np.exp(- (len*len) / problem.neighbors.horizon / problem.neighbors.horizon)
+    if type == "NORM":
+        return 1. / linalgebra.norm(X) 
     
     return 1.
