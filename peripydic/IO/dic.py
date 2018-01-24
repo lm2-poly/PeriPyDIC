@@ -42,7 +42,7 @@ class DICreader2D():
     ## Find unique values for x
     # @param self Object pointer
     def determineUnitHorizon(self):
-        self.delta_x = np.sqrt(np.power(self.x[1]-self.x[0],2)+np.power(self.y[1]-self.y[0],2))
+        self.delta_x = np.sqrt(np.power(self.x[59]-self.x[58],2)+np.power(self.y[59]-self.y[58],2))
 
     ## Stores the data extracted from the CSV file in objects which can be
     # manipulated by other modules

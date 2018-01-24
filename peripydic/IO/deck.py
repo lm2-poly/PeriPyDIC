@@ -165,6 +165,21 @@ class PD_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
+                                        
+                            if "Critical_Stretch" in self.doc["Material"]:
+                                ##Critical bond stretch
+                                self.critical_stretch = float(self.doc["Material"]["Critical_Stretch"])
+                            else:
+                                self.critical_stretch = -1.
+                            
+                            ## Type of damage
+                            self.damage_type = "None"    
+                            if "Damage_Type" in self.doc["Material"] and not self.critical_stretch == -1:
+                                ##Damage type
+                                self.damage_type = self.doc["Material"]["Damage_Type"]
+                            else:
+                                print "Error: Specify a damage type when providing a critical stretch"
+                                
                         ## List of all outputs specified in the configuration file
                         self.outputs = []
                         if "Output" in self.doc:
@@ -275,7 +290,20 @@ class DIC_deck():
                             else:
                                 print "Error in deck.py: Material type unknown, please use Elastic or Viscoelastic"
                                 sys.exit(1)
-
+                                        
+                            if "Critical_Stretch" in self.doc["Material"]:
+                                ##Critical bond stretch
+                                self.critical_stretch = float(self.doc["Material"]["Critical_Stretch"])
+                            else:
+                                self.critical_stretch = -1.
+                            
+                            self.damage_type = "None" 
+                            if "Damage_Type" in self.doc["Material"] and not self.critical_stretch == -1:
+                                ##Damage type
+                                self.damage_type = self.doc["Material"]["Damage_Type"]
+                            else:
+                                print "Error: Specify a damage type when providing a critical stretch"
+                            
                         if not "Discretization" in self.doc:
                             print "Error: Specify a Discretization tag in your yaml"
                             sys.exit(1)

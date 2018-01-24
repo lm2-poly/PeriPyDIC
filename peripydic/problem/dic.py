@@ -34,6 +34,10 @@ class DIC_problem(abstractions.Problem):
 
         ## Extension state
         self.ext = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors,2),dtype=np.float32 )
+        
+        if deck.critical_stretch > 0:
+            ## Bond damage
+            self.damage = np.zeros((deck.num_nodes,deck.num_nodes,deck.time_steps))
 
 
         if deck.material_type == "Elastic":
@@ -42,8 +46,11 @@ class DIC_problem(abstractions.Problem):
             self.update_force_data(mat_class)
             self.update_ext_state_data(mat_class)
 
-
-        self.update_pos(deck.geometry.act)
+        if not deck.damage_type == "None":    
+            self.compute_damage(deck, self.y)
+            self.update_pos(deck.geometry.act)
+        
+        self.update_damage(deck)    
         self.strain_energy = mat_class.strain_energy
 
     ## Records the force vector at each time step
@@ -64,3 +71,8 @@ class DIC_problem(abstractions.Problem):
     def update_pos(self,act):
         ## Actual position state
         self.y[:,:, 1] = act
+    
+    ## Update the damage between bonds
+    # @param     
+    def update_damage(self,deck):
+        self.damage[:,:, 1] = deck.neighbors.damage

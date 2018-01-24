@@ -37,5 +37,22 @@ class Problem():
             n = 0
             for p in index_x_family:
                 X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
-                self.weighted_volume[i] += functions.w(self, X, deck.influence_function) * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
+                self.weighted_volume[i] += functions.damage(deck,self,i, p) * functions.w(self, X, deck.influence_function) * (linalgebra.norm(X))**2 * self.volume_correction[i,n] * deck.geometry.volumes[p]
                 n += 1    
+                
+                
+    def compute_damage(self,deck,y):
+        for i in range(0, deck.num_nodes):
+           index_x_family = self.neighbors.get_index_x_family(i)
+           for p in index_x_family:
+                X = deck.geometry.nodes[p,:] - deck.geometry.nodes[i,:]
+                Y = (y[p,:]) - y[i,:]
+                
+                stretch = (linalgebra.norm(Y) - linalgebra.norm(X)) / linalgebra.norm(X)
+                
+                if stretch >= deck.critical_stretch:
+                    self.neighbors.damage[i][p] = 1
+                else:
+                    self.neighbors.damage[i][p] = stretch
+        
+        

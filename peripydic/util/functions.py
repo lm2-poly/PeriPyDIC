@@ -12,3 +12,17 @@ def w(problem,X,type):
         return 1. / linalgebra.norm(X) 
     
     return 1.
+
+def damage(deck,problem,i,j):
+    
+    if deck.damage_type == "ADAPTIVE":
+        return (1-problem.neighbors.damage[i][j])
+    
+    if deck.damage_type == "FULL":
+        
+        if (problem.neighbors.damage[i][j] >= 1.):
+            return 0.
+        else:
+            return 1.
+        
+    return 1.

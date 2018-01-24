@@ -21,6 +21,9 @@ class NeighborSearch():
         ## Horizon of the neighborhood
         self.horizon = deck.horizon_factor_m_value * deck.delta_X * self.safety_factor
         self.findNeighbors(deck)
+        
+        if deck.critical_stretch > 0:
+            self.damage = np.zeros((deck.num_nodes,deck.num_nodes))
 
     ## Returns the family of node "i"
     # @param i Id of the node

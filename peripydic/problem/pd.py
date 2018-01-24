@@ -37,6 +37,10 @@ class PD_problem(abstractions.Problem):
         if deck.material_type == "Viscoelastic":
             ## Viscoelastic part of the extension state at each node between the node and its family
             self.ext_visco = np.zeros( ( deck.num_nodes, self.neighbors.max_neighbors, len(deck.relax_time), deck.time_steps ), dtype=np.float64 )
+            
+        if deck.critical_stretch > 0:
+            ## Bond damage
+            self.damage = np.zeros((deck.num_nodes,deck.num_nodes,deck.time_steps))
 
         ## Compute the external force density "b" applied on each node
         self.compute_b(deck)
@@ -262,7 +266,14 @@ class PD_problem(abstractions.Problem):
                 res = linalgebra.norm(residual)
 
                 iteration += 1
+            
+            if not deck.damage_type == "None":    
+                self.compute_damage(deck,ysolver);
+                self.damage[:,:,t_n] = self.neighbors.damage
+                
             self.y[:,:,t_n] = ysolver
+            
+            
             print "t_n:" , t_n , "res:" , res , "Iteration #",iteration-1
 
     ## Store the internal force density for each node at each time step
