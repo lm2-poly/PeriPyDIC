@@ -4,6 +4,7 @@
 #@author: patrick.diehl@polymtl.ca
 
 import pkgutil
+from Crypto.Util.py3compat import bord
 vtk_loader = pkgutil.find_loader('vtk')
 found_vtk = vtk_loader is not None
 if found_vtk == True:
@@ -288,6 +289,19 @@ class vtk_writer():
                         
                         dataOut.AddArray(array)   
                         
+                    if out_type == "Damage":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Damage")
+                        array.SetNumberOfComponents(1)
+                        array.SetNumberOfTuples(num_nodes)
+                        
+                        for i in range(num_nodes):
+                            broken = 0
+                            for j in range(num_nodes):
+                                if problem.neighbors.damage[i][j] == 1.:
+                                    borken += 1
+                            
+                            array.SetTuple1(i,broken)
                         
 
                 writer.SetInputData(grid)

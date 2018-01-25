@@ -74,5 +74,5 @@ class DIC_problem(abstractions.Problem):
     
     ## Update the damage between bonds
     # @param     
-    def update_damage(self,deck):
-        self.damage[:,:, 1] = deck.neighbors.damage
+    def update_damage(self):
+        self.damage[:,:, 1] = self.neighbors.damage
