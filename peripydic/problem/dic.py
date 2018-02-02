@@ -48,9 +48,13 @@ class DIC_problem(abstractions.Problem):
 
         if not deck.damage_type == "None":    
             self.compute_damage(deck, self.y)
-            self.update_pos(deck.geometry.act)
+            self.update_damage()  
+            
+        self.update_pos(deck.geometry.act)
         
-        self.update_damage()    
+      
+           
+              
         self.strain_energy = mat_class.strain_energy
 
     ## Records the force vector at each time step
