@@ -50,7 +50,7 @@ class DIC_problem(abstractions.Problem):
             self.compute_damage(deck, self.y)
             self.update_pos(deck.geometry.act)
         
-        self.update_damage(deck)    
+        self.update_damage()    
         self.strain_energy = mat_class.strain_energy
 
     ## Records the force vector at each time step

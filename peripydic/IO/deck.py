@@ -174,10 +174,9 @@ class PD_deck():
                             
                             ## Type of damage
                             self.damage_type = "None"    
-                            if "Damage_Type" in self.doc["Material"] and not self.critical_stretch == -1:
-                                ##Damage type
+                            if "Damage_Type" in self.doc["Material"]:
                                 self.damage_type = self.doc["Material"]["Damage_Type"]
-                            else:
+                            if not "Damage_Type" in self.doc["Material"] and not self.critical_stretch == -1.:
                                 print "Error: Specify a damage type when providing a critical stretch"
                                 
                         ## List of all outputs specified in the configuration file
@@ -297,12 +296,13 @@ class DIC_deck():
                             else:
                                 self.critical_stretch = -1.
                             
-                            self.damage_type = "None" 
-                            if "Damage_Type" in self.doc["Material"] and not self.critical_stretch == -1:
-                                ##Damage type
+                            ## Type of damage
+                            self.damage_type = "None"    
+                            if "Damage_Type" in self.doc["Material"]:
                                 self.damage_type = self.doc["Material"]["Damage_Type"]
-                            else:
+                            if not "Damage_Type" in self.doc["Material"] and not self.critical_stretch == -1.:
                                 print "Error: Specify a damage type when providing a critical stretch"
+                                
                             
                         if not "Discretization" in self.doc:
                             print "Error: Specify a Discretization tag in your yaml"
