@@ -169,6 +169,8 @@ An example for an elastic material and an viscoelastic material is provided in t
 
 # License
 
-The code is licensed under the GNU General Public License v3.0 developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/).
+The code is licensed under the GNU General Public License v3.0 developed by [Ilyass Tabiai](http://iltabiai.github.io/), Rolland Delorme, and [Patrick Diehl](http://diehlpk.github.io/). Please cite our code with following [![DOI](https://zenodo.org/badge/46075533.svg)](https://zenodo.org/badge/latestdoi/46075533)
+
+
 
 Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="http://dx.doi.org/10.1016/S0022-5096(99)00029-0" rel="dct:source">http://dx.doi.org/10.1016/S0022-5096(99)00029-0</a>.
