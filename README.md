@@ -173,4 +173,4 @@ The code is licensed under the GNU General Public License v3.0 developed by [Pat
 
 
 
-Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="http://dx.doi.org/10.1016/S0022-5096(99)00029-0" rel="dct:source">http://dx.doi.org/10.1016/S0022-5096(99)00029-0</a>.
+Based on works at <a xmlns:dct="http://purl.org/dc/terms/" href="http://dx.doi.org/10.1016/S0022-5096(99)00029-0" rel="dct:source">http://dx.doi.org/10.1016/S0022-5096(99)00029-0</a> and <a xmlns:dct="http://purl.org/dc/terms/" href="https://doi.org/10.1007/s11043-017-9342-3" rel="dct:source">https://doi.org/10.1007/s11043-017-9342-3</a>.
