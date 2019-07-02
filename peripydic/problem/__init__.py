@@ -2,6 +2,6 @@
 # Provides the different materials
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrickdiehl@lsu.edu
+#@author: patrick.diehl@polymtl.ca
 
 from . import *

@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrickdiehl@lsu.edu
+#@author: patrick.diehl@polymtl.ca
 import numpy as np
 import scipy.spatial
 import sys 
