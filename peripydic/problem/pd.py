@@ -252,9 +252,9 @@ class PD_problem(abstractions.Problem):
             res = linalgebra.norm(residual)
            
             while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :
-                print "iteration", iteration , res
+                print ("iteration", iteration , res)
                 if iteration == deck.solver_max_it:
-                    print "Warning: Solver reached limit of " + str(deck.solver_max_it) + " iterations"
+                    print ("Warning: Solver reached limit of " + str(deck.solver_max_it) + " iterations")
                 delta_y = self.newton_step(deck, ysolver, t_n, deck.solver_perturbation, residual)
                 ysolver += delta_y
                 residual = self.residual_vector(deck, ysolver, t_n)
@@ -263,7 +263,7 @@ class PD_problem(abstractions.Problem):
 
                 iteration += 1
             self.y[:,:,t_n] = ysolver
-            print "t_n:" , t_n , "res:" , res , "Iteration #",iteration-1
+            print ("t_n:" , t_n , "res:" , res , "Iteration #",iteration-1)
 
     ## Store the internal force density for each node at each time step
     # @param mat_class Data from the material class
