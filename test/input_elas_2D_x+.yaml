@@ -44,4 +44,4 @@ Solver:
     Tolerance: 1.0e-3
     Jacobian_Perturbation: 1.0e-6
 Parallel:
-    Threads: 3
+    Threads: 12

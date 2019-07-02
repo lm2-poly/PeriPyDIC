@@ -4,6 +4,4 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrickdiehl@lsu.edu
 
-from .condition import *
-from .linalgebra import *
-from .neighbor import *
+from . import *
