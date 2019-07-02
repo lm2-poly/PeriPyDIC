@@ -38,7 +38,7 @@ class ConditionFromFile():
     # @return The ids read from the inFile
     def readCondition(self, inFile,volume):
         if not os.path.exists(inFile):
-            print "Error: Could not find " + inFile
+            print ("Error: Could not find " + str(inFile))
             sys.exit(1)
 
         with open(inFile, 'r') as csvfile:

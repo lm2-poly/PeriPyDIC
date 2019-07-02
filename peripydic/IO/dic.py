@@ -4,7 +4,7 @@
 #@author: patrick.diehl@polymtl.ca
 import csv
 import numpy as np
-import deck
+from . import deck
 
 ## A class for reading VIC3D CSV grid exports and converting them into list
 # objects usable by other classes
