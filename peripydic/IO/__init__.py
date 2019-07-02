@@ -4,4 +4,9 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 
-from . import *
+from .deck import *
+from .dic import *
+from .geometry import *
+from .output import *
+from .vis import *
+from .ccm import *

@@ -4,4 +4,6 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 
-from . import *
+from .dic import *
+from .pd import *
+from .energy import *

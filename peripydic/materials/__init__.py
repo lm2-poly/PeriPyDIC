@@ -4,4 +4,5 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 
-from . import *
+from .elastic import *
+from .viscoelastic import *

@@ -3,4 +3,7 @@
 #@author: rolland.delorme@polymtl.ca
 #@author: patrick.diehl@polymtl.ca
 
-from . import *
+from .problem import *
+from .materials import *
+from .util import *
+from .IO import *
