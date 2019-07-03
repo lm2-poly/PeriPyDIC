@@ -32,11 +32,11 @@ class DICreader2D():
     def read(self, path):
         ## Total number of points in the DIC CSV file
         self.length = 0
-        with open(path, 'rb') as csvfile:
+        with open(path, 'r') as csvfile:
             csvreader = csv.reader(csvfile, delimiter=',')
             next(csvreader, None)
             for row in csvreader:
-                self.data.append(np.array(map(float, row)))
+                self.data.append(np.array(list(map(float, row))))
                 self.length += 1
 
     ## Find unique values for x
