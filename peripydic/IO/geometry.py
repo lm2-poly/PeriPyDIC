@@ -17,7 +17,7 @@ class Geometry():
     def readNodes(self,dim,inFile):
 
         if not os.path.exists(inFile):
-                print "Error: Could not find " + inFile
+                print ("Error: Could not find " + inFile)
                 sys.exit(1)
         ##Dimension of the problem
         self.dim = dim
