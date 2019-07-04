@@ -8,5 +8,5 @@ setup(name='PeriPyDIC',
       url='https://github.com/lm2-poly/PeriPyDIC',
       keywords='material science, peridynamics, digital image correlation',
       license='GPL-3.0',
-      packages=find_namespace_packages(),
+      packages=find_namespace_packages(where="./"),
       zip_safe=False)
