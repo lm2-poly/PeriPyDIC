@@ -32,6 +32,16 @@ problem = PD_problem(deck)
    * `doxygen`
    * `dot`
 
+### Installation
+
+    
+```bash
+virtualenv pddic
+source pddic/binactivate
+pip install -r requirements.txt
+python setup.py install
+```
+
 ## Usage
 ```bash
 python pd_dic.py -i input.yaml -t pd   

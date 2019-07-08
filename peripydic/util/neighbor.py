@@ -36,7 +36,7 @@ class NeighborSearch():
         ## Adjaceny list
         self.family = []
         for i in range(0,len(ids)):
-            self.family.append(np.array(filter(lambda x: x != i, np.array(filter(lambda x: x < deck.num_nodes, ids[i])))))
+            self.family.append(np.array(list(filter(lambda x: x != i, np.array(list(filter(lambda x: x < deck.num_nodes, ids[i])))))))
             tmp = len(self.family[i])
             if tmp > self.max_neighbors:
                 self.max_neighbors = tmp
