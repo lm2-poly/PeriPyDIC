@@ -73,6 +73,8 @@ class Elastic_material():
                     self.dilatation[i] += (1. / self.Weighted_Volume[i]) * functions.w(data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                 if deck.dim == 2:
+                    if self.Weighted_Volume[i] == 0:
+                        print(self.Weighted_Volume[i],i,p)
                     self.dilatation[i] += (2. / self.Weighted_Volume[i]) * self.factor2d * functions.w(data_solver, X, deck.influence_function) * linalgebra.norm(X) * self.e[i,n] * self.Volume_Correction[i,n] * deck.geometry.volumes[p]
 
                 if deck.dim == 3:
