@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
 import sys
 import numpy as np
 from scipy import linalg
