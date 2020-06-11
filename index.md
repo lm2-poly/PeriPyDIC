@@ -7,7 +7,7 @@ The code is written for the following usage:
 * State-based Peridynamic forces and energy computations out of real displacements obtained from Digital Image Correlation, for the case of an elastic or viscoelastic material
 
 ### Authors 
-The code is developed by Ilyass Tabiai (@ilyasst), Rolland Delorme (@rollanddelorme) and Patrick Diehl (@diehlpk). The code for the package is developed at the _Laboratory of Multiscale Mechanics_, _École Polytechnique Montréal_, Montréal, QC, Canada.
+The code is developed by Ilyass Tabiai (@ilyasst), Rolland Delorme (@rollanddelorme) and Patrick Diehl (@diehlpk). The code for the package is developed at the _Laboratory of Multiscale Mechanics_, _École Polytechnique Montréal_, Montréal, QC, Canada and the _Center of Computation & Technology_, _Louisiana State University_, Baton Rouge, LA, USA.
 
 ### Publications related to the code
 
