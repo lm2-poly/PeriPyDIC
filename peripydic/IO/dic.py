@@ -59,25 +59,41 @@ class DICreader2D():
         ## Strain from DIC
         self.strain = np.zeros((self.length,3))
 
-        for i in range(0, len(self.data)):
-            # Remove values for which the confidence is -1.0
-            if self.data[i][self.sigma_column] == -1.:
-                pass
-            else:
+        if deck.filetype == "VIC3D":
+            for i in range(0, len(self.data)):
+                # Remove values for which the confidence is -1.0
+                if self.data[i][self.sigma_column] == -1.:
+                    pass
+                else:
 
-                self.x[i] = self.data[i][0]
+                    self.x[i] = self.data[i][0]
+                    if self.dim == 2:
+                        self.y[i] = self.data[i][1]
+
+                    dx[i] = self.data[i][3]
+                    if self.dim == 2:
+                        dy[i] = self.data[i][4]
+
+                    self.strain[i][0] = self.data[i][6]
+                    self.strain[i][1] = self.data[i][7]
+                    self.strain[i][2] = self.data[i][8]
+
+                    self.volumes[i] = deck.dic_volume
+
+        if deck.filetype == "mudic":
+
+            for i in range(0, len(self.data)):
+                self.x[i] = self.data[i][1]
                 if self.dim == 2:
-                    self.y[i] = self.data[i][1]
-
+                    self.y[i] = self.data[i][2]
+                
                 dx[i] = self.data[i][3]
                 if self.dim == 2:
                     dy[i] = self.data[i][4]
 
-                self.strain[i][0] = self.data[i][6]
-                self.strain[i][1] = self.data[i][7]
-                self.strain[i][2] = self.data[i][8]
-
-                self.volumes[i] = deck.dic_volume
+                self.strain[i][0] = self.data[i][8]
+                self.strain[i][1] = self.data[i][0]
+                self.strain[i][2] = self.data[i][10]
 
         del self.data
         ## Nodes initial positions
@@ -90,3 +106,4 @@ class DICreader2D():
         self.act[:,0] = self.x + dx
         if self.dim == 2:
             self.act[:,1] = self.y + dy
+

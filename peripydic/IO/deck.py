@@ -340,6 +340,12 @@ class DIC_deck():
                                     ## Filename of the input file
                                     self.filename = self.doc["Data"]["File"]["Name"]
 
+                                if not "Type" in self.doc["Data"]["File"]:
+                                    print ("Error: No Type tag found")
+                                    sys.exit(1)
+                                else:
+                                    self.filetype = self.doc["Data"]["File"]["Type"]
+
                                 if not "Path" in self.doc["Data"]["File"]:
                                     print ("Error: No Path tag found")
                                     sys.exit(1)
@@ -352,6 +358,7 @@ class DIC_deck():
                                     self.num_nodes = len(self.geometry.nodes)
                                     ## Minimal nodal spacing
                                     self.delta_X = self.geometry.delta_x
+                                
 
                         ## Amount of time steps
                         self.time_steps = 2
