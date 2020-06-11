@@ -25,7 +25,7 @@ class PD_deck():
             else:
                 with open(inputFile,'r') as f:
                     ## Container of the tags parsed from the yaml file
-                    self.doc = yaml.load(f)
+                    self.doc = yaml.load(f, Loader=yaml.FullLoader)
                     ## Safety factor for the computation of the radius
                     self.safety_factor = 1.001
                     ## Number of threads
@@ -237,7 +237,7 @@ class DIC_deck():
             else:
                 with open(inputFile,'r') as f:
                     ## Container of the tags parsed from the yaml file
-                    self.doc = yaml.load(f)
+                    self.doc = yaml.load(f, Loader=yaml.FullLoader)
                     if not "Material" in self.doc:
                         print ("Error: Specify a Material tag in your yaml")
                         sys.exit(1)
