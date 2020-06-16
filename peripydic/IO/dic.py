@@ -5,6 +5,7 @@
 import csv
 import numpy as np
 from . import deck
+import matplotlib.pyplot as plt
 
 ## A class for reading VIC3D CSV grid exports and converting them into list
 # objects usable by other classes
@@ -92,7 +93,7 @@ class DICreader2D():
                     dy[i] = self.data[i][4]
 
                 self.strain[i][0] = self.data[i][8]
-                self.strain[i][1] = self.data[i][0]
+                self.strain[i][1] = self.data[i][9]
                 self.strain[i][2] = self.data[i][10]
 
         del self.data
