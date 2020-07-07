@@ -89,14 +89,16 @@ class DICreader2D():
                     self.y[i] = self.data[i][2]
                 
                 dx[i] = self.data[i][4]
+
                 if self.dim == 2:
                     dy[i] = self.data[i][5]
-
-                self.strain[i][0] = self.data[i][9]
-                self.strain[i][1] = self.data[i][10]
-                self.strain[i][2] = self.data[i][11]
-
+                    
                 self.volumes[i] = self.data[i][3]
+
+                self.strain[i][0] = self.data[i][8]
+                self.strain[i][1] = self.data[i][9]
+                self.strain[i][2] = self.data[i][10]
+
 
         del self.data
         ## Nodes initial positions
