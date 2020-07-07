@@ -11,7 +11,7 @@ Data:
 Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
-    Saftety_Factor: 1.1
+    Safety_Factor: 1.1
 Output:
     VTK:
         Path: ./outDIC/

@@ -295,13 +295,9 @@ class DIC_deck():
                             else:
                                 ## Influence function
                                 self.influence_function = self.doc["Discretization"]["Influence_Function"]
-                            if "Saftety_Factor" in self.doc["Discretization"]:
+                            if "Safety_Factor" in self.doc["Discretization"]:
                                 self.safety_factor = float(self.doc["Discretization"]["Safety_Factor"])
-                            if not "Volume" in self.doc["Discretization"]:
-                                print ("Error: No Volume tag found in Discretization")
-                                sys.exit(1)
-                            else:
-                                ## Volume of a DIC node
+                            if "Volume" in self.doc["Discretization"]:
                                 self.dic_volume = float(self.doc["Discretization"]["Volume"])
 
                         if not "Data" in self.doc:

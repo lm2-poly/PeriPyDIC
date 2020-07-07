@@ -4,5 +4,5 @@
 #@author: patrickdiehl@lsu.edu
 from peripydic import *
 
-dic_deck = DIC_deck("./examples/input_DIC_2d.yaml")
+dic_deck = DIC_deck("./examples/dic/input_DIC_2d.yaml")
 #DICreader2D(deck)
