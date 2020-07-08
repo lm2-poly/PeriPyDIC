@@ -296,7 +296,7 @@ class DIC_deck():
                                 ## Influence function
                                 self.influence_function = self.doc["Discretization"]["Influence_Function"]
                             if "Saftety_Factor" in self.doc["Discretization"]:
-                                self.safety_factor = float(self.doc["Discretization"]["Safety_Factor"])
+                                self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
 
                         if not "Data" in self.doc:
                             print ("Error: Specify a Data tag in your yaml")
