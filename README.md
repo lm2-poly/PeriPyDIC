@@ -42,6 +42,14 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
+### Testing
+
+```bash
+cd tools
+./run_tests_1D.sh 
+./run_tests_2D.sh
+```
+
 ## Usage
 ```bash
 python pd_dic.py -i input.yaml -t pd   
