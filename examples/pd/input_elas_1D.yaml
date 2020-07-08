@@ -3,7 +3,7 @@ Discretization:
     Final_Time: 1.0
     Time_Steps: 1
     Horizon_Factor_m_value: 1.0
-    Influence_Function: EXP
+    Influence_Function: ONE
     File: 
         Name: geometry_1D.csv
 Material:
@@ -32,22 +32,6 @@ Boundary:
             - 1.0
             - 1.0
             - 1.0
-Output:
-    CSV:
-        Type:
-            - Position
-        File:
-            - nodes_positions_dx0_50.csv
-    VTK:
-        Path: ./out1/
-        Type:
-            - Displacement
-            - Neighbors
-            - Force
-            - Conditions
-            - Strain
-            - Stress
-        Slice: 1
 Solver:
     Max_Iteration: 100
     Tolerance: 1.0e-6

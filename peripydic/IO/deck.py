@@ -296,13 +296,7 @@ class DIC_deck():
                                 ## Influence function
                                 self.influence_function = self.doc["Discretization"]["Influence_Function"]
                             if "Saftety_Factor" in self.doc["Discretization"]:
-                                self.safety_factor = float(self.doc["Discretization"]["Safety_Factor"])
-                            if not "Volume" in self.doc["Discretization"]:
-                                print ("Error: No Volume tag found in Discretization")
-                                sys.exit(1)
-                            else:
-                                ## Volume of a DIC node
-                                self.dic_volume = float(self.doc["Discretization"]["Volume"])
+                                self.safety_factor = float(self.doc["Discretization"]["Saftety_Factor"])
 
                         if not "Data" in self.doc:
                             print ("Error: Specify a Data tag in your yaml")
@@ -358,6 +352,13 @@ class DIC_deck():
                                     self.num_nodes = len(self.geometry.nodes)
                                     ## Minimal nodal spacing
                                     self.delta_X = self.geometry.delta_x
+
+                                if not "Volume" in self.doc["Discretization"] and self.filetype == "vic3d":
+                                    print ("Error: No Volume tag found in Discretization which is needed VIC3D")
+                                    sys.exit(1)
+                                else:
+                                    ## Volume of a DIC node
+                                    self.dic_volume = float(self.doc["Discretization"]["Volume"])
                                 
 
                         ## Amount of time steps

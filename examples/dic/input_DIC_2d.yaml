@@ -5,13 +5,16 @@ Material:
 Data:
     Dimension: 2
     Sigma: 16
+    Type: Plane_Stress
     File:
         Name: VIC3D_DIC.csv
         Path: ./
+        Type: vic3d
 Discretization:
     Horizon_Factor_m_value: 1.0
     Influence_Function: 1.0
     Saftety_Factor: 1.1
+    Volume: 0.79375
 Output:
     VTK:
         Path: ./outDIC/

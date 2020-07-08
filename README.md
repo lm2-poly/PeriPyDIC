@@ -42,6 +42,14 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
+### Testing
+
+```bash
+cd tools
+./run_tests_1D.sh 
+./run_tests_2D.sh
+```
+
 ## Usage
 ```bash
 python pd_dic.py -i input.yaml -t pd   
@@ -74,8 +82,10 @@ Discretization:
     Saftety_Factor: 1.001
     File:
         Name: geometry_dx0_50.csv
+        Path: ./
+        Type: mudic
 ```
-where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force with respect to the distance of the horizon and `Saftety_Factor` influences the computation of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. An example for this file is provided here:
+where `Dim` is the dimension of the node cloud, `Final_Time` the end time of the simulation, `Time_Steps` the amount of time steps, `Horizon_Factor_m_value` the m value of the horizon, `Influence_Function` the factor to scale the influence of the force with respect to the distance of the horizon and `Saftety_Factor` influences the computation of the horizon, and `Name` the file providing the node information in the CSV format with spaces as delimiter. The `path` is the path to the file in the file system. The `Type` describes if the CSV file was exported by `mudic` or `vic3d`. An example for this file is provided here:
 
 ```
 #id x y z volume
