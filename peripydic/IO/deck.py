@@ -355,6 +355,7 @@ class DIC_deck():
                                     self.num_nodes = len(self.geometry.nodes)
                                     ## Minimal nodal spacing
                                     self.delta_X = self.geometry.delta_x
+
                             self.dic_volume = 1
                             if not "Volume" in self.doc["Discretization"] and self.filetype == "vic3d":
                                 print ("Error: No Volume tag found in Discretization which is needed VIC3D")
