@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
 
 import numpy as np
 from scipy import linalg
@@ -135,9 +135,9 @@ class Energy_problem(abstractions.Problem):
         while res >= deck.solver_tolerance and iteration <= deck.solver_max_it :
             
             res = self.newton_step(deck, deck.geometry.act,p)
-            print iteration , res 
+            print (iteration , res)
             iteration += 1
             
-        print p
+        print (p)
         
         

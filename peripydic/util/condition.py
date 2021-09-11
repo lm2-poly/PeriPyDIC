@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
 import os
 import sys
 import csv
@@ -38,7 +38,7 @@ class ConditionFromFile():
     # @return The ids read from the inFile
     def readCondition(self, inFile,volume):
         if not os.path.exists(inFile):
-            print "Error: Could not find " + inFile
+            print ("Error: Could not find " + str(inFile))
             sys.exit(1)
 
         with open(inFile, 'r') as csvfile:

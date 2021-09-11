@@ -1,11 +1,11 @@
 #-*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
 import sys
 import getopt
 import numpy as np
-np.set_printoptions(precision=8, threshold='nan', suppress=True)
+np.set_printoptions(precision=8, threshold=sys.maxsize, suppress=True)
 import time
 from peripydic import *
 
@@ -19,14 +19,14 @@ def main(argv):
     types = ['pd', 'dic' , 'energy']
 
     if len(sys.argv) != 5:
-        print helptext
+        print (helptext)
         sys.exit(1)
 
     try:
         opts, args = getopt.getopt(
             argv, "hi:o:t:", ["ifile=","type="])
     except getopt.GetoptError:
-        print helptext
+        print( helptext)
         sys.exit(0)
 
     for opt, arg in opts:
@@ -45,7 +45,7 @@ def main(argv):
         elif deck.material_type == "Viscoelastic":
             simulation(deck)
         else:
-            print "Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic"
+            print ("Error in pd_dict.py: Material type unknown, please use Elastic or Viscoelastic")
 
     if typeIn == types[1]:
         deck = IO.deck.DIC_deck(inputFile)
@@ -77,26 +77,26 @@ def simulation(deck):
     if deck.vtk_writer.vtk_enabled == True:
         deck.vtk_writer.write_data(deck,pb_solver_class,ccm_class)
 
-    print "delta_x =" , deck.delta_X
-    print "Horizon =" , pb_solver_class.neighbors.horizon
+    print ("delta_x = " + str(deck.delta_X))
+    print ("Horizon = " + str(pb_solver_class.neighbors.horizon))
               
     strain_tensor = ccm_class.global_strain[:,:,deck.time_steps-1]
-    print "epsilon_tensor"
-    print strain_tensor
+    print ("epsilon_tensor")
+    print (strain_tensor)
     
     strain_longi = pb_solver_class.strain_calculation(deck, 5, 7)
-    print "strain_longi", strain_longi
+    print ("strain_longi", strain_longi)
     #print "Nodes positions = "
     #print pb_solver_class.y
 
     if deck.material_type == "Elastic":
         stress_tensor = ccm_class.global_stress[:,:,deck.time_steps-1]
-        print "stress_tensor"
-        print stress_tensor
-        print "strain_energy"
-        print pb_solver_class.strain_energy 
+        print ("stress_tensor")
+        print (stress_tensor)
+        print ("strain_energy")
+        print (pb_solver_class.strain_energy) 
 
-    print "Duration:", (time.time() - t0)/60. , "minutes"
+    print ("Duration:", (time.time() - t0)/60. , "minutes")
 
 def writeCSV(deck,problem):
     for out in deck.outputs:

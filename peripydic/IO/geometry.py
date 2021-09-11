@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
 import numpy as np
 from numpy import linalg
 import csv
@@ -17,7 +17,7 @@ class Geometry():
     def readNodes(self,dim,inFile):
 
         if not os.path.exists(inFile):
-                print "Error: Could not find " + inFile
+                print ("Error: Could not find " + inFile)
                 sys.exit(1)
         ##Dimension of the problem
         self.dim = dim

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
 
 import pkgutil
 vtk_loader = pkgutil.find_loader('vtk')
@@ -287,8 +287,17 @@ class vtk_writer():
                             array.SetTuple1(i,strain_energy[i])
                         
                         dataOut.AddArray(array)   
+
+                    if out_type == "Volume":
+                        array = vtk.vtkDoubleArray()
+                        array.SetName("Volume")
+                        array.SetNumberOfComponents(1)
+                        array.SetNumberOfTuples(num_nodes)
+
+                        for i in range(num_nodes):
+                            array.SetTuple1(i,deck.geometry.volumes[i])
                         
-                        
+                        dataOut.AddArray(array) 
 
                 writer.SetInputData(grid)
 

@@ -2,7 +2,7 @@
 # Handles the input and output
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
 
 from .deck import *
 from .dic import *

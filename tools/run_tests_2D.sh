@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 ## Tests
 cd ../test
 echo "--2D direction x+"

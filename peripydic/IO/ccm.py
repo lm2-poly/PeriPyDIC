@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #@author: ilyass.tabiai@polymtl.ca
 #@author: rolland.delorme@polymtl.ca
-#@author: patrick.diehl@polymtl.ca
+#@author: patrickdiehl@lsu.edu
+import sys
 import numpy as np
 from scipy import linalg
-np.set_printoptions(precision=8, threshold='nan')
+np.set_printoptions(precision=8, threshold=sys.maxsize)
 from ..util import functions
-import sys
 
 ## Class to compute the well-known strain and stress tensors defined in the classical continuum mechanics
 class CCM_calcul():
